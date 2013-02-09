@@ -1,0 +1,43 @@
+
+celestia is a two-dimensional cartoon space game
+
+you can build satellites and spaceships spacecraft out of parts
+spacecraft are represented as a heirarchy of parts, with a special "brain" part at the top.
+parts can be structural, propulsion, fuel, and the brain
+
+all spacecraft are persistently simulated and can be permanently destroyed
+salvaging parts is big
+
+Structural is grayscale, (0,0,0) is broken and (255,255,255) is durable
+Brain is blue circle, (0,0,0) is dead and (0,0,255) is full health
+Fuel tanks are green rectangles, (0,0,0) is empty, while (0,255,0) is full
+Engines are red triangles, (0,0,0) is throttle cut and (255,0,0) is throttle full
+
+so you start off in space by asteroids
+
+asteroids give you lots of metal and some platinum
+comets give you lots of ice and some metal
+
+metal used to make parts - fueltanks, engines, and struts
+
+ice used to make fuel - must be electrolyzed
+
+platinum used to make special parts
+
+red + green is yellow, engines + fuel = industrial parts
+red + blue is purple, engines + brain = mechatronic parts
+green + blue is cyan, fuel + brain = powerplant parts
+
+industrial parts: (yellow)
+- electrolyzer
+- refinery (turn metal into platinum + useless slag)
+
+mechatronic parts: (purple)
+- detacher
+- turntables
+
+powerplant parts: (cyan)
+- solar panels
+- nukes
+
+as expected some of these parts wouldn't go on your ship
