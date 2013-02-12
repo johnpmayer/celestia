@@ -1,20 +1,21 @@
-
 module Types where
 
-type Dimensions = 
-    { length : Float
-    , width : Float }
+-- These need to be copied into every file now (12 lines)
+type Size = 
+  { length : Float
+  , ratio  : Float }
+type Attach =
+  { offset : Float
+  , facing : Float }
+type Ship = 
+  { x      : Float 
+  , y      : Float 
+  , facing : Float
+  , struct : Structure }
 
-data Part = FuelTank Dimensions
-          | Engine Dimensions
-          | Strut Dimensions
+data Structure = Node Size Part 
 
-type Position =
-    { offsetX : Float
-    , offsetY : Float
-    , orientation : Float }
-
-data PartTree = PT Position Part [PartTree]
-
-data SpaceCraft = Brain [PartTree]
-
+data Part = Brain
+          | FuelTank
+          | Engine
+          | Beam [(Attach, Structure)]
