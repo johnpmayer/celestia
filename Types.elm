@@ -1,21 +1,43 @@
 module Types where
 
+import List
+
 -- These need to be copied into every file now (12 lines)
-type Size = 
-  { length : Float
-  , ratio  : Float }
 type Attach =
   { offset : Float
-  , facing : Float }
-type Ship = 
-  { x      : Float 
-  , y      : Float 
-  , facing : Float
-  , struct : Structure }
+  , theta : Float }
+type Position =
+  { x     : Float
+  , y     : Float
+  , theta : Float }
 
-data Structure = Node Size Part 
+modPosition : Position -> Attach -> Position
+modPosition beamPos modAtt =
+  let modX = beamPos.x + modAtt.offset * (asin beamPos.theta)
+      modY = beamPos.y + modAtt.offset * (asin beamPos.theta)
+      modTheta = beamPos.theta + modAtt.theta
+  in { x=modX, y=modY, theta=modTheta }
 
-data Part = Brain
-          | FuelTank
-          | Engine
-          | Beam [(Attach, Structure)]
+data Structure = Module Part
+               | Beam Float [(Attach, Structure)]
+
+data EngineConfig = Thrust 
+                  | TurnLeft 
+                  | TurnRight
+
+data Part = Brain { r:Float }
+          | FuelTank { l:Float, w:Float }
+          | Engine { l:Float, w:Float, config:EngineConfig }
+
+fold : 
+  (Position -> Part -> a) -> 
+  (Position -> Float -> [a] -> a) -> 
+  Position -> Structure -> a
+fold fPart fBeam pos structure = 
+  case structure of
+    (Module part) -> fPart pos part
+    (Beam length attachments) ->
+      let foldAttachment (attach, structure) =
+        fold fPart fBeam (modPosition pos attach) structure
+      in fBeam pos length $ map foldAttachment attachments
+      

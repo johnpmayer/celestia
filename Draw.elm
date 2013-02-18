@@ -1,51 +1,42 @@
 module Draw where
 
 import Types
-import List
 
 -- These need to be copied into every file now (12 lines)
-type Size = 
-  { length : Float
-  , ratio  : Float }
 type Attach =
   { offset : Float
-  , facing : Float }
-type Ship = 
-  { x      : Float 
-  , y      : Float 
-  , facing : Float
-  , struct : Structure }
+  , theta : Float }
+type Position =
+  { x     : Float
+  , y     : Float
+  , theta : Float }
 
--- local type
-type Placement =
-  { x      : Float
-  , y      : Float
-  , facing : Float }
+angleToTurn : Float -> Float
+angleToTurn theta = theta / (2 * pi)
 
-
-drawAttachedPart : Placement -> (Attach,Structure) -> [Form]
-drawAttachedPart beamPos (attach, struct) =
-  let theta  = 2 * pi * beamPos.facing
-      x      = attach.offset * cos theta
-      y      = attach.offset * sin theta
-      facing = attach.facing
-  in drawPart { x=x, y=y, facing=facing } struct
-
-drawPart : Placement -> Structure -> [Form]
-drawPart pos (Node size part) = 
+drawPart : Position -> Part -> [Form]
+drawPart pos part =
   let local = case part of
-    Brain        -> [ filled blue $ 
-                      circle size.length (0,0) ]
-    FuelTank     -> [ filled green $ 
-                      rect size.length (size.length * size.ratio) (0,0) ]
-    Engine       -> [ rotate 0.5 . filled red $ 
-                      ngon 3 size.length (0,0) ]
-    (Beam pairs) -> (( move (size.length/2) 0 . outlined gray $
-                       rect size.length (size.length * size.ratio) (0,0))
-                       :: concatMap (drawAttachedPart pos) pairs)
-  in map ((move pos.x pos.y) . (rotate pos.facing)) local
+    (Brain size) -> 
+      filled blue $ circle size.r (pos.x,pos.y)
+    (FuelTank size) -> 
+      filled green $ rect size.w size.l (pos.x,pos.y)
+    (Engine size) -> 
+      rotate 0.5 .
+      filled red $ ngon 3 size.l (pos.x,pos.y)
+  in  [ rotate (angleToTurn pos.theta) local ]
 
-drawShip : Ship -> [Form]
-drawShip ship = 
-  let placement = { x=ship.x, y=ship.y, facing=ship.facing }
-  in drawPart placement ship.struct
+drawBeam : Position -> Float -> [[Form]] -> [Form]
+drawBeam pos beamL subStructureForms =
+  let beamCenter = modPosition pos {  offset=beamL/2,
+                                      theta=pos.theta }
+      beamW = beamL * 0.05
+      beamForm = 
+        rotate (angleToTurn beamCenter.theta) .
+        filled black $ rect beamL beamW (pos.x,pos.y)
+  in beamForm :: concat subStructureForms
+
+drawStructure : Position -> Structure -> [Form]
+drawStructure pos structure =
+  fold drawPart drawBeam pos structure
+
