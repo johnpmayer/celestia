@@ -28,12 +28,13 @@ drawPart pos part =
 
 drawBeam : Position -> Float -> [[Form]] -> [Form]
 drawBeam pos beamL subStructureForms =
-  let beamCenter = modPosition pos {  offset=beamL/2,
+  let beamCenter = modPosition pos {  offset=(beamL/2),
                                       theta=pos.theta }
       beamW = beamL * 0.05
       beamForm = 
-        rotate (angleToTurn beamCenter.theta) .
-        filled black $ rect beamL beamW (pos.x,pos.y)
+        rotate (angleToTurn pos.theta) .
+        filled black $ 
+          rect beamL beamW (beamCenter.x,beamCenter.y)
   in beamForm :: concat subStructureForms
 
 drawStructure : Position -> Structure -> [Form]

@@ -13,8 +13,8 @@ type Position =
 
 modPosition : Position -> Attach -> Position
 modPosition beamPos modAtt =
-  let modX = beamPos.x + modAtt.offset * (asin beamPos.theta)
-      modY = beamPos.y + modAtt.offset * (asin beamPos.theta)
+  let modX = beamPos.x + modAtt.offset * (cos beamPos.theta)
+      modY = beamPos.y + modAtt.offset * (sin beamPos.theta)
       modTheta = beamPos.theta + modAtt.theta
   in { x=modX, y=modY, theta=modTheta }
 
@@ -38,6 +38,12 @@ fold fPart fBeam pos structure =
     (Module part) -> fPart pos part
     (Beam length attachments) ->
       let foldAttachment (attach, structure) =
-        fold fPart fBeam (modPosition pos attach) structure
+        let subPos = modPosition pos attach
+        in fold fPart fBeam subPos structure
       in fBeam pos length $ map foldAttachment attachments
-      
+
+getParts : Position -> Structure -> [(Position, Part)]
+getParts =
+  let fPart pos part = [(pos,part)]
+      fBeam _ _ subPartLists = concat subPartLists
+  in fold fPart fBeam
