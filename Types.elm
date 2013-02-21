@@ -27,7 +27,7 @@ data EngineConfig = Thrust
 
 data Part = Brain { r:Float }
           | FuelTank { l:Float, w:Float }
-          | Engine { l:Float, w:Float, config:EngineConfig }
+          | Engine { r:Float, config:EngineConfig }
 
 fold : 
   (Position -> Part -> a) -> 

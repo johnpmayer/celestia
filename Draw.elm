@@ -20,17 +20,18 @@ drawPart pos part =
     (Brain size) -> 
       filled blue $ circle size.r (pos.x,pos.y)
     (FuelTank size) -> 
+      rotate 0.25 .
       filled green $ rect size.w size.l (pos.x,pos.y)
     (Engine size) -> 
       rotate 0.5 .
-      filled red $ ngon 3 size.l (pos.x,pos.y)
+      filled red $ ngon 3 size.r (pos.x,pos.y)
   in  [ rotate (angleToTurn pos.theta) local ]
 
 drawBeam : Position -> Float -> [[Form]] -> [Form]
 drawBeam pos beamL subStructureForms =
   let beamCenter = modPosition pos {  offset=(beamL/2),
                                       theta=pos.theta }
-      beamW = beamL * 0.05
+      beamW = beamL * 0.15
       beamForm = 
         rotate (angleToTurn pos.theta) .
         filled black $ 
