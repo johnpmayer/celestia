@@ -1,6 +1,6 @@
 module Types where
 
-import List
+--import List
 
 -- These need to be copied into every file now (12 lines)
 type Attach =

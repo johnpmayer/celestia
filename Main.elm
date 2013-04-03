@@ -1,5 +1,7 @@
 module Main where
 
+import Graphics.Collage
+
 import Draw
 import Types
 

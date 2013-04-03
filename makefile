@@ -1,13 +1,13 @@
 
-all: site
+all: Main.html
 
 SOURCES=*.elm
 
-build:
-	mkdir -p build
+elm-runtime.js:
+	cp /home/mayerjoh/.cabal/share/Elm-0.8/elm-runtime.js .
 
-site: build build/elm-runtime.js ${SOURCES}
-	elm --output-directory=build --runtime=elm-runtime.js --make Main.elm
+Main.html: elm-runtime.js ${SOURCES}
+	elm --runtime elm-runtime.js Main.elm 
 
-build/elm-runtime.js: build
-	cp ~/workspace/Elm/elm/elm-runtime-0.7.2.js build/elm-runtime.js
+clean:
+	rm *js *html
