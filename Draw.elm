@@ -1,5 +1,7 @@
 module Draw where
 
+import Graphics.Geometry
+
 import Types
 
 -- These need to be copied into every file now (12 lines)
