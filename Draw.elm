@@ -1,10 +1,12 @@
 module Draw where
 
+import Graphics.Collage
 import Graphics.Geometry
+import Graphics.Matrix as M
 
 import Types
 
--- These need to be copied into every file now (12 lines)
+-- Import Types Aliases
 type Attach =
   { offset : Float
   , theta : Float }
@@ -13,34 +15,31 @@ type Position =
   , y     : Float
   , theta : Float }
 
-angleToTurn : Float -> Float
-angleToTurn theta = theta / (2 * pi)
-
-drawPart : Position -> Part -> [Form]
-drawPart pos part =
-  let local = case part of
+drawPart : Part -> Form
+drawPart part =
+  case part of
     (Brain size) -> 
-      filled blue $ circle size.r (pos.x,pos.y)
+      filled blue $ circle size.r 
     (FuelTank size) -> 
-      rotate 0.25 .
-      filled green $ rect size.w size.l (pos.x,pos.y)
+      filled green $ rect size.w size.l 
     (Engine size) -> 
-      rotate 0.5 .
-      filled red $ ngon 3 size.r (pos.x,pos.y)
-  in  [ rotate (angleToTurn pos.theta) local ]
+      rotate 0.5 . filled red $ ngon 3 size.r 
 
-drawBeam : Position -> Float -> [[Form]] -> [Form]
-drawBeam pos beamL subStructureForms =
-  let beamCenter = modPosition pos {  offset=(beamL/2),
-                                      theta=pos.theta }
-      beamW = beamL * 0.15
-      beamForm = 
-        rotate (angleToTurn pos.theta) .
-        filled black $ 
-          rect beamL beamW (beamCenter.x,beamCenter.y)
-  in beamForm :: concat subStructureForms
+drawAttachment : (Attach, Structure) -> Form
+drawAttachment ({offset,theta}, structure) =
+  let modelM = M.rotate theta (M.move 0 offset (M.identity))
+      subForm = drawStructure structure
+  in groupTransform modelM [subForm]
 
-drawStructure : Position -> Structure -> [Form]
-drawStructure pos structure =
-  fold drawPart drawBeam pos structure
+drawBeam : Float -> [(Attach, Structure)] -> Form
+drawBeam length attachments =
+  let width = length * 0.05
+      beamForm = filled gray $ rect width length
+  in group (beamForm :: map drawAttachment attachments) 
+
+drawStructure : Structure -> Form
+drawStructure structure =
+  case structure of
+    Module part -> drawPart part
+    Beam length attachments -> drawBeam length attachments
 
