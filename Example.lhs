@@ -1,8 +1,11 @@
 websockets example
 
+> {-# LANGUAGE OverloadedStrings #-}
+
+> module Main where
+
 This is the Haskell implementation of the example for the WebSockets library. We implement a simple multi-user chat program. A live demo of the example is available here. In order to understand this example, keep the reference nearby to check out the functions we use.
 
-> {-# LANGUAGE OverloadedStrings #-}
 > import Data.Char (isPunctuation, isSpace)
 > import Data.Monoid (mappend)
 > import Data.Text (Text)

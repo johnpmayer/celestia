@@ -1,7 +1,7 @@
 
 ELM=elm --runtime elm-runtime.js
 
-all: example WS.html
+all: example WS.html Ship.o
 
 SOURCES=Draw.elm  Main.elm  Physics.elm  Types.elm
 
@@ -17,5 +17,8 @@ WS.html: elm-runtime.js WS.elm
 example: Example.lhs
 	ghc --make Example.lhs -o example
 
+Ship.o: Ship.hs
+	ghc Ship.hs
+
 clean:
-	rm *js *html
+	rm -f *.js *.html *.hi *.o

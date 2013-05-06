@@ -8,20 +8,20 @@ A tagged rose tree has 3 types
 2) Tags for each child of an internal node (!)
 3) Leaves
 
-> data TaggedRoseTree nodeTag edgeTag leaf
+> data TaggedRoseTree leaf nodeTag edgeTag
 >   = Leaf leaf
->   | Node nodeTag [(edgeTag, TaggedRoseTree nodeTag edgeTag leaf)]
+>   | Node nodeTag [(edgeTag, TaggedRoseTree leaf nodeTag edgeTag)]
 
 The type of the fold corresponds to the constructors
 
 > foldTaggedRoseTree ::
+>   (leaf -> a) -> 
 >   (nodeTag -> [a] -> a) ->
 >   (edgeTag -> a -> a) ->
->   (leaf -> a) -> 
->   TaggedRoseTree nodeTag edgeTag leaf -> a
+>   TaggedRoseTree leaf nodeTag edgeTag -> a
 
-> foldTaggedRoseTree fNode fEdge fLeaf tree =
->   let y = foldTaggedRoseTree fNode fEdge fLeaf
+> foldTaggedRoseTree fLeaf fNode fEdge tree =
+>   let y = foldTaggedRoseTree fLeaf fNode fEdge
 >       fChild (edgeTag, child) = fEdge edgeTag $ y child
 >   in case tree of
 >     Leaf leaf -> fLeaf leaf
