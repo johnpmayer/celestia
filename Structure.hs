@@ -2,30 +2,37 @@
 {-# Options -Wall -Werror #-}
 {-# LANGUAGE DataKinds, TypeOperators #-}
 
-module Ship where
+module Structure where
 
 import TaggedRoseTree
 
 import Data.Vinyl
 
-{- Bunch of fields used -}
+{- Fields -}
 
 length :: "length" ::: Double
-length = Field :: "length" ::: Double
+length = Field
+
 width :: "width" ::: Double
-width = Field :: "width" ::: Double
+width = Field
+
 radius :: "radius" ::: Double
-radius = Field :: "radius" ::: Double
+radius = Field
+
 offset :: "offset" ::: Double
-offset = Field :: "offset" ::: Double
+offset = Field
+
 angle :: "angle" ::: Double
-angle = Field :: "angle" ::: Double
+angle = Field
+
 x :: "x" ::: Double
-x = Field :: "x" ::: Double
+x = Field
+
 y :: "y" ::: Double
-y = Field :: "y" ::: Double
+y = Field
+
 mass :: "mass" ::: Double
-mass = Field :: "mass" ::: Double
+mass = Field
 
 {- Structure definition -}
 
