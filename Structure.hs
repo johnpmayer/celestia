@@ -1,6 +1,7 @@
 
 {-# Options -Wall -Werror #-}
 {-# LANGUAGE DataKinds, TypeOperators #-}
+{-# LANGUAGE FlexibleContexts #-}
 
 module Structure where
 
@@ -8,7 +9,7 @@ import TaggedRoseTree
 
 import Data.Vinyl
 
-{- Fields -}
+{- Basic Fields -}
 
 length :: "length" ::: Double
 length = Field
@@ -25,19 +26,13 @@ offset = Field
 angle :: "angle" ::: Double
 angle = Field
 
-x :: "x" ::: Double
-x = Field
+group :: "group" ::: Int
+group = Field
 
-y :: "y" ::: Double
-y = Field
-
-mass :: "mass" ::: Double
-mass = Field
-
-{- Structure definition -}
+{- Structure Types -}
 
 data Part
-  = Engine (PlainRec '[ "radius" ::: Double ])
+  = Engine (PlainRec '[ "radius" ::: Double, "group" ::: Int ])
   | FuelTank (PlainRec [ "length" ::: Double, "width" ::: Double ])
   | Processor (PlainRec '[ "radius" ::: Double ])
 
@@ -46,17 +41,43 @@ type Attach = PlainRec [ "offset" ::: Double, "angle" ::: Double ]
 
 type Structure = TaggedRoseTree Part Beam Attach
 
-{- Getting the Center of Mass -}
+{- Vectors -}
+
+x :: "x" ::: Double
+x = Field
+
+y :: "y" ::: Double
+y = Field
 
 type Vec2 = PlainRec [ "x" ::: Double, "y" ::: Double ]
 
-addVec :: Vec2 -> Vec2 -> Vec2
-addVec v1 v2 =
-  x =: (rGet x v1 + rGet x v2) <+>
-  y =: (rGet y v1 + rGet y v2)
+addVec :: 
+  (IElem ("x" ::: Double) v, IElem ("y" ::: Double) v)
+  => Vec2 -> PlainRec v -> PlainRec v
+addVec vec =
+  rMod x (+ rGet x vec) 
+  . rMod y (+ rGet y vec)
 
 sumVectors :: [Vec2] -> Vec2
 sumVectors = foldr addVec (x=:0<+>y=:0)
+
+translateAttach :: 
+  (IElem ("x" ::: Double) v, IElem ("y" ::: Double) v)
+  => Attach -> PlainRec v -> PlainRec v
+translateAttach attach = addVec $ x=:dX <+> y=:dY
+
+  where
+
+  dX :: Double
+  dX = rGet offset attach * (cos $ rGet angle attach)
+
+  dY :: Double
+  dY = rGet offset attach * (sin $ rGet angle attach)
+
+{- Getting the Center of Mass -}
+
+mass :: "mass" ::: Double
+mass = Field
 
 type PointMass = PlainRec '[
   "x" ::: Double,
@@ -78,18 +99,9 @@ beamMasses :: Beam -> [[PointMass]] -> [PointMass]
 beamMasses _beam subMasses = concat subMasses
 
 attachMasses :: Attach -> [PointMass] -> [PointMass]
-attachMasses attach subMasses = fmap trans subMasses 
+attachMasses attach subMasses = 
+  fmap (translateAttach attach) subMasses 
 
-  where
-
-  dX :: Double
-  dX = rGet offset attach * (cos $ rGet angle attach)
-
-  dY :: Double
-  dY = rGet offset attach * (sin $ rGet angle attach)
-
-  trans :: PointMass -> PointMass
-  trans = rMod x (+dX) . rMod y (+dY)
 
 structureMasses :: Structure -> [PointMass]
 structureMasses = foldTaggedRoseTree partMasses beamMasses attachMasses
@@ -114,4 +126,22 @@ centerOfMass struct = normalize . sumVectors $ contribs
     . rMod x (/totalMass) 
     . rMod y (/totalMass)
 
+{- Thrust Types -}
+
+pos :: "pos" ::: Vec2
+pos = Field
+
+force :: "force" ::: Vec2
+force = Field
+
+type Thrust = PlainRec '[ "pos" ::: Vec2, "force" ::: Vec2, "group" ::: Int ]
+
+partThrusts :: Part -> [Thrust]
+partThrusts part = case part of
+  Engine meta -> 
+    let p = x=:0 <+> y=:0
+        f = x=:0 <+> y=:0
+        g = rGet group meta
+    in [pos=:p <+> force=:f <+> group=:g]
+  _ -> []
 
