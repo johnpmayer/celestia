@@ -9,7 +9,7 @@ type TextState = {
   start : Int,
   end   : Int }
 
-(tes, msgs) = text "message" {input="Hi! I am John",start=0,end=1}
+(tes, msgs) = field "message" 
 (be, send) = button "send"
 
 transmit = sampleOn send (lift (\x -> x.input) msgs)
