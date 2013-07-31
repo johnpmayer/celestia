@@ -5,8 +5,10 @@ all: example WS.html Structure.o
 
 SOURCES=Draw.elm  Main.elm  Physics.elm  Types.elm
 
+ELM_VER=0.8.0.3
+
 elm-runtime.js:
-	cp ${HOME}/.cabal/share/Elm-0.8/elm-runtime.js .
+	cp ${HOME}/.cabal/share/Elm-${ELM_VER}/elm-runtime.js .
 
 Main.html: elm-runtime.js ${SOURCES}
 	${ELM} --make Main.elm 

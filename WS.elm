@@ -1,8 +1,8 @@
 
 module WS where
 
-import Graphics.Input
-import WebSocket
+import Graphics.Input (field, button)
+import WebSocket (connect)
 
 type TextState = {
   input : String,
@@ -12,9 +12,9 @@ type TextState = {
 (tes, msgs) = field "message" 
 (be, send) = button "send"
 
-transmit = sampleOn send (lift (\x -> x.input) msgs)
+transmit = sampleOn send msgs
 
-receive = open "ws://192.168.2.3:9160/" transmit
+receive = connect "ws://192.168.2.3:9160/" transmit
 
 display te me = flow down [te,be,me]
 
