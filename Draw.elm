@@ -21,14 +21,14 @@ drawPart part =
 
 drawAttachment : (Attach, Structure) -> Form
 drawAttachment ({offset,theta}, structure) =
-  let modelM = M.multiply (M.rotation theta) (translation 0 offset)
+  let modelM = M.multiply (translation 0 offset) (M.rotation theta)
       subForm = drawStructure structure
   in groupTransform modelM [subForm]
 
 drawBeam : Float -> [(Attach, Structure)] -> Form
 drawBeam length attachments =
   let width = length * 0.05
-      beamForm = filled gray <| rect width length
+      beamForm = move (0, length * 0.5) . filled gray <| rect width length
   in group (beamForm :: map drawAttachment attachments) 
 
 drawStructure : Structure -> Form
