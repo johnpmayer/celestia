@@ -3,7 +3,7 @@ module Physics where
 import List
 import open Types
 
-{- Center of Mass -}
+{- Mass -}
 
 sumMasses : [PointMass] -> Float
 sumMasses = sum . map (\pm -> pm.m)
@@ -23,7 +23,7 @@ partMasses part =
   in [{ x=0, y=0, m=m }]
 
 beamMasses : Beam -> [[PointMass]] -> [PointMass]
-beamMasses beam subMasses = concat subMasses
+beamMasses = cnst concat 
 
 attachMasses : Attach -> [PointMass] -> [PointMass]
 attachMasses attach = map (translateAttach attach)
@@ -39,8 +39,30 @@ centerOfMass structure =
         foldl addVec origin . map massContrib <| masses 
   in scaleVec (1 / totalMass) totalPointMass
 
-partThrust : Part -> Vec2
-partThrust p = { x=0, y=0 }
+{- Thrust -}
+
+partThrusts : [EngineConfig] -> Part -> [Thrust]
+partThrusts ecs part = 
+  case part of
+    (Engine engine) -> 
+      if any (\ec -> ec == engine.config) ecs
+      then let force = -0.15 * engine.r
+           in [ { disp = origin, force = { x = force, y = 0 } } ]
+      else [] 
+    _ -> []
+
+beamThrusts : Beam -> [[Thrust]] -> [Thrust]
+beamThrusts = cnst concat
+
+attachThrusts : Attach -> [Thrust] -> [Thrust]
+attachThrusts attach ts = 
+  let offsetDisp t = { t | disp <- addVec { x = attach.offset, y = 0 } t.disp }
+      rotateDisp t = { t | disp <- rotVec attach.theta t.disp }
+      rotateForce t = { t | force <- rotVec attach.theta t.force }
+  in map (offsetDisp . rotateDisp . rotateForce) <| ts
+
+structureThrusts : [EngineConfig] -> Structure -> [Thrust]
+structureThrusts ec = foldTagTree (partThrusts ec) beamThrusts attachThrusts
 
 -- totalThrust
 
