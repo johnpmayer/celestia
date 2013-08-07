@@ -1,10 +1,11 @@
 module Draw where
 
 import Graphics.Collage
+
 import Matrix2D (Matrix2D)
 import Matrix2D as M
 
-import Types (Part, Brain, FuelTank, Engine, Structure, Beam, Module, Attach, EngineConfig)
+import open Types 
 
 translation : Float -> Float -> Matrix2D
 translation = M.matrix 1 0 0 1
@@ -23,21 +24,19 @@ drawPart ecs part =
         then [ move (0,(0.7*size.r)) . rotate 0.5 . filled yellow <| ngon 3 (size.r * 0.7) ]
         else [])
 
-drawAttachment : [EngineConfig] -> (Attach, Structure) -> Form
-drawAttachment ec ({offset,theta}, structure) =
+drawAttach : Attach -> Form -> Form
+drawAttach {offset,theta} subForm =
   let modelM = M.multiply (translation 0 offset) (M.rotation theta)
-      subForm = drawStructure ec structure
   in groupTransform modelM [subForm]
 
-drawBeam : [EngineConfig] -> Float -> [(Attach, Structure)] -> Form
-drawBeam ec length attachments =
-  let width = length * 0.05
-      beamForm = move (0, length * 0.5) . filled gray <| rect width length
-  in group (beamForm :: map (drawAttachment ec) attachments) 
+drawBeam : Beam -> [Form] -> Form
+drawBeam beam subForms =
+  let l = beam.l
+      w = l * 0.05
+      beamForm = move (0, l * 0.5) . filled gray <| rect w l
+  in group (beamForm :: subForms)
 
 drawStructure : [EngineConfig] -> Structure -> Form
-drawStructure ec structure =
-  case structure of
-    Module part -> drawPart ec part
-    Beam length attachments -> drawBeam ec length attachments
+drawStructure ec =
+  foldTagTree (drawPart ec) drawBeam drawAttach
 

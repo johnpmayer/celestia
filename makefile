@@ -1,9 +1,9 @@
 
 ELM=elm --runtime elm-runtime.js
 
-all: example WS.html Structure.o Main.html
+all: clean WS.html Main.html
 
-SOURCES=Draw.elm  Main.elm  Physics.elm  Types.elm
+SOURCES=Draw.elm Main.elm Physics.elm Types.elm
 
 ELM_VER=0.8.0.3
 
@@ -30,4 +30,3 @@ Structure.o: Structure.hs
 clean:
 	rm -rf ElmFiles
 
-fresh: clean all

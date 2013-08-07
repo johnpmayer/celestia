@@ -2,29 +2,30 @@ module Main where
 
 import Draw (drawStructure)
 import Keyboard (wasd)
-import Types (Structure, Beam, Module, Part, Engine, Brain, FuelTank, EngineConfig, Thrust, TurnLeft, TurnRight, Attach)
+import Types (Structure, Node, Leaf, Part, Engine, Brain, FuelTank, EngineConfig, Thrust, TurnLeft, TurnRight, Attach)
+import Physics (structureCOM)
 
 attitudeL : Structure
-attitudeL = Beam 10 <|
+attitudeL = Node { l=10 } <|
   [ ( { offset=10, theta=0 }, 
-      Module <| Engine {r=5,config=TurnLeft} ) ]
+      Leaf <| Engine {r=5,config=TurnLeft} ) ]
 
 attitudeR : Structure
-attitudeR = Beam 10 <| 
+attitudeR = Node { l=10 } <| 
   [ ( { offset=10, theta=0 }, 
-      Module <| Engine {r=5,config=TurnRight} ) ]
+      Leaf <| Engine {r=5,config=TurnRight} ) ]
 
 mods : [(Attach, Structure)]
 mods = 
   [ ({ offset=45, theta=(3*pi/2) }, attitudeL)
   , ({ offset=45, theta=(pi/2) }, attitudeR)
-  , ({ offset=0, theta=0 }, Module <| Brain {r=7})
-  , ({ offset=25, theta=0 }, Module <| FuelTank {l=20,w=14})
+  , ({ offset=0, theta=0 }, Leaf <| Brain {r=7})
+  , ({ offset=25, theta=0 }, Leaf <| FuelTank {l=20,w=14})
   , ( { offset=50, theta=0 }, 
-      Module <| Engine {r=10,config=Thrust}) ]
+      Leaf <| Engine {r=10,config=Thrust}) ]
 
 simpleShip : Structure
-simpleShip = Beam 50 mods
+simpleShip = Node { l=50 } mods
 
 control : { x:Int, y:Int } -> [ EngineConfig ]
 control input = 
