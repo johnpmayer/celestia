@@ -22,26 +22,25 @@ partMasses part =
     (Engine size)   -> 2 * size.r * size.r
   in [{ x=0, y=0, m=m }]
 
-{-
-structureCOM : Position -> Structure -> Position
-structureCOM rootPos structure =
-  let parts = getParts rootPos structure
-      masses = map (\(_,part) -> partMass part) parts
-      totalM = sum masses
-      contribs = 
-        map (\(pos,part) ->
-          let mass = partMass part
-          in (pos.x * mass, pos.y * mass))
-      addcontrib (mx,my) (accx,accy) =
-        (mx + accx, my + accy)
-      (xM,yM) = foldr addcontrib (0,0) contribs
-  in { x=xM / totalM
-     , y=yM / totalM
-     , theta=rootPos.theta }
+beamMasses : Beam -> [[PointMass]] -> [PointMass]
+beamMasses beam subMasses = concat subMasses
 
-partThrust : Part -> { x:Float, y:Float }
+attachMasses : Attach -> [PointMass] -> [PointMass]
+attachMasses attach = map (translateAttach attach)
+
+structureMasses : Structure -> [PointMass]
+structureMasses = foldTagTree partMasses beamMasses attachMasses
+
+centerOfMass : Structure -> Vec2
+centerOfMass structure = 
+  let masses = structureMasses structure
+      totalMass = sumMasses masses
+      totalPointMass = 
+        foldl addVec origin . map massContrib <| masses 
+  in scaleVec (1 / totalMass) totalPointMass
+
+partThrust : Part -> Vec2
 partThrust p = { x=0, y=0 }
--}
 
 -- totalThrust
 
