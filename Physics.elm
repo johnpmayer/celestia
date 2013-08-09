@@ -1,6 +1,7 @@
 module Physics where
 
 import List
+import open Vec2
 import open Types
 
 {- Mass -}

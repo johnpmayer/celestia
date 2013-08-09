@@ -7,13 +7,13 @@ SOURCES=Draw.elm Main.elm Physics.elm Types.elm
 
 ELM_VER=0.8.0.3
 
-RUNTIME="ElmFiles/elm-runtime.js"
+RUNTIME="build/elm-runtime.js"
 
-ElmFiles:
-	mkdir -p ElmFiles
+build:
+	mkdir -p build
 
-${RUNTIME}: ElmFiles
-	cp ${HOME}/.cabal/share/Elm-${ELM_VER}/elm-runtime.js ElmFiles/
+${RUNTIME}: build
+	cp ${HOME}/.cabal/share/Elm-${ELM_VER}/elm-runtime.js build/
 
 Main.html: ${RUNTIME} ${SOURCES}
 	${ELM} --make Main.elm 
@@ -28,5 +28,5 @@ Structure.o: Structure.hs
 	ghc Structure.hs
 
 clean:
-	rm -rf ElmFiles
+	rm -rf build cache
 

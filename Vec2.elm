@@ -24,8 +24,9 @@ addVec v1 v2 =
       newY = v1.y + v2.y
   in { v2 | x <- newX, y <- newY }
 
-flip : (a -> b -> c) -> (b -> a -> c)
-flip f a b = f b a
+extractVec : Vec2Ext a -> Vec2
+extractVec v = { x = v.x, y = v.y }
 
 sumVec : [ Vec2Ext a ] -> Vec2
-sumVec = foldl (flip addVec) origin
+sumVec = foldl addVec origin . map extractVec
+

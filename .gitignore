@@ -3,4 +3,5 @@
 *.hi
 *.o
 example
-ElmFiles
+build
+cache
