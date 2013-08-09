@@ -47,7 +47,7 @@ partThrusts ecs part =
   case part of
     (Engine engine) -> 
       if any (\ec -> ec == engine.config) ecs
-      then let force = -0.15 * engine.r
+      then let force = -1.4 * engine.r
            in [ { disp = origin, force = { x = force, y = 0 } } ]
       else [] 
     _ -> []
@@ -74,3 +74,16 @@ netAcceleration ec s = scaleVec (1 / totalMass s) <| netForce ec s
 -- structureRotInertia
 
 -- totalTorque
+
+netDelta : [EngineConfig] -> Structure -> MotionDelta
+netDelta ec s = { a = netAcceleration ec s, alpha = 0 }
+
+updateMotion : MotionDelta -> MotionState -> MotionState
+updateMotion delta state = 
+  let newV : Vec2
+      newV = addVec delta.a state.v
+      midV : Vec2
+      midV = midVec state.v newV
+      newPos : Position
+      newPos = addVec midV state.pos
+  in { state | pos <- newPos, v <- newV }

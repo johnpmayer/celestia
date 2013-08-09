@@ -23,18 +23,11 @@ foldTagTree fLeaf fNode fEdge tree =
     Leaf leaf -> fLeaf leaf
     Node node subs -> fNode node <| map fChild subs
 
-type Position = 
-  { x : Float
-  , y : Float
-  , theta : Float 
-  }
+type Position = { x : Float, y : Float, theta : Float }
 
 {- Structures -}
 
-type Attach =
-  { offset : Float
-  , theta : Float 
-  }
+type Attach ={ offset : Float, theta : Float }
 
 translateAttach : Attach -> Vec2Ext a -> Vec2Ext a
 translateAttach attach vext = 
@@ -42,19 +35,14 @@ translateAttach attach vext =
       dY = attach.offset * sin attach.theta
   in addVec { x = dX, y = dY } vext
 
-type PointMass = 
-  { x : Float
-  , y : Float
-  , m : Float
-  }
+type PointMass = { x : Float, y : Float, m : Float}
 
-type Beam = 
-  { l : Float 
-  }
+type Beam = { l : Float }
 
 type Structure = TagTree Part Beam Attach
 
 data EngineConfig = Forward 
+                  | Reverse
                   | TurnLeft 
                   | TurnRight
 
@@ -62,7 +50,10 @@ data Part = Brain { r : Float }
           | FuelTank { l : Float, w : Float }
           | Engine { r : Float, config : EngineConfig }
 
-type Thrust = 
-  { disp : Vec2
-  , force : Vec2
-  }
+{- Physics -}
+
+type MotionState = { pos : Position, v : Vec2, omega : Float }
+
+type MotionDelta = { a : Vec2, alpha : Float }
+
+type Thrust = { disp : Vec2, force : Vec2 }

@@ -24,6 +24,12 @@ addVec v1 v2 =
       newY = v1.y + v2.y
   in { v2 | x <- newX, y <- newY }
 
+addVec2 : Vec2 -> Vec2 -> Vec2
+addVec2 = addVec
+
+midVec : Vec2Ext a -> Vec2Ext b -> Vec2Ext b
+midVec v1 v2 = scaleVec (1/2) <| addVec v1 v2 
+
 extractVec : Vec2Ext a -> Vec2
 extractVec v = { x = v.x, y = v.y }
 
