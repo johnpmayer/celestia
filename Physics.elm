@@ -10,10 +10,7 @@ sumMasses : [PointMass] -> Float
 sumMasses = sum . map (\pm -> pm.m)
 
 massContrib : PointMass -> Vec2
-massContrib pm = 
-  { x = pm.x * pm.m
-  , y = pm.y * pm.m
-  }
+massContrib pm = scaleVec pm.m <| extractVec pm
 
 partMasses : Part -> [PointMass]
 partMasses part = 
@@ -32,13 +29,16 @@ attachMasses attach = map (translateAttach attach)
 structureMasses : Structure -> [PointMass]
 structureMasses = foldTagTree partMasses beamMasses attachMasses
 
+totalMass : Structure -> Float
+totalMass = sumMasses . structureMasses
+
 centerOfMass : Structure -> Vec2
 centerOfMass structure = 
-  let masses = structureMasses structure
-      totalMass = sumMasses masses
-      totalPointMass = 
-        foldl addVec origin . map massContrib <| masses 
-  in scaleVec (1 / totalMass) totalPointMass
+  scaleVec (1 / totalMass structure) .
+  sumVec .
+  map massContrib .
+  structureMasses <|
+  structure
 
 {- Thrust -}
 
@@ -65,9 +65,11 @@ attachThrusts attach ts =
 structureThrusts : [EngineConfig] -> Structure -> [Thrust]
 structureThrusts ec = foldTagTree (partThrusts ec) beamThrusts attachThrusts
 
--- totalThrust
+netForce : [EngineConfig] -> Structure -> Vec2
+netForce ec s = sumVec . map .force <| structureThrusts ec s
 
--- totalAcceleration
+netAcceleration : [EngineConfig] -> Structure -> Vec2
+netAcceleration ec s = scaleVec (1 / totalMass s) <| netForce ec s
 
 -- structureRotInertia
 
