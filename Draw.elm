@@ -10,18 +10,20 @@ import open Types
 translation : Float -> Float -> Matrix2D
 translation = M.matrix 1 0 0 1
 
-drawPart : [EngineConfig] -> Part -> Form
-drawPart ecs part =
-  case part of
+drawPart : Time -> [EngineConfig] -> Part -> Form
+drawPart noise ecs part =
+  let hashedNoise = mod (truncate noise) 150
+      gasColor = rgb 255 (255 - hashedNoise) 0
+  in case part of
     (Brain size) -> 
       filled blue <| circle size.r 
     (FuelTank size) -> 
-      filled green <| rect size.w size.l 
+      filled green <| rect size.l size.w 
     (Engine engine) -> 
       group <|
         (rotate pi . filled red <| ngon 3 engine.r) ::
         (if any (\ec -> ec == engine.config) ecs
-        then [ move ((0.7*engine.r),0) . rotate pi . filled yellow <| ngon 3 (engine.r * 0.7) ]
+        then [ move ((0.4 * engine.r), 0) . rotate pi . filled gasColor <| ngon 3 (engine.r * 0.8) ]
         else [])
 
 drawAttach : Attach -> Form -> Form
@@ -36,7 +38,7 @@ drawBeam beam subForms =
       beamForm = move (l * 0.5, 0) . filled gray <| rect l w
   in group (beamForm :: subForms)
 
-drawStructure : [EngineConfig] -> Structure -> Form
-drawStructure ec =
-  foldTagTree (drawPart ec) drawBeam drawAttach
+drawStructure : Time -> [EngineConfig] -> Structure -> Form
+drawStructure noise ec =
+  foldTagTree (drawPart noise ec) drawBeam drawAttach
 

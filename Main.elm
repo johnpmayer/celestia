@@ -3,8 +3,8 @@ module Main where
 import Keyboard (wasd)
 
 import open Types 
-import Draw (drawStructure)
-import Physics (structureCOM, structureThrusts)
+import open Draw 
+import open Physics 
 
 attitudeL : Structure
 attitudeL = Node { l=10 } <|
@@ -36,14 +36,23 @@ control input =
   (if input.x > 0 then [ TurnRight ] else []) ++
   (if input.x < 0 then [ TurnLeft ] else [])
 
+engines : Signal [ EngineConfig ]
+engines = control <~ wasd
+
 position : Signal Position
 position = constant <|
   { x = 50
   , y = 50
   , theta = 0 }
 
+clock : Signal Time
+clock = fps 30
+
+frameStamp : Signal Time
+frameStamp = fst <~ timestamp clock
+
 ship : Signal Form
-ship = (\ec -> drawStructure ec simpleShip) <~ (control <~ wasd)
+ship = (drawStructure) <~ frameStamp ~ engines ~ (constant simpleShip)
 
 space : Signal Element
 space = (\ship position ->
@@ -58,7 +67,9 @@ main = (\ses -> flow down <~ combine ses) <|
   , constant . plainText <| "Ship position"
   , asText <~ position
   , constant . plainText <| "Ship Controls"
-  , asText . control <~ wasd
+  , asText <~ engines
   , constant . plainText <| "Ship thrusts (local to structure)"
-  , asText <~ (structureThrusts <~ (control <~ wasd) ~ (constant simpleShip))
+  , asText <~ (structureThrusts <~ (engines) ~ (constant simpleShip))
+  , asText <~ (netAcceleration <~ (engines) ~ (constant simpleShip))
+  , asText <~ frameStamp
   ]
