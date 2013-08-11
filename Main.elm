@@ -77,8 +77,11 @@ space = (\ship state ->
     , move (state.pos.x, state.pos.y) . rotate (state.pos.theta) <| ship
     ]) <~ ship ~ state
 
+position : [Signal Element] -> Signal Element
+position ses = flow down <~ combine ses
+
 main : Signal Element
-main = (\ses -> flow down <~ combine ses) <|
+main = position <|
   [ space 
   , constant . plainText <| "Ship position"
   , asText <~ state

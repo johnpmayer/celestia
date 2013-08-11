@@ -1,11 +1,13 @@
 
 ELM=elm --runtime elm-runtime.js
 
-all: clean WS.html Main.html
+all: build/WS.html build/Main.html cache/Server.elmo
 
-SOURCES=Draw.elm Main.elm Physics.elm Types.elm
+fresh: clean all
 
-ELM_VER=0.8.0.3
+SOURCES=*.elm
+
+ELM_VER=0.9
 
 RUNTIME="build/elm-runtime.js"
 
@@ -15,11 +17,14 @@ build:
 ${RUNTIME}: build
 	cp ${HOME}/.cabal/share/Elm-${ELM_VER}/elm-runtime.js build/
 
-Main.html: ${RUNTIME} ${SOURCES}
+build/Main.html: ${RUNTIME} ${SOURCES}
 	${ELM} --make Main.elm 
 
-WS.html: ${RUNTIME} WS.elm
+build/WS.html: ${RUNTIME} WS.elm
 	${ELM} --make WS.elm
+
+cache/Server.elmo: ${RUNTIME} Server.elm
+	${ELM} --make Server.elm
 
 example: Example.lhs
 	ghc --make Example.lhs -o example
