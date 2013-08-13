@@ -5,7 +5,9 @@ import Graphics.Collage
 import Matrix2D (Matrix2D)
 import Matrix2D as M
 
+import open Physics
 import open Types 
+import open Vec2
 
 translation : Float -> Float -> Matrix2D
 translation = M.matrix 1 0 0 1
@@ -39,6 +41,8 @@ drawBeam beam subForms =
   in group (beamForm :: subForms)
 
 drawStructure : Time -> [EngineConfig] -> Structure -> Form
-drawStructure noise ec =
-  foldTagTree (drawPart noise ec) drawBeam drawAttach
+drawStructure noise ec structure =
+  let comOffset = scaleVec -1 <| centerOfMass structure
+  in groupTransform (translation comOffset.x comOffset.y) <|
+    [ foldTagTree (drawPart noise ec) drawBeam drawAttach structure ]
 

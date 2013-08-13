@@ -1,13 +1,15 @@
 
 ELM=elm --runtime elm-runtime.js
 
-all: build/WS.html build/Main.html cache/Server.elmo
+all: build/WS.html build/Main.html 
+
+server: cache/Server.elmo
 
 fresh: clean all
 
 SOURCES=*.elm
 
-ELM_VER=0.9
+ELM_VER=$(shell ghc-pkg latest Elm)
 
 RUNTIME="build/elm-runtime.js"
 
@@ -15,7 +17,7 @@ build:
 	mkdir -p build
 
 ${RUNTIME}: build
-	cp ${HOME}/.cabal/share/Elm-${ELM_VER}/elm-runtime.js build/
+	cp ${HOME}/.cabal/share/${ELM_VER}/elm-runtime.js build/
 
 build/Main.html: ${RUNTIME} ${SOURCES}
 	${ELM} --make Main.elm 

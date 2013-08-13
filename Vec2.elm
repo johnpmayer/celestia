@@ -24,6 +24,9 @@ addVec v1 v2 =
       newY = v1.y + v2.y
   in { v2 | x <- newX, y <- newY }
 
+subVec : Vec2Ext a -> Vec2Ext b -> Vec2Ext b
+subVec v1 = addVec <| scaleVec (-1) v1
+
 addVec2 : Vec2 -> Vec2 -> Vec2
 addVec2 = addVec
 
@@ -36,3 +39,9 @@ extractVec v = { x = v.x, y = v.y }
 sumVec : [ Vec2Ext a ] -> Vec2
 sumVec = foldl addVec origin . map extractVec
 
+magnitude : Vec2Ext a -> Float
+magnitude v = sqrt <| v.x * v.x + v.y * v.y
+
+crossVecMag : Vec2Ext a -> Vec2Ext a -> Float
+crossVecMag v1 v2 =
+  v1.x * v2.y - v1.y * v2.x

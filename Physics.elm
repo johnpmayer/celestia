@@ -40,6 +40,19 @@ centerOfMass structure =
   structureMasses <|
   structure
 
+rotInertiaContrib : PointMass -> Float
+rotInertiaContrib pm =
+  let r = magnitude pm
+  in pm.m * r * r
+
+rotInertia : Structure -> Float
+rotInertia structure = 
+  sum .
+  map rotInertiaContrib .
+  map (subVec <| centerOfMass structure) .
+  structureMasses <|
+  structure
+
 {- Thrust -}
 
 partThrusts : [EngineConfig] -> Part -> [Thrust]
@@ -71,19 +84,32 @@ netForce ec s = sumVec . map .force <| structureThrusts ec s
 netAcceleration : [EngineConfig] -> Structure -> Vec2
 netAcceleration ec s = scaleVec (1 / totalMass s) <| netForce ec s
 
--- structureRotInertia
+torqueMag : Thrust -> Float
+torqueMag t = crossVecMag t.disp t.force
 
--- totalTorque
+netTorque : [EngineConfig] -> Structure -> Float
+netTorque ec s =
+  let com = centerOfMass s
+      thrusts = structureThrusts ec s
+      center thrust = { thrust | disp <- subVec com thrust.disp }
+      torqueForces = map center thrusts
+  in sum . map torqueMag <| torqueForces 
+
+netRotAcceleration : [EngineConfig] -> Structure -> Float
+netRotAcceleration ec s = netTorque ec s / rotInertia s
 
 netDelta : [EngineConfig] -> Structure -> MotionDelta
-netDelta ec s = { a = netAcceleration ec s, alpha = 0 }
+netDelta ec s = { a = netAcceleration ec s, alpha = netRotAcceleration ec s }
 
 updateMotion : MotionDelta -> MotionState -> MotionState
 updateMotion delta state = 
-  let newV : Vec2
-      newV = addVec delta.a state.v
-      midV : Vec2
+  let newOmega = delta.alpha + state.omega
+      midOmega = (state.omega + newOmega) / 2
+      newTheta = state.pos.theta + midOmega
+      midTheta = (state.pos.theta + newTheta) / 2
+      absA = rotVec midTheta delta.a
+      newV = addVec absA state.v
       midV = midVec state.v newV
-      newPos : Position
-      newPos = addVec midV state.pos
-  in { state | pos <- newPos, v <- newV }
+      statePos = state.pos
+      newPos = addVec midV <| { statePos | theta <- newTheta }
+  in { state | pos <- newPos, v <- newV, omega <- newOmega }
