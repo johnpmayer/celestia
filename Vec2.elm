@@ -1,5 +1,7 @@
 module Vec2 where
 
+import Matrix2D (Matrix2D, matrix)
+
 {- 2D Vector -}
 
 type Vec2Ext a = { a | x : Float, y : Float }
@@ -11,6 +13,9 @@ origin = { x = 0, y = 0 }
 
 scaleVec : Float -> Vec2Ext a -> Vec2Ext a
 scaleVec a v = { v | x <- v.x * a, y <- v.y * a }
+
+negVec : Vec2Ext a -> Vec2Ext a
+negVec = scaleVec -1
 
 rotVec : Float -> Vec2Ext a -> Vec2Ext a
 rotVec theta v =
@@ -45,3 +50,6 @@ magnitude v = sqrt <| v.x * v.x + v.y * v.y
 crossVecMag : Vec2Ext a -> Vec2Ext a -> Float
 crossVecMag v1 v2 =
   v1.x * v2.y - v1.y * v2.x
+
+vecTranslate : Vec2Ext a -> Matrix2D
+vecTranslate v = matrix 1 0 0 1 v.x v.y

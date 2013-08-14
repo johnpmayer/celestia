@@ -5,8 +5,9 @@ import Mouse
 
 import open Build
 import open Draw 
-import open Types 
 import open Physics 
+import open Types 
+import open Vec2
 
 attitude : EngineConfig -> Structure
 attitude ec = Node { r=10 } <|
@@ -72,8 +73,16 @@ clock = fps 30
 frameStamp : Signal Time
 frameStamp = fst <~ timestamp clock
 
-gameForms : Signal [Form]
-gameForms = (\time es -> map (drawEntity time) es) <~ frameStamp ~ gameObjects
+camera : Signal Vec2
+camera = (extractVec . .pos) <~ state
+
+gameForms : Signal Form
+gameForms = 
+  (\time es camera -> 
+    let modelM = vecTranslate <| negVec camera
+        forms = map (drawEntity time) es
+    in groupTransform modelM forms)
+    <~ frameStamp ~ gameObjects ~ camera
 
 mode : Signal BuildMode
 mode = foldp updateMode Inactive Keyboard.lastPressed
@@ -90,12 +99,13 @@ canvasH = 300
 convertPos : (Int,Int) -> (Int,Int)
 convertPos (x,y) = (x - div canvasW 2, div canvasH 2 - y)
 
-space' : (Int,Int) -> BuildMode -> [Form] -> Element
-space' mouse mode forms = 
+space' : (Int,Int) -> BuildMode -> Form -> Element
+space' mouse mode objects = 
   (collage canvasW canvasH) <|
-    (filled black <| rect (toFloat canvasW) (toFloat canvasH)) ::
-    (construct (convertPos mouse) mode) ::
-    forms
+    [ (filled black <| rect (toFloat canvasW) (toFloat canvasH))
+    , (construct (convertPos mouse) mode)
+    , objects
+    ]
 
 space : Signal Element
 space = space' <~ Mouse.position ~ mode ~ gameForms
