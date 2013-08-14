@@ -37,11 +37,12 @@ translateAttach attach vext =
 
 type PointMass = { x : Float, y : Float, m : Float}
 
-type Beam = { l : Float }
+type Beam = { r : Float }
 
 type Structure = TagTree Part Beam Attach
 
-data EngineConfig = Forward 
+data EngineConfig = Disabled
+                  | Forward 
                   | Reverse
                   | TurnLeft 
                   | TurnRight
@@ -57,3 +58,9 @@ type MotionState = { pos : Position, v : Vec2, omega : Float }
 type MotionDelta = { a : Vec2, alpha : Float }
 
 type Thrust = { disp : Vec2, force : Vec2 }
+
+{- Build -}
+
+data BuildMode = Inactive
+               | BeamMode Beam
+               | PartMode Part

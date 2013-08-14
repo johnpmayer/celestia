@@ -35,7 +35,7 @@ drawAttach {offset,theta} subForm =
 
 drawBeam : Beam -> [Form] -> Form
 drawBeam beam subForms =
-  let l = beam.l
+  let l = beam.r
       w = l * 0.05
       beamForm = move (l * 0.5, 0) . filled gray <| rect l w
   in group (beamForm :: subForms)

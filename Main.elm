@@ -1,23 +1,25 @@
 module Main where
 
-import Keyboard (wasd)
+import Keyboard 
+import Mouse
 
-import open Types 
+import open Build
 import open Draw 
+import open Types 
 import open Physics 
 
 attitude : EngineConfig -> Structure
-attitude ec = Node { l=10 } <|
+attitude ec = Node { r=10 } <|
   [ ( { offset=10, theta=0 }, 
       Leaf <| Engine {r=4, config=ec} ) ]
 
 reverseL : Structure
-reverseL = Node { l=10 } <|
+reverseL = Node { r=10 } <|
   [ ( { offset=10, theta=(-pi/2) }, 
       Leaf <| Engine {r=4, config=Reverse} ) ]
 
 reverseR : Structure
-reverseR = Node { l=10 } <|
+reverseR = Node { r=10 } <|
   [ ( { offset=10, theta=(pi/2) }, 
       Leaf <| Engine {r=4, config=Reverse} ) ]
 
@@ -33,7 +35,7 @@ mods =
       Leaf <| Engine {r=13, config=Forward}) ]
 
 simpleShip : Signal Structure
-simpleShip = constant <| Node { l=50 } mods
+simpleShip = constant <| Node { r=50 } mods
 
 startPos : MotionState
 startPos = { pos = { x = 0, y = 0, theta = 0 }, v = { x = 0, y = 0 }, omega = 0 }
@@ -46,7 +48,7 @@ control input =
   (if input.x < 0 then [ TurnLeft ] else [])
 
 engines : Signal [ EngineConfig ]
-engines = control <~ wasd
+engines = control <~ Keyboard.wasd
 
 delta : Signal MotionDelta
 delta = sampleOn (fps 30) <| netDelta <~ engines ~ simpleShip
@@ -63,12 +65,28 @@ frameStamp = fst <~ timestamp clock
 ship : Signal Form
 ship = (drawStructure) <~ frameStamp ~ engines ~ simpleShip
 
+mode : Signal BuildMode
+mode = foldp updateMode Inactive Keyboard.lastPressed
+
+construct : (Int,Int) -> BuildMode -> Form
+construct (x,y) mode = move (toFloat x, toFloat y) <| blueprint mode
+
+canvasW : Int
+canvasW = 400
+
+canvasH : Int
+canvasH = 300
+
+convertPos : (Int,Int) -> (Int,Int)
+convertPos (x,y) = (x - div canvasW 2, div canvasH 2 - y)
+
 space : Signal Element
-space = (\ship state ->
-  collage 400 300 <|
-    [ filled black <| rect 400 300
+space = (\ship state mouse mode ->
+  collage canvasW canvasH <|
+    [ filled black <| rect (toFloat canvasW) (toFloat canvasH)
+    , construct (convertPos mouse) mode
     , move (state.pos.x, state.pos.y) . rotate (state.pos.theta) <| ship
-    ]) <~ ship ~ state
+    ]) <~ ship ~ state ~ Mouse.position ~ mode
 
 position : [Signal Element] -> Signal Element
 position ses = flow down <~ combine ses
@@ -82,4 +100,5 @@ main = position <|
   , (asText . centerOfMass) <~ simpleShip
   , constant . plainText <| "Ship thrusts (local to structure)"
   , asText <~ (netDelta <~ (engines) ~ simpleShip)
+  , asText <~ mode
   ]
