@@ -42,11 +42,11 @@ drawBeam beam subForms =
 
 drawStructure : Time -> [EngineConfig] -> Structure -> Form
 drawStructure noise ec structure =
-  let comOffset = scaleVec -1 <| centerOfMass structure
-  in groupTransform (translation comOffset.x comOffset.y) <|
-    [ foldTagTree (drawPart noise ec) drawBeam drawAttach structure ]
+  foldTagTree (drawPart noise ec) drawBeam drawAttach structure
 
 drawEntity : Time -> Entity -> Form
 drawEntity noise { controls, motion, structure } = 
-  let modelM = M.multiply (translation motion.pos.x motion.pos.y) (M.rotation motion.pos.theta)
+  let comOffset = centerOfMass structure
+      moveM = translation (motion.pos.x - comOffset.x) (motion.pos.y - comOffset.y)
+      modelM = M.multiply moveM (M.rotation motion.pos.theta)
   in groupTransform modelM <| [ drawStructure noise controls structure ]
