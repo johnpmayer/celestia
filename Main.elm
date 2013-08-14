@@ -34,8 +34,8 @@ mods =
   , ( { offset=50, theta=0 }, 
       Leaf <| Engine {r=13, config=Forward}) ]
 
-simpleShip : Signal Structure
-simpleShip = constant <| Node { r=50 } mods
+simpleShip : Structure
+simpleShip = Node { r=50 } mods
 
 startPos : MotionState
 startPos = { pos = { x = 0, y = 0, theta = 0 }, v = { x = 0, y = 0 }, omega = 0 }
@@ -51,10 +51,20 @@ engines : Signal [ EngineConfig ]
 engines = control <~ Keyboard.wasd
 
 delta : Signal MotionDelta
-delta = sampleOn (fps 30) <| netDelta <~ engines ~ simpleShip
+delta = sampleOn (fps 30) <| netDelta <~ engines ~ (constant simpleShip)
 
 state : Signal MotionState
 state = foldp updateMotion startPos delta
+
+myShip : Signal Entity
+myShip = (\engines state structure -> { controls = engines, motion = state, structure = structure }) <~ engines ~ state ~ (constant simpleShip)
+
+gameObjects : Signal [Entity]
+gameObjects = combine <| 
+  constant { controls = [], motion = { pos = { x=60,y=50,theta=1}, v = {x=0,y=0}, omega=0}, structure = simpleShip } ::
+  constant { controls = [], motion = { pos = { x=-80,y=40,theta=4}, v = {x=0,y=0}, omega=0}, structure = simpleShip } ::
+  constant { controls = [], motion = { pos = { x=120,y=-20,theta=3}, v = {x=0,y=0}, omega=0}, structure = simpleShip } ::
+  [ myShip ]
 
 clock : Signal Time
 clock = fps 30
@@ -62,8 +72,8 @@ clock = fps 30
 frameStamp : Signal Time
 frameStamp = fst <~ timestamp clock
 
-ship : Signal Form
-ship = (drawStructure) <~ frameStamp ~ engines ~ simpleShip
+gameForms : Signal [Form]
+gameForms = (\time es -> map (drawEntity time) es) <~ frameStamp ~ gameObjects
 
 mode : Signal BuildMode
 mode = foldp updateMode Inactive Keyboard.lastPressed
@@ -80,13 +90,15 @@ canvasH = 300
 convertPos : (Int,Int) -> (Int,Int)
 convertPos (x,y) = (x - div canvasW 2, div canvasH 2 - y)
 
+space' : (Int,Int) -> BuildMode -> [Form] -> Element
+space' mouse mode forms = 
+  (collage canvasW canvasH) <|
+    (filled black <| rect (toFloat canvasW) (toFloat canvasH)) ::
+    (construct (convertPos mouse) mode) ::
+    forms
+
 space : Signal Element
-space = (\ship state mouse mode ->
-  collage canvasW canvasH <|
-    [ filled black <| rect (toFloat canvasW) (toFloat canvasH)
-    , construct (convertPos mouse) mode
-    , move (state.pos.x, state.pos.y) . rotate (state.pos.theta) <| ship
-    ]) <~ ship ~ state ~ Mouse.position ~ mode
+space = space' <~ Mouse.position ~ mode ~ gameForms
 
 position : [Signal Element] -> Signal Element
 position ses = flow down <~ combine ses
@@ -96,9 +108,5 @@ main = position <|
   [ space 
   , constant . plainText <| "Ship position"
   , asText <~ state
-  , constant . plainText <| "Ship center of mass (local to structure)"
-  , (asText . centerOfMass) <~ simpleShip
-  , constant . plainText <| "Ship thrusts (local to structure)"
-  , asText <~ (netDelta <~ (engines) ~ simpleShip)
-  , asText <~ mode
   ]
+

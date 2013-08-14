@@ -46,3 +46,7 @@ drawStructure noise ec structure =
   in groupTransform (translation comOffset.x comOffset.y) <|
     [ foldTagTree (drawPart noise ec) drawBeam drawAttach structure ]
 
+drawEntity : Time -> Entity -> Form
+drawEntity noise { controls, motion, structure } = 
+  let modelM = M.multiply (translation motion.pos.x motion.pos.y) (M.rotation motion.pos.theta)
+  in groupTransform modelM <| [ drawStructure noise controls structure ]

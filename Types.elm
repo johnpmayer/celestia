@@ -53,11 +53,13 @@ data Part = Brain { r : Float }
 
 {- Physics -}
 
+type Thrust = { disp : Vec2, force : Vec2 }
+
 type MotionState = { pos : Position, v : Vec2, omega : Float }
 
 type MotionDelta = { a : Vec2, alpha : Float }
 
-type Thrust = { disp : Vec2, force : Vec2 }
+type Entity = { controls : [EngineConfig], motion : MotionState, structure : Structure }
 
 {- Build -}
 
