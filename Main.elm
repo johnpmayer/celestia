@@ -105,6 +105,7 @@ space' mouse mode objects =
     [ (filled black <| rect (toFloat canvasW) (toFloat canvasH))
     , (construct (convertPos mouse) mode)
     , objects
+    , drawBuildArea mode
     ]
 
 space : Signal Element
