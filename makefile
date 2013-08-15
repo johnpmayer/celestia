@@ -1,7 +1,7 @@
 
 ELM=elm --runtime elm-runtime.js
 
-all: build/Main.html 
+all: build/Main.html build/index.html
 
 server: cache/Server.elmo
 
@@ -18,6 +18,9 @@ ${RUNTIME}: build
 
 build/Main.html: ${RUNTIME} ${SOURCES}
 	${ELM} --make Main.elm 
+
+build/index.html: build/Main.html
+	(cd build; ln -s Main.html index.html)
 
 cache/Server.elmo: ${RUNTIME} Server.elm
 	${ELM} --make Server.elm
