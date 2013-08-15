@@ -1,0 +1,747 @@
+<!DOCTYPE HTML>
+
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>
+            Main
+        </title>
+        <script type="text/javascript" src="elm-runtime.js">
+            
+        </script>
+        <script type="text/javascript">
+            
+Elm.Main = function(elm){
+  var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Main';
+  var Text = Elm.Text(elm);
+  var Text = Elm.Text(elm);
+  var Basics = Elm.Basics(elm);
+  var Signal = Elm.Signal(elm);
+  var List = Elm.List(elm);
+  var Maybe = Elm.Maybe(elm);
+  var Time = Elm.Time(elm);
+  var Prelude = Elm.Prelude(elm);
+  var Graphics = Graphics || {};
+  Graphics.Element = Elm.Graphics.Element(elm);
+  var Color = Elm.Color(elm);
+  var Graphics = Graphics || {};
+  Graphics.Collage = Elm.Graphics.Collage(elm);
+  var Keyboard = Elm.Keyboard(elm);
+  var Mouse = Elm.Mouse(elm);
+  var Build = Elm.Build(elm);
+  var Draw = Elm.Draw(elm);
+  var Physics = Elm.Physics(elm);
+  var Types = Elm.Types(elm);
+  var Vec2 = Elm.Vec2(elm);
+  var _op = {};
+  var startPos = {
+    _:{
+    },
+    omega:0,
+    pos:{
+    _:{
+    },
+    theta:0,
+    x:0,
+    y:0},
+    v:{
+    _:{
+    },
+    x:0,
+    y:0}};
+  var reverseR = Types.Node({
+    _:{
+    },
+    r:10})(_J.toList([{ctor:"_Tuple2", _0:{
+    _:{
+    },
+    offset:10,
+    theta:(Basics.pi/2)}, _1:Types.Leaf(Types.Engine({
+    _:{
+    },
+    config:Types.Reverse,
+    r:4}))}]));
+  var reverseL = Types.Node({
+    _:{
+    },
+    r:10})(_J.toList([{ctor:"_Tuple2", _0:{
+    _:{
+    },
+    offset:10,
+    theta:((0-Basics.pi)/2)}, _1:Types.Leaf(Types.Engine({
+    _:{
+    },
+    config:Types.Reverse,
+    r:4}))}]));
+  var position = function(ses){
+    return A2(Signal._op['<~'], Graphics.Element.flow(Graphics.Element.down), Signal.combine(ses));};
+  var mode = A3(Signal.foldp, Build.updateMode, Types.Inactive, Keyboard.lastPressed);
+  var control = function(input){
+    return _L.append(((_N.cmp(input.y,0)<0) ? _J.toList([Types.Reverse]) : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'on line 46, column 4 to 43'))),_L.append(((_N.cmp(input.y,0)>0) ? _J.toList([Types.Forward]) : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'on line 47, column 4 to 43'))),_L.append(((_N.cmp(input.x,0)>0) ? _J.toList([Types.TurnRight]) : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'on line 48, column 4 to 45'))),((_N.cmp(input.x,0)<0) ? _J.toList([Types.TurnLeft]) : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'on line 49, column 4 to 44'))))));};
+  var engines = A2(Signal._op['<~'], control, Keyboard.wasd);
+  var construct = F2(function(arg2, mode){
+    return function(){
+      switch (arg2.ctor) {
+        case '_Tuple2':
+          return Graphics.Collage.move({ctor:"_Tuple2", _0:Basics.toFloat(arg2._0), _1:Basics.toFloat(arg2._1)})(Build.blueprint(mode));
+      }_E.Case($moduleName,'on line 91, column 24 to 69')}();});
+  var clock = Time.fps(30);
+  var frameStamp = A2(Signal._op['<~'], Basics.fst, Time.timestamp(clock));
+  var canvasW = 400;
+  var canvasH = 300;
+  var convertPos = function(arg1){
+    return function(){
+      switch (arg1.ctor) {
+        case '_Tuple2':
+          return {ctor:"_Tuple2", _0:(arg1._0-A2(Basics.div, canvasW, 2)), _1:(A2(Basics.div, canvasH, 2)-arg1._1)};
+      }_E.Case($moduleName,'on line 100, column 21 to 57')}();};
+  var space$ = F3(function(mouse, mode, objects){
+    return A2(Graphics.Collage.collage, canvasW, canvasH)(_J.toList([Graphics.Collage.filled(Color.black)(A2(Graphics.Collage.rect, Basics.toFloat(canvasW), Basics.toFloat(canvasH))),A2(construct, convertPos(mouse), mode),objects,Draw.drawBuildArea(mode)]));});
+  var attitude = function(ec){
+    return Types.Node({
+      _:{
+      },
+      r:10})(_J.toList([{ctor:"_Tuple2", _0:{
+      _:{
+      },
+      offset:10,
+      theta:0}, _1:Types.Leaf(Types.Engine({
+      _:{
+      },
+      config:ec,
+      r:4}))}]));};
+  var mods = _J.toList([{ctor:"_Tuple2", _0:{
+    _:{
+    },
+    offset:6,
+    theta:((3*Basics.pi)/2)}, _1:reverseL},{ctor:"_Tuple2", _0:{
+    _:{
+    },
+    offset:6,
+    theta:(Basics.pi/2)}, _1:reverseR},{ctor:"_Tuple2", _0:{
+    _:{
+    },
+    offset:42,
+    theta:((3*Basics.pi)/2)}, _1:attitude(Types.TurnLeft)},{ctor:"_Tuple2", _0:{
+    _:{
+    },
+    offset:42,
+    theta:(Basics.pi/2)}, _1:attitude(Types.TurnRight)},{ctor:"_Tuple2", _0:{
+    _:{
+    },
+    offset:0,
+    theta:0}, _1:Types.Leaf(Types.Brain({
+    _:{
+    },
+    r:7}))},{ctor:"_Tuple2", _0:{
+    _:{
+    },
+    offset:25,
+    theta:0}, _1:Types.Leaf(Types.FuelTank({
+    _:{
+    },
+    l:30,
+    w:14}))},{ctor:"_Tuple2", _0:{
+    _:{
+    },
+    offset:50,
+    theta:0}, _1:Types.Leaf(Types.Engine({
+    _:{
+    },
+    config:Types.Forward,
+    r:13}))}]);
+  var simpleShip = A2(Types.Node, {
+    _:{
+    },
+    r:50}, mods);
+  var delta = Signal.sampleOn(Time.fps(30))(A2(Signal._op['~'], A2(Signal._op['<~'], Physics.netDelta, engines), Signal.constant(simpleShip)));
+  var state = A3(Signal.foldp, Physics.updateMotion, startPos, delta);
+  var camera = A2(Signal._op['<~'], function($){
+    return Vec2.extractVec(function(_){
+      return _.pos;}($));}, state);
+  var myShip = A2(Signal._op['~'], A2(Signal._op['~'], A2(Signal._op['<~'], F3(function(engines, state, structure){
+    return {
+      _:{
+      },
+      controls:engines,
+      motion:state,
+      structure:structure};}), engines), state), Signal.constant(simpleShip));
+  var gameObjects = Signal.combine(_L.Cons(Signal.constant({
+    _:{
+    },
+    controls:_J.toList([]),
+    motion:{
+    _:{
+    },
+    omega:0,
+    pos:{
+    _:{
+    },
+    theta:1,
+    x:60,
+    y:50},
+    v:{
+    _:{
+    },
+    x:0,
+    y:0}},
+    structure:simpleShip}),_L.Cons(Signal.constant({
+    _:{
+    },
+    controls:_J.toList([]),
+    motion:{
+    _:{
+    },
+    omega:0,
+    pos:{
+    _:{
+    },
+    theta:4,
+    x:(0-80),
+    y:40},
+    v:{
+    _:{
+    },
+    x:0,
+    y:0}},
+    structure:simpleShip}),_L.Cons(Signal.constant({
+    _:{
+    },
+    controls:_J.toList([]),
+    motion:{
+    _:{
+    },
+    omega:0,
+    pos:{
+    _:{
+    },
+    theta:3,
+    x:120,
+    y:(0-20)},
+    v:{
+    _:{
+    },
+    x:0,
+    y:0}},
+    structure:simpleShip}),_J.toList([myShip])))));
+  var gameForms = A2(Signal._op['~'], A2(Signal._op['~'], A2(Signal._op['<~'], F3(function(time, es, camera){
+    return function(){
+      var modelM = Vec2.vecTranslate(Vec2.negVec(camera));
+      var forms = A2(List.map, Draw.drawEntity(time), es);
+      return A2(Graphics.Collage.groupTransform, modelM, forms);}();}), frameStamp), gameObjects), camera);
+  var space = A2(Signal._op['~'], A2(Signal._op['~'], A2(Signal._op['<~'], space$, Mouse.position), mode), gameForms);
+  var main = position(_J.toList([space,Signal.constant(Text.plainText(_str('Ship position'))),A2(Signal._op['<~'], Text.asText, state)]));
+  return elm.Main = {
+    _op : _op, 
+    attitude : attitude, 
+    reverseL : reverseL, 
+    reverseR : reverseR, 
+    mods : mods, 
+    simpleShip : simpleShip, 
+    startPos : startPos, 
+    control : control, 
+    engines : engines, 
+    delta : delta, 
+    state : state, 
+    myShip : myShip, 
+    gameObjects : gameObjects, 
+    clock : clock, 
+    frameStamp : frameStamp, 
+    camera : camera, 
+    gameForms : gameForms, 
+    mode : mode, 
+    construct : construct, 
+    canvasW : canvasW, 
+    canvasH : canvasH, 
+    convertPos : convertPos, 
+    space$ : space$, 
+    space : space, 
+    position : position, 
+    main : main};};
+Elm.Build = function(elm){
+  var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Build';
+  var Text = Elm.Text(elm);
+  var Text = Elm.Text(elm);
+  var Basics = Elm.Basics(elm);
+  var Signal = Elm.Signal(elm);
+  var List = Elm.List(elm);
+  var Maybe = Elm.Maybe(elm);
+  var Time = Elm.Time(elm);
+  var Prelude = Elm.Prelude(elm);
+  var Graphics = Graphics || {};
+  Graphics.Element = Elm.Graphics.Element(elm);
+  var Color = Elm.Color(elm);
+  var Graphics = Graphics || {};
+  Graphics.Collage = Elm.Graphics.Collage(elm);
+  var Char = Elm.Char(elm);
+  var Keyboard = Elm.Keyboard(elm);
+  var Draw = Elm.Draw(elm);
+  var Types = Elm.Types(elm);
+  var _op = {};
+  var updateMode = F2(function(key, mode){
+    return (_N.eq(key,Char.toCode('1')) ? Types.Inactive : (_N.eq(key,Char.toCode('2')) ? Types.BeamMode({
+      _:{
+      },
+      r:10}) : (_N.eq(key,Char.toCode('3')) ? Types.PartMode(Types.Brain({
+      _:{
+      },
+      r:5})) : (_N.eq(key,Char.toCode('4')) ? Types.PartMode(Types.FuelTank({
+      _:{
+      },
+      l:5,
+      w:5})) : (_N.eq(key,Char.toCode('5')) ? Types.PartMode(Types.Engine({
+      _:{
+      },
+      config:Types.Disabled,
+      r:5})) : (Basics.otherwise ? mode : _E.If($moduleName,'between lines 12 and 17')))))));});
+  var blueprint = function(mode){
+    return function(){
+      switch (mode.ctor) {
+        case 'BeamMode':
+          return A2(Draw.drawBeam, mode._0, _J.toList([]));
+        case 'Inactive':
+          return Graphics.Collage.group(_J.toList([]));
+        case 'PartMode':
+          return A3(Draw.drawPart, 0, _J.toList([]), mode._0);
+      }_E.Case($moduleName,'between lines 21 and 24')}();};
+  return elm.Build = {
+    _op : _op, 
+    updateMode : updateMode, 
+    blueprint : blueprint};};
+Elm.Draw = function(elm){
+  var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Draw';
+  var Text = Elm.Text(elm);
+  var Text = Elm.Text(elm);
+  var Basics = Elm.Basics(elm);
+  var Signal = Elm.Signal(elm);
+  var List = Elm.List(elm);
+  var Maybe = Elm.Maybe(elm);
+  var Time = Elm.Time(elm);
+  var Prelude = Elm.Prelude(elm);
+  var Graphics = Graphics || {};
+  Graphics.Element = Elm.Graphics.Element(elm);
+  var Color = Elm.Color(elm);
+  var Graphics = Graphics || {};
+  Graphics.Collage = Elm.Graphics.Collage(elm);
+  var Graphics = Graphics || {};
+  Graphics.Collage = Elm.Graphics.Collage(elm);
+  var Matrix2D = Elm.Matrix2D(elm);
+  var Matrix2D = Elm.Matrix2D(elm);
+  var Physics = Elm.Physics(elm);
+  var Types = Elm.Types(elm);
+  var Vec2 = Elm.Vec2(elm);
+  var _op = {};
+  var translation = A4(Matrix2D.matrix, 1, 0, 0, 1);
+  var drawPart = F3(function(noise, ecs, part){
+    return function(){
+      var hashedNoise = A2(Basics.mod, Basics.truncate(noise), 150);
+      var gasColor = A3(Color.rgb, 255, (255-hashedNoise), 0);
+      return function(){
+        switch (part.ctor) {
+          case 'Brain':
+            return Graphics.Collage.filled(Color.blue)(Graphics.Collage.circle(part._0.r));
+          case 'Engine':
+            return Graphics.Collage.group(_L.Cons(Graphics.Collage.rotate(Basics.pi)(Graphics.Collage.filled(Color.red)(A2(Graphics.Collage.ngon, 3, part._0.r))),(A2(List.any, function(ec){
+              return _N.eq(ec,part._0.config);}, ecs) ? _J.toList([Graphics.Collage.move({ctor:"_Tuple2", _0:(0.4*part._0.r), _1:0})(Graphics.Collage.rotate(Basics.pi)(Graphics.Collage.filled(gasColor)(A2(Graphics.Collage.ngon, 3, (part._0.r*0.8)))))]) : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'between lines 27 and 29')))));
+          case 'FuelTank':
+            return Graphics.Collage.filled(Color.green)(A2(Graphics.Collage.rect, part._0.l, part._0.w));
+        }_E.Case($moduleName,'between lines 19 and 29')}();}();});
+  var drawBuildArea = function(mode){
+    return function(){
+      switch (mode.ctor) {
+        case 'Inactive':
+          return Graphics.Collage.group(_J.toList([]));
+      }
+      return Graphics.Collage.filled(A4(Color.rgba, 255, 255, 0, 0.2))(A2(Graphics.Collage.oval, 200, 200));}();};
+  var drawBeam = F2(function(beam, subForms){
+    return function(){
+      var l = beam.r;
+      var w = (l*5.0e-2);
+      var beamForm = Graphics.Collage.move({ctor:"_Tuple2", _0:(l*0.5), _1:0})(Graphics.Collage.filled(Color.gray)(A2(Graphics.Collage.rect, l, w)));
+      return Graphics.Collage.group(_L.Cons(beamForm,subForms));}();});
+  var drawAttach = F2(function(arg2, subForm){
+    return function(){
+      return function(){
+        var modelM = A2(Matrix2D.multiply, A2(translation, arg2.offset, 0), Matrix2D.rotation(arg2.theta));
+        return A2(Graphics.Collage.groupTransform, modelM, _J.toList([subForm]));}();}();});
+  var drawStructure = F3(function(noise, ec, structure){
+    return A4(Types.foldTagTree, A2(drawPart, noise, ec), drawBeam, drawAttach, structure);});
+  var drawEntity = F2(function(noise, arg1){
+    return function(){
+      return function(){
+        var comOffset = Physics.centerOfMass(arg1.structure);
+        var moveM = A2(translation, (arg1.motion.pos.x-comOffset.x), (arg1.motion.pos.y-comOffset.y));
+        var modelM = A2(Matrix2D.multiply, moveM, Matrix2D.rotation(arg1.motion.pos.theta));
+        return Graphics.Collage.groupTransform(modelM)(_J.toList([A3(drawStructure, noise, arg1.controls, arg1.structure)]));}();}();});
+  return elm.Draw = {
+    _op : _op, 
+    translation : translation, 
+    drawPart : drawPart, 
+    drawAttach : drawAttach, 
+    drawBeam : drawBeam, 
+    drawStructure : drawStructure, 
+    drawEntity : drawEntity, 
+    drawBuildArea : drawBuildArea};};
+Elm.Physics = function(elm){
+  var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Physics';
+  var Text = Elm.Text(elm);
+  var Text = Elm.Text(elm);
+  var Basics = Elm.Basics(elm);
+  var Signal = Elm.Signal(elm);
+  var List = Elm.List(elm);
+  var Maybe = Elm.Maybe(elm);
+  var Time = Elm.Time(elm);
+  var Prelude = Elm.Prelude(elm);
+  var Graphics = Graphics || {};
+  Graphics.Element = Elm.Graphics.Element(elm);
+  var Color = Elm.Color(elm);
+  var Graphics = Graphics || {};
+  Graphics.Collage = Elm.Graphics.Collage(elm);
+  var List = Elm.List(elm);
+  var Vec2 = Elm.Vec2(elm);
+  var Types = Elm.Types(elm);
+  var _op = {};
+  var updateMotion = F2(function(delta, state){
+    return function(){
+      var statePos = state.pos;
+      var newOmega = (delta.alpha+state.omega);
+      var midOmega = ((state.omega+newOmega)/2);
+      var newTheta = (state.pos.theta+midOmega);
+      var midTheta = ((state.pos.theta+newTheta)/2);
+      var absA = A2(Vec2.rotVec, midTheta, delta.a);
+      var newV = A2(Vec2.addVec, absA, state.v);
+      var midV = A2(Vec2.midVec, state.v, newV);
+      var newPos = Vec2.addVec(midV)(_N.replace([['theta',newTheta]], statePos));
+      return _N.replace([['pos',newPos],['v',newV],['omega',newOmega]], state);}();});
+  var torqueMag = function(t){
+    return A2(Vec2.crossVecMag, t.disp, t.force);};
+  var sumMasses = function($){
+    return List.sum(List.map(function(pm){
+      return pm.m;})($));};
+  var rotInertiaContrib = function(pm){
+    return function(){
+      var r = Vec2.magnitude(pm);
+      return ((pm.m*r)*r);}();};
+  var partThrusts = F2(function(ecs, part){
+    return function(){
+      switch (part.ctor) {
+        case 'Engine':
+          return (A2(List.any, function(ec){
+            return _N.eq(ec,part._0.config);}, ecs) ? function(){
+            var force = ((0-1.4)*part._0.r);
+            return _J.toList([{
+              _:{
+              },
+              disp:Vec2.origin,
+              force:{
+              _:{
+              },
+              x:force,
+              y:0}}]);}() : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'between lines 62 and 65')));
+      }
+      return _J.toList([]);}();});
+  var partMasses = function(part){
+    return function(){
+      var m = function(){
+        switch (part.ctor) {
+          case 'Brain':
+            return ((3*part._0.r)*part._0.r);
+          case 'Engine':
+            return ((2*part._0.r)*part._0.r);
+          case 'FuelTank':
+            return ((1.5*part._0.l)*part._0.w);
+        }_E.Case($moduleName,'between lines 17 and 21')}();
+      return _J.toList([{
+        _:{
+        },
+        m:m,
+        x:0,
+        y:0}]);}();};
+  var massContrib = function(pm){
+    return Vec2.scaleVec(pm.m)(Vec2.extractVec(pm));};
+  var beamThrusts = Types.cnst(List.concat);
+  var beamMasses = Types.cnst(List.concat);
+  var attachThrusts = F2(function(attach, ts){
+    return function(){
+      var rotateForce = function(t){
+        return _N.replace([['force',A2(Vec2.rotVec, attach.theta, t.force)]], t);};
+      var rotateDisp = function(t){
+        return _N.replace([['disp',A2(Vec2.rotVec, attach.theta, t.disp)]], t);};
+      var offsetDisp = function(t){
+        return _N.replace([['disp',A2(Vec2.addVec, {
+          _:{
+          },
+          x:attach.offset,
+          y:0}, t.disp)]], t);};
+      return List.map(function($){
+        return offsetDisp(rotateDisp(rotateForce($)));})(ts);}();});
+  var structureThrusts = function(ec){
+    return A3(Types.foldTagTree, partThrusts(ec), beamThrusts, attachThrusts);};
+  var netForce = F2(function(ec, s){
+    return Vec2.sumVec(List.map(function(_){
+      return _.force;})(A2(structureThrusts, ec, s)));});
+  var attachMasses = function(attach){
+    return List.map(Types.translateAttach(attach));};
+  var structureMasses = A3(Types.foldTagTree, partMasses, beamMasses, attachMasses);
+  var totalMass = function($){
+    return sumMasses(structureMasses($));};
+  var centerOfMass = function(structure){
+    return Vec2.scaleVec((1/totalMass(structure)))(Vec2.sumVec(List.map(massContrib)(structureMasses(structure))));};
+  var netTorque = F2(function(ec, s){
+    return function(){
+      var thrusts = A2(structureThrusts, ec, s);
+      var com = centerOfMass(s);
+      var center = function(thrust){
+        return _N.replace([['disp',A2(Vec2.subVec, com, thrust.disp)]], thrust);};
+      var torqueForces = A2(List.map, center, thrusts);
+      return List.sum(List.map(torqueMag)(torqueForces));}();});
+  var rotInertia = function(structure){
+    return List.sum(List.map(rotInertiaContrib)(List.map(Vec2.subVec(centerOfMass(structure)))(structureMasses(structure))));};
+  var netRotAcceleration = F2(function(ec, s){
+    return (A2(netTorque, ec, s)/rotInertia(s));});
+  var netAcceleration = F2(function(ec, s){
+    return Vec2.scaleVec((1/totalMass(s)))(A2(netForce, ec, s));});
+  var netDelta = F2(function(ec, s){
+    return {
+      _:{
+      },
+      a:A2(netAcceleration, ec, s),
+      alpha:A2(netRotAcceleration, ec, s)};});
+  return elm.Physics = {
+    _op : _op, 
+    sumMasses : sumMasses, 
+    massContrib : massContrib, 
+    partMasses : partMasses, 
+    beamMasses : beamMasses, 
+    attachMasses : attachMasses, 
+    structureMasses : structureMasses, 
+    totalMass : totalMass, 
+    centerOfMass : centerOfMass, 
+    rotInertiaContrib : rotInertiaContrib, 
+    rotInertia : rotInertia, 
+    partThrusts : partThrusts, 
+    beamThrusts : beamThrusts, 
+    attachThrusts : attachThrusts, 
+    structureThrusts : structureThrusts, 
+    netForce : netForce, 
+    netAcceleration : netAcceleration, 
+    torqueMag : torqueMag, 
+    netTorque : netTorque, 
+    netRotAcceleration : netRotAcceleration, 
+    netDelta : netDelta, 
+    updateMotion : updateMotion};};
+Elm.Types = function(elm){
+  var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Types';
+  var Text = Elm.Text(elm);
+  var Text = Elm.Text(elm);
+  var Basics = Elm.Basics(elm);
+  var Signal = Elm.Signal(elm);
+  var List = Elm.List(elm);
+  var Maybe = Elm.Maybe(elm);
+  var Time = Elm.Time(elm);
+  var Prelude = Elm.Prelude(elm);
+  var Graphics = Graphics || {};
+  Graphics.Element = Elm.Graphics.Element(elm);
+  var Color = Elm.Color(elm);
+  var Graphics = Graphics || {};
+  Graphics.Collage = Elm.Graphics.Collage(elm);
+  var Vec2 = Elm.Vec2(elm);
+  var _op = {};
+  var translateAttach = F2(function(attach, vext){
+    return function(){
+      var dY = (attach.offset*Basics.sin(attach.theta));
+      var dX = (attach.offset*Basics.cos(attach.theta));
+      return A2(Vec2.addVec, {
+        _:{
+        },
+        x:dX,
+        y:dY}, vext);}();});
+  var cnst = F2(function(x, a){
+    return x;});
+  var TurnRight = {ctor:"TurnRight"};
+  var TurnLeft = {ctor:"TurnLeft"};
+  var Thrust = F2(function(a, b){
+    return {
+      _:{
+      },
+      disp:a,
+      force:b};});
+  var Reverse = {ctor:"Reverse"};
+  var Position = F3(function(a, b, c){
+    return {
+      _:{
+      },
+      theta:c,
+      x:a,
+      y:b};});
+  var PointMass = F3(function(a, b, c){
+    return {
+      _:{
+      },
+      m:c,
+      x:a,
+      y:b};});
+  var PartMode = function(a){
+    return {ctor:"PartMode", _0:a};};
+  var Node = F2(function(a, b){
+    return {ctor:"Node", _0:a, _1:b};});
+  var MotionState = F3(function(a, b, c){
+    return {
+      _:{
+      },
+      omega:c,
+      pos:a,
+      v:b};});
+  var MotionDelta = F2(function(a, b){
+    return {
+      _:{
+      },
+      a:a,
+      alpha:b};});
+  var Leaf = function(a){
+    return {ctor:"Leaf", _0:a};};
+  var foldTagTree = F4(function(fLeaf, fNode, fEdge, tree){
+    return function(){
+      var y = A3(foldTagTree, fLeaf, fNode, fEdge);
+      var fChild = function(arg1){
+        return function(){
+          switch (arg1.ctor) {
+            case '_Tuple2':
+              return fEdge(arg1._0)(y(arg1._1));
+          }_E.Case($moduleName,'on line 21, column 30 to 51')}();};
+      return function(){
+        switch (tree.ctor) {
+          case 'Leaf':
+            return fLeaf(tree._0);
+          case 'Node':
+            return fNode(tree._0)(A2(List.map, fChild, tree._1));
+        }_E.Case($moduleName,'between lines 22 and 24')}();}();});
+  var Inactive = {ctor:"Inactive"};
+  var FuelTank = function(a){
+    return {ctor:"FuelTank", _0:a};};
+  var Forward = {ctor:"Forward"};
+  var Entity = F3(function(a, b, c){
+    return {
+      _:{
+      },
+      controls:a,
+      motion:b,
+      structure:c};});
+  var Engine = function(a){
+    return {ctor:"Engine", _0:a};};
+  var Disabled = {ctor:"Disabled"};
+  var Brain = function(a){
+    return {ctor:"Brain", _0:a};};
+  var BeamMode = function(a){
+    return {ctor:"BeamMode", _0:a};};
+  var Beam = function(a){
+    return {
+      _:{
+      },
+      r:a};};
+  var Attach = F2(function(a, b){
+    return {
+      _:{
+      },
+      offset:a,
+      theta:b};});
+  return elm.Types = {
+    _op : _op, 
+    cnst : cnst, 
+    foldTagTree : foldTagTree, 
+    translateAttach : translateAttach, 
+    Leaf : Leaf, 
+    Node : Node, 
+    Disabled : Disabled, 
+    Forward : Forward, 
+    Reverse : Reverse, 
+    TurnLeft : TurnLeft, 
+    TurnRight : TurnRight, 
+    Brain : Brain, 
+    FuelTank : FuelTank, 
+    Engine : Engine, 
+    Inactive : Inactive, 
+    BeamMode : BeamMode, 
+    PartMode : PartMode};};
+Elm.Vec2 = function(elm){
+  var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Vec2';
+  var Text = Elm.Text(elm);
+  var Text = Elm.Text(elm);
+  var Basics = Elm.Basics(elm);
+  var Signal = Elm.Signal(elm);
+  var List = Elm.List(elm);
+  var Maybe = Elm.Maybe(elm);
+  var Time = Elm.Time(elm);
+  var Prelude = Elm.Prelude(elm);
+  var Graphics = Graphics || {};
+  Graphics.Element = Elm.Graphics.Element(elm);
+  var Color = Elm.Color(elm);
+  var Graphics = Graphics || {};
+  Graphics.Collage = Elm.Graphics.Collage(elm);
+  var Matrix2D = Elm.Matrix2D(elm);
+  var _op = {};
+  var vecTranslate = function(v){
+    return A6(Matrix2D.matrix, 1, 0, 0, 1, v.x, v.y);};
+  var scaleVec = F2(function(a, v){
+    return _N.replace([['x',(v.x*a)],['y',(v.y*a)]], v);});
+  var rotVec = F2(function(theta, v){
+    return function(){
+      var newY = ((v.x*Basics.sin(theta))+(v.y*Basics.cos(theta)));
+      var newX = ((v.x*Basics.cos(theta))-(v.y*Basics.sin(theta)));
+      return _N.replace([['x',newX],['y',newY]], v);}();});
+  var origin = {
+    _:{
+    },
+    x:0,
+    y:0};
+  var negVec = scaleVec((0-1));
+  var magnitude = function(v){
+    return Basics.sqrt(((v.x*v.x)+(v.y*v.y)));};
+  var extractVec = function(v){
+    return {
+      _:{
+      },
+      x:v.x,
+      y:v.y};};
+  var crossVecMag = F2(function(v1, v2){
+    return ((v1.x*v2.y)-(v1.y*v2.x));});
+  var addVec = F2(function(v1, v2){
+    return function(){
+      var newY = (v1.y+v2.y);
+      var newX = (v1.x+v2.x);
+      return _N.replace([['x',newX],['y',newY]], v2);}();});
+  var addVec2 = addVec;
+  var midVec = F2(function(v1, v2){
+    return scaleVec((1/2))(A2(addVec, v1, v2));});
+  var subVec = function(v1){
+    return addVec(A2(scaleVec, (0-1), v1));};
+  var sumVec = function($){
+    return A2(List.foldl, addVec, origin)(List.map(extractVec)($));};
+  var Vec2Ext = F3(function(a, b, c){
+    return _N.insert('y', b, _N.insert('x', a, c));});
+  return elm.Vec2 = {
+    _op : _op, 
+    origin : origin, 
+    scaleVec : scaleVec, 
+    negVec : negVec, 
+    rotVec : rotVec, 
+    addVec : addVec, 
+    subVec : subVec, 
+    addVec2 : addVec2, 
+    midVec : midVec, 
+    extractVec : extractVec, 
+    sumVec : sumVec, 
+    magnitude : magnitude, 
+    crossVecMag : crossVecMag, 
+    vecTranslate : vecTranslate};};
+        </script>
+    </head>
+    <body>
+        <script type="text/javascript">
+            Elm.fullscreen(Elm.Main)
+        </script>
+        <noscript>
+            
+        </noscript>
+    </body>
+</html>
