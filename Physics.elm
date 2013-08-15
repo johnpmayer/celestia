@@ -101,15 +101,45 @@ netRotAcceleration ec s = netTorque ec s / rotInertia s
 netDelta : [EngineConfig] -> Structure -> MotionDelta
 netDelta ec s = { a = netAcceleration ec s, alpha = netRotAcceleration ec s }
 
-updateMotion : MotionDelta -> MotionState -> MotionState
-updateMotion delta state = 
-  let newOmega = delta.alpha + state.omega
-      midOmega = (state.omega + newOmega) / 2
-      newTheta = state.pos.theta + midOmega
-      midTheta = (state.pos.theta + newTheta) / 2
-      absA = rotVec midTheta delta.a
-      newV = addVec absA state.v
-      midV = midVec state.v newV
-      statePos = state.pos
-      newPos = addVec midV <| { statePos | theta <- newTheta }
-  in { state | pos <- newPos, v <- newV, omega <- newOmega }
+applyBrakes : MotionState -> { newOmega : Float, newV : { x : Float, y : Float } }
+applyBrakes state = 
+  let vx = state.v.x
+      vy = state.v.y
+      w = state.omega
+      posfactor = 0.01
+      rotfactor = 0.0005
+      damp factor n =  
+        if n < factor && n > -1 * factor 
+        then 0 
+        else 
+          if n > 0
+          then n - factor
+          else n + factor
+  in { newOmega = damp rotfactor w
+     ,  newV = { x = damp posfactor vx, y = damp posfactor vy } }
+
+updateMotion : (Bool,MotionDelta) -> MotionState -> MotionState
+updateMotion (brakes,delta) state = 
+  if brakes
+  then 
+    let fakeDelta = applyBrakes state
+        newOmega = fakeDelta.newOmega
+        midOmega = (state.omega + newOmega) / 2
+        newTheta = state.pos.theta + midOmega
+        midTheta = (state.pos.theta + newTheta) / 2
+        newV = fakeDelta.newV
+        midV = midVec state.v newV
+        statePos = state.pos
+        newPos = addVec midV <| { statePos | theta <- newTheta }
+    in { state | pos <- newPos, v <- newV, omega <- newOmega }
+  else
+    let newOmega = delta.alpha + state.omega
+        midOmega = (state.omega + newOmega) / 2
+        newTheta = state.pos.theta + midOmega
+        midTheta = (state.pos.theta + newTheta) / 2
+        absA = rotVec midTheta delta.a
+        newV = addVec absA state.v
+        midV = midVec state.v newV
+        statePos = state.pos
+        newPos = addVec midV <| { statePos | theta <- newTheta }
+    in { state | pos <- newPos, v <- newV, omega <- newOmega }

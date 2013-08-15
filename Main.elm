@@ -1,7 +1,9 @@
 module Main where
 
-import Keyboard 
-import Mouse
+import Char (toCode)
+
+import Keyboard as K
+import Mouse as M
 
 import open Build
 import open Draw 
@@ -49,13 +51,16 @@ control input =
   (if input.x < 0 then [ TurnLeft ] else [])
 
 engines : Signal [ EngineConfig ]
-engines = control <~ Keyboard.wasd
+engines = control <~ K.wasd
+
+brakes : Signal Bool
+brakes = K.isDown <| toCode 'x'
 
 delta : Signal MotionDelta
 delta = sampleOn (fps 30) <| netDelta <~ engines ~ (constant simpleShip)
 
 state : Signal MotionState
-state = foldp updateMotion startPos delta
+state = foldp updateMotion startPos ((,) <~ brakes ~ delta)
 
 myShip : Signal Entity
 myShip = (\engines state structure -> { controls = engines, motion = state, structure = structure }) <~ engines ~ state ~ (constant simpleShip)
@@ -85,7 +90,7 @@ gameForms =
     <~ frameStamp ~ gameObjects ~ camera
 
 mode : Signal BuildMode
-mode = foldp updateMode Inactive Keyboard.lastPressed
+mode = foldp updateMode Inactive K.lastPressed
 
 construct : (Int,Int) -> BuildMode -> Form
 construct (x,y) mode = move (toFloat x, toFloat y) <| blueprint mode
@@ -109,7 +114,7 @@ space' mouse mode objects =
     ]
 
 space : Signal Element
-space = space' <~ Mouse.position ~ mode ~ gameForms
+space = space' <~ M.position ~ mode ~ gameForms
 
 position : [Signal Element] -> Signal Element
 position ses = flow down <~ combine ses
@@ -119,5 +124,8 @@ main = position <|
   [ space 
   , constant . plainText <| "Ship position"
   , asText <~ state
+  , asText <~ K.keysDown
+  , asText <~ brakes
+  , asText <~ K.space
   ]
 
