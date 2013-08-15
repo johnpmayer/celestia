@@ -2,5 +2,4 @@
 *.hi
 *.o
 example
-build
 cache
