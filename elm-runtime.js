@@ -1260,7 +1260,7 @@ Elm.Native.Char = function(elm) {
 
  return elm.Native.Char = {
      fromCode : function(c) { return String.fromCharCode(c); },
-     toCode   : function(c) { return c.charCodeAt(0); },
+     toCode   : function(c) { return c.toUpperCase().charCodeAt(0); },
      toUpper  : function(c) { return c.toUpperCase(); },
      toLower  : function(c) { return c.toLowerCase(); },
      toLocaleUpper : function(c) { return c.toLocaleUpperCase(); },
@@ -1514,29 +1514,79 @@ Elm.Native.Keyboard = function(elm) {
   elm.Native = elm.Native || {};
   if (elm.Native.Keyboard) return elm.Native.Keyboard;
 
+  // Duplicated from Native.Signal
+  function send(node, timestep, changed) {
+    var kids = node.kids;
+    for (var i = kids.length; i--; ) {
+      kids[i].recv(timestep, changed, node.id);
+    }
+  }
+
   var Signal = Elm.Signal(elm);
   var NList = Elm.Native.List(elm);
+  var Utils = Elm.Native.Utils(elm);
 
-  var keysDown = Signal.constant(NList.Nil);
-  var lastKey = Signal.constant('\0');
+  var downEvents = Signal.constant(0);
+  var upEvents = Signal.constant(0);
+  var blurEvents = Signal.constant(0);
 
-  elm.addListener([keysDown.id], document, 'keydown', function down(e) {
-          if (NList.member(e.keyCode)(keysDown.value)) return;
-          elm.notify(keysDown.id, NList.Cons(e.keyCode, keysDown.value));
-      });
-  elm.addListener([keysDown.id], document, 'keyup', function up(e) {
-          function notEq(kc) { return kc !== e.keyCode; }
-          elm.notify(keysDown.id, NList.filter(notEq)(keysDown.value));
-      });
-  elm.addListener([keysDown.id], document, 'blur', function blur(e) {
-          elm.notify(keysDown.id, NList.Nil);
-      });
-  elm.addListener([lastKey.id], document, 'keypress', function press(e) {
-          elm.notify(lastKey.id, e.charCode || e.keyCode);
-      });
+  elm.addListener([downEvents.id], document, 'keydown', function down(e) {
+    elm.notify(downEvents.id, e.keyCode);
+  });
+
+  elm.addListener([upEvents.id], document, 'keyup', function up(e) {
+    elm.notify(upEvents.id, e.keyCode);
+  });
+
+  elm.addListener([blurEvents.id], document, 'blur', function blur(e) {
+    elm.notify(blurEvents.id, NList.Nil);
+  });
+
+  function KeyMerge(down, up, blur) {
+    var args = [down,up,blur];
+    this.id = Utils.guid();
+    // Ignore starting values here
+    this.value = NList.Nil
+    this.kids = [];
+    
+    var n = args.length;
+    var count = 0;
+    var isChanged = false;
+
+    this.recv = function(timestep, changed, parentID) {
+      ++count;
+      if (changed) { 
+        // We know this a change must only be one of the following cases
+        if (parentID === down.id && !(NList.member(down.value)(this.value))) {
+          isChanged = true;
+          this.value = NList.Cons(down.value, this.value); 
+        } 
+        if (parentID === up.id) {
+          isChanged = true;
+          var notEq = function(kc) { return kc !== up.value };
+          this.value = NList.filter(notEq)(this.value);
+        } 
+        if (parentID === blur.id) {
+          isChanged = true;
+          this.value = NList.Nil;
+        }
+      }
+      if (count == n) {
+        send(this, timestep, isChanged);
+        isChanged = false;
+        count = 0;
+      }
+    };
+
+    for (var i = n; i--; ) { args[i].kids.push(this); }
+
+  }
+
+  var keysDown = Signal.dropRepeats(new KeyMerge(downEvents,upEvents,blurEvents));
 
   function keySignal(f) {
-    var signal = Signal.dropRepeats(A2(Signal.lift, f, keysDown));
+    var signal = A2(Signal.lift, f, keysDown);
+    // what's the significance of these two following lines? -jpm
     keysDown.defaultNumberOfKids += 1;
     signal.defaultNumberOfKids = 0;
     return signal;
@@ -1561,11 +1611,13 @@ Elm.Native.Keyboard = function(elm) {
 
   function is(key) { return keySignal(NList.member(key)); }
 
+  var lastPressed = Signal.dropRepeats(downEvents);
+
   return elm.Native.Keyboard = {
-      isDown:is,
-      directions:F4(dir),
-      keysDown:keysDown,
-      lastPressed:lastKey
+    isDown:is,
+    directions:F4(dir),
+    keysDown:keysDown,
+    lastPressed:lastPressed
   };
 
 };
@@ -2969,7 +3021,7 @@ Elm.Dict = function(elm){
           return base;
         case 'RBNode':
           return function(){
-            var case115 = A2(Native.Utils.compare, k, k$);
+            var case115 = A2(Native.Utils.compare, k, t._1);
             switch (case115.ctor) {
               case 'EQ':
                 return t._2;
@@ -3011,7 +3063,7 @@ Elm.Dict = function(elm){
           return Maybe.Nothing;
         case 'RBNode':
           return function(){
-            var case134 = A2(Native.Utils.compare, k, k$);
+            var case134 = A2(Native.Utils.compare, k, t._1);
             switch (case134.ctor) {
               case 'EQ':
                 return Maybe.Just(t._2);
@@ -3106,14 +3158,14 @@ Elm.Dict = function(elm){
             case 'RBNode':
               return function(){
                 var h = function(){
-                  var case192 = A2(Native.Utils.compare, k, k$);
+                  var case192 = A2(Native.Utils.compare, k, t._1);
                   switch (case192.ctor) {
                     case 'EQ':
-                      return A5(RBNode, t._0, k$, v, t._3, t._4);
+                      return A5(RBNode, t._0, t._1, v, t._3, t._4);
                     case 'GT':
-                      return A5(RBNode, t._0, k$, v$, t._3, ins(t._4));
+                      return A5(RBNode, t._0, t._1, t._2, t._3, ins(t._4));
                     case 'LT':
-                      return A5(RBNode, t._0, k$, v$, ins(t._3), t._4);
+                      return A5(RBNode, t._0, t._1, t._2, ins(t._3), t._4);
                   }_E.Case($moduleName,'between lines 219 and 223')}();
                 return fixUp(h);}();
           }_E.Case($moduleName,'between lines 216 and 224')}();};
@@ -3190,7 +3242,7 @@ Elm.Dict = function(elm){
             case 'RBNode':
               switch (t._4.ctor) {
                 case 'RBEmpty':
-                  return _N.eq(k,k$);
+                  return _N.eq(k,t._1);
               }break;
           }
           return false;}();};
@@ -3198,7 +3250,7 @@ Elm.Dict = function(elm){
         return function(){
           switch (t.ctor) {
             case 'RBNode':
-              return _N.eq(k,k$);
+              return _N.eq(k,t._1);
           }
           return false;}();};
       var delEQ = function(t){
@@ -3227,7 +3279,7 @@ Elm.Dict = function(elm){
             case 'RBEmpty':
               return RBEmpty;
             case 'RBNode':
-              return ((_N.cmp(k,k$)<0) ? delLT(t) : (Basics.otherwise ? function(){
+              return ((_N.cmp(k,t._1)<0) ? delLT(t) : (Basics.otherwise ? function(){
                 var u = (isRedLeft(t) ? rotateRight(t) : (Basics.otherwise ? t : _E.If($moduleName,'on line 336, column 33 to 73')));
                 return (eq_and_noRightNode(u) ? RBEmpty : (Basics.otherwise ? function(){
                   var t$ = moveRedRightIfNeeded(t);
@@ -3239,7 +3291,7 @@ Elm.Dict = function(elm){
             case 'RBEmpty':
               return Native.Error.raise(_str('delGT called on a Empty'));
             case 'RBNode':
-              return fixUp(A5(RBNode, t._0, k$, t._2, t._3, del(t._4)));
+              return fixUp(A5(RBNode, t._0, t._1, t._2, t._3, del(t._4)));
           }_E.Case($moduleName,'between lines 329 and 332')}();};
       var delLT = function(t){
         return function(){
@@ -3248,7 +3300,7 @@ Elm.Dict = function(elm){
             case 'RBEmpty':
               return Native.Error.raise(_str('delLT on Empty'));
             case 'RBNode':
-              return fixUp(A5(RBNode, case262._0, k$, case262._2, del(case262._3), case262._4));
+              return fixUp(A5(RBNode, case262._0, case262._1, case262._2, del(case262._3), case262._4));
           }_E.Case($moduleName,'between lines 322 and 325')}();};
       return (A2(member, k, t) ? ensureBlackRoot(del(t)) : (Basics.otherwise ? t : _E.If($moduleName,'on line 340, column 7 to 56')));}();});
   var diff = F2(function(t1, t2){
@@ -3644,7 +3696,7 @@ Elm.Automaton = function(elm){
                       case '_Tuple2':
                         return function(){
                           var sum$ = ((arg1._2+n)-case19._0._0);
-                          return {ctor:"_Tuple2", _0:{ctor:"_Tuple3", _0:A2(enqueue, n, ns$), _1:arg1._1, _2:sum$}, _1:(sum$/Basics.toFloat(arg1._1))};}();
+                          return {ctor:"_Tuple2", _0:{ctor:"_Tuple3", _0:A2(enqueue, n, case19._0._1), _1:arg1._1, _2:sum$}, _1:(sum$/Basics.toFloat(arg1._1))};}();
                     }break;
                   case 'Nothing':
                     return {ctor:"_Tuple2", _0:{ctor:"_Tuple3", _0:arg1._0, _1:arg1._1, _2:arg1._2}, _1:0};
