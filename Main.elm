@@ -127,5 +127,6 @@ main = position <|
   , asText <~ K.keysDown
   , asText <~ brakes
   , asText <~ K.space
+  , asText <~ ((minimumDist origin (fromIntPair (50,0))) <~ ((fromIntPair . convertPos) <~ M.position))
   ]
 
