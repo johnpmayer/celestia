@@ -12,19 +12,19 @@ import open Types
 import open Vec2
 
 attitude : EngineConfig -> Structure
-attitude ec = Node { r=10 } <|
+attitude ec = beam { r=10 } <|
   [ ( { offset=10, theta=0 }, 
-      Leaf <| Engine {r=4, config=ec} ) ]
+      part <| Engine {r=4, config=ec} ) ]
 
 reverseL : Structure
-reverseL = Node { r=10 } <|
+reverseL = beam { r=10 } <|
   [ ( { offset=10, theta=(-pi/2) }, 
-      Leaf <| Engine {r=4, config=Reverse} ) ]
+      part <| Engine {r=4, config=Reverse} ) ]
 
 reverseR : Structure
-reverseR = Node { r=10 } <|
+reverseR = beam { r=10 } <|
   [ ( { offset=10, theta=(pi/2) }, 
-      Leaf <| Engine {r=4, config=Reverse} ) ]
+      part <| Engine {r=4, config=Reverse} ) ]
 
 mods : [(Attach, Structure)]
 mods = 
@@ -32,13 +32,13 @@ mods =
   , ({ offset=6, theta=(pi/2) }, reverseR)
   , ({ offset=42, theta=(3*pi/2) }, attitude TurnLeft)
   , ({ offset=42, theta=(pi/2) }, attitude TurnRight)
-  , ({ offset=0, theta=0 }, Leaf <| Brain {r=7})
-  , ({ offset=25, theta=0 }, Leaf <| FuelTank {l=30,w=14})
+  , ({ offset=0, theta=0 }, part <| Brain {r=7})
+  , ({ offset=25, theta=0 }, part <| FuelTank {l=30,w=14})
   , ( { offset=50, theta=0 }, 
-      Leaf <| Engine {r=13, config=Forward}) ]
+      part <| Engine {r=13, config=Forward}) ]
 
 simpleShip : Structure
-simpleShip = Node { r=50 } mods
+simpleShip = beam { r=50 } mods
 
 startPos : MotionState
 startPos = { pos = { x = 0, y = 0, theta = 0 }, v = { x = 0, y = 0 }, omega = 0 }
@@ -128,5 +128,6 @@ main = position <|
   , asText <~ brakes
   , asText <~ K.space
   , asText <~ ((minimumDist origin (fromIntPair (50,0))) <~ ((fromIntPair . convertPos) <~ M.position))
+  , constant . asText . labelBeams <| simpleShip
   ]
 

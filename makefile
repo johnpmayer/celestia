@@ -18,7 +18,7 @@ build/Main.html: ${RUNTIME} ${SOURCES}
 	${ELM} --make Main.elm 
 
 build/index.html: build/Main.html
-	(cd build; ln -s Main.html index.html)
+	(cd build; ln -sf Main.html index.html)
 
 clean:
 	rm -rf cache

@@ -1,5 +1,7 @@
 module Types where
 
+import open State
+import open TagTree
 import open Vec2
 
 {- Utils -}
@@ -7,27 +9,11 @@ import open Vec2
 cnst : a -> b -> a
 cnst x = \a -> x
 
-data TagTree leaf node edge 
-  = Leaf leaf
-  | Node node [(edge, TagTree leaf node edge)]
-
-foldTagTree :
-  (leaf -> a) ->
-  (node -> [a] -> a) ->
-  (edge -> a -> a) ->
-  TagTree leaf node edge -> a
-foldTagTree fLeaf fNode fEdge tree =
-  let y = foldTagTree fLeaf fNode fEdge
-      fChild (edge, child) = fEdge edge <| y child
-  in case tree of
-    Leaf leaf -> fLeaf leaf
-    Node node subs -> fNode node <| map fChild subs
-
 type Position = { x : Float, y : Float, theta : Float }
 
 {- Structures -}
 
-type Attach ={ offset : Float, theta : Float }
+type Attach = { offset : Float, theta : Float }
 
 translateAttach : Attach -> Vec2Ext a -> Vec2Ext a
 translateAttach attach vext = 
@@ -39,7 +25,14 @@ type PointMass = { x : Float, y : Float, m : Float}
 
 type Beam = { r : Float }
 
-type Structure = TagTree Part Beam Attach
+type StructureExt a = TagTree Part a Attach
+type Structure = StructureExt Beam
+
+beam : Beam -> [(Attach, Structure)] -> Structure
+beam = Node
+
+part : Part -> Structure
+part = Leaf
 
 data EngineConfig = Disabled
                   | Forward 
@@ -50,6 +43,28 @@ data EngineConfig = Disabled
 data Part = Brain { r : Float }
           | FuelTank { l : Float, w : Float }
           | Engine { r : Float, config : EngineConfig }
+
+{- Labeling -}
+
+type LabelBeamExt a = { a | id : Int }
+type LabelBeam = LabelBeamExt Beam
+
+type LabelStructure = TagTree Part LabelBeam Attach
+
+labelStructurePart : Part -> State Int Part
+labelStructurePart = returnS
+
+fresh : State Int Int
+fresh =
+  bindS get (\i ->
+  bindS (put (i + 1)) (\_ ->
+  returnS i))
+
+labelBeams : Structure -> LabelStructure
+labelBeams s =
+  let labelBeam beam = fmapS (\i -> { beam | id = i }) fresh
+      modifyStructure = walkModify returnS labelBeam returnS
+  in evalState (modifyStructure s) 0
 
 {- Physics -}
 

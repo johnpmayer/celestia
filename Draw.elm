@@ -6,6 +6,7 @@ import Matrix2D (Matrix2D)
 import Matrix2D as M
 
 import open Physics
+import open TagTree
 import open Types 
 import open Vec2
 
