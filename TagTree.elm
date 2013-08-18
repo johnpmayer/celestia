@@ -19,6 +19,19 @@ foldTagTree fLeaf fNode fEdge tree =
     Leaf leaf -> fLeaf leaf
     Node node subs -> fNode node <| map fChild subs
 
+foldTagTree' :
+  (leaf -> a) ->
+  (node -> [(edge,a)] -> a) ->
+  TagTree leaf node edge -> a
+foldTagTree' fLeaf fNode tree =
+  let y = foldTagTree' fLeaf fNode
+  in case tree of
+    Leaf leaf -> fLeaf leaf
+    Node node subs -> 
+      let mapAttach f (attach, s) = (attach, f s) 
+          subs' = map (mapAttach y) subs
+      in fNode node subs'
+
 walkModify :
   (leaf -> State a leaf') ->
   (node -> State a node') ->

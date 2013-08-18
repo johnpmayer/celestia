@@ -4,11 +4,6 @@ import open State
 import open TagTree
 import open Vec2
 
-{- Utils -}
-
-cnst : a -> b -> a
-cnst x = \a -> x
-
 type Position = { x : Float, y : Float, theta : Float }
 
 {- Structures -}
@@ -50,9 +45,6 @@ type LabelBeamExt a = { a | id : Int }
 type LabelBeam = LabelBeamExt Beam
 
 type LabelStructure = TagTree Part LabelBeam Attach
-
-labelStructurePart : Part -> State Int Part
-labelStructurePart = returnS
 
 fresh : State Int Int
 fresh =

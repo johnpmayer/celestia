@@ -9,6 +9,7 @@ import open Build
 import open Draw 
 import open Physics 
 import open Types 
+import open Utils
 import open Vec2
 
 attitude : EngineConfig -> Structure
@@ -95,39 +96,31 @@ mode = foldp updateMode Inactive K.lastPressed
 construct : (Int,Int) -> BuildMode -> Form
 construct (x,y) mode = move (toFloat x, toFloat y) <| blueprint mode
 
-canvasW : Int
-canvasW = 400
+canvasWH : (Int,Int)
+canvasWH = (400,300)
 
-canvasH : Int
-canvasH = 300
-
-convertPos : (Int,Int) -> (Int,Int)
-convertPos (x,y) = (x - div canvasW 2, div canvasH 2 - y)
+gamePointer : Signal (Int,Int)
+gamePointer = (convertPos canvasWH) <~ M.position
 
 space' : (Int,Int) -> BuildMode -> Form -> Element
-space' mouse mode objects = 
-  (collage canvasW canvasH) <|
-    [ (filled black <| rect (toFloat canvasW) (toFloat canvasH))
-    , (construct (convertPos mouse) mode)
+space' point mode objects = spaceBlack canvasWH
+    [ (construct point mode)
     , objects
     , drawBuildArea mode
     ]
 
 space : Signal Element
-space = space' <~ M.position ~ mode ~ gameForms
-
-position : [Signal Element] -> Signal Element
-position ses = flow down <~ combine ses
+space = space' <~ gamePointer ~ mode ~ gameForms
 
 main : Signal Element
-main = position <|
+main = combineSElems <|
   [ space 
   , constant . plainText <| "Ship position"
   , asText <~ state
   , asText <~ K.keysDown
   , asText <~ brakes
   , asText <~ K.space
-  , asText <~ ((minimumDist origin (fromIntPair (50,0))) <~ ((fromIntPair . convertPos) <~ M.position))
+  , asText <~ ((minimumDist origin (fromIntPair (50,0))) <~ (fromIntPair <~ gamePointer))
   , constant . asText . labelBeams <| simpleShip
   ]
 

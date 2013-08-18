@@ -1,9 +1,9 @@
 module Physics where
 
-import List
 import open Vec2
 import open TagTree
 import open Types
+import open Utils
 
 {- Mass -}
 
