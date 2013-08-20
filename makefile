@@ -1,7 +1,7 @@
 
 ELM=elm --runtime elm-runtime.js
 
-all: build/index.html
+all: build/index.html build/Demo.html
 
 fresh: clean all
 
@@ -16,6 +16,9 @@ ${RUNTIME}: build
 
 build/Main.html: ${RUNTIME} ${SOURCES}
 	${ELM} --make Main.elm 
+
+build/Demo.html: ${RUNTIME} ${SOURCES}
+	${ELM} --make Demo.elm 
 
 build/index.html: build/Main.html
 	(cd build; ln -sf Main.html index.html)
