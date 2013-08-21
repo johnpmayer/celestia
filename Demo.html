@@ -4,15 +4,15 @@
     <head>
         <meta charset="UTF-8">
         <title>
-            Main
+            Demo
         </title>
-        <script type="text/javascript" src="/elm-runtime.js">
+        <script type="text/javascript" src="elm-runtime.js">
             
         </script>
         <script type="text/javascript">
             
-Elm.Main = function(elm){
-  var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Main';
+Elm.Demo = function(elm){
+  var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Demo';
   var Text = Elm.Text(elm);
   var Text = Elm.Text(elm);
   var Basics = Elm.Basics(elm);
@@ -26,285 +26,41 @@ Elm.Main = function(elm){
   var Color = Elm.Color(elm);
   var Graphics = Graphics || {};
   Graphics.Collage = Elm.Graphics.Collage(elm);
-  var Char = Elm.Char(elm);
-  var Keyboard = Elm.Keyboard(elm);
-  var Mouse = Elm.Mouse(elm);
-  var Build = Elm.Build(elm);
+  var Dict = Elm.Dict(elm);
   var Draw = Elm.Draw(elm);
-  var Physics = Elm.Physics(elm);
-  var Types = Elm.Types(elm);
-  var Utils = Elm.Utils(elm);
   var Public = Public || {};
-  Public.Vec2 = Public.Vec2 || {};
-  Public.Vec2.Vec2 = Elm.Public.Vec2.Vec2(elm);
+  Public.State = Public.State || {};
+  Public.State.State = Elm.Public.State.State(elm);
+  var Step = Elm.Step(elm);
+  var Trigger = Elm.Trigger(elm);
+  var Utils = Elm.Utils(elm);
   var _op = {};
-  var startPos = {
+  var initialMode = {
     _:{
     },
-    omega:0,
-    pos:{
+    build:Step.None,
+    pause:false};
+  var initialState = {
     _:{
     },
-    theta:0,
-    x:0,
-    y:0},
-    v:{
-    _:{
-    },
-    x:0,
-    y:0}};
-  var reverseR = Types.beam({
-    _:{
-    },
-    r:10})(_J.toList([{ctor:"_Tuple2", _0:{
-    _:{
-    },
-    offset:10,
-    theta:(Basics.pi/2)}, _1:Types.part(Types.Engine({
-    _:{
-    },
-    config:Types.Reverse,
-    r:4}))}]));
-  var reverseL = Types.beam({
-    _:{
-    },
-    r:10})(_J.toList([{ctor:"_Tuple2", _0:{
-    _:{
-    },
-    offset:10,
-    theta:((0-Basics.pi)/2)}, _1:Types.part(Types.Engine({
-    _:{
-    },
-    config:Types.Reverse,
-    r:4}))}]));
-  var mode = A3(Signal.foldp, Build.updateMode, Types.Inactive, Keyboard.lastPressed);
-  var control = function(input){
-    return _L.append(((_N.cmp(input.y,0)<0) ? _J.toList([Types.Reverse]) : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'on line 49, column 4 to 43'))),_L.append(((_N.cmp(input.y,0)>0) ? _J.toList([Types.Forward]) : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'on line 50, column 4 to 43'))),_L.append(((_N.cmp(input.x,0)>0) ? _J.toList([Types.TurnRight]) : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'on line 51, column 4 to 45'))),((_N.cmp(input.x,0)<0) ? _J.toList([Types.TurnLeft]) : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'on line 52, column 4 to 44'))))));};
-  var engines = A2(Signal._op['<~'], control, Keyboard.wasd);
-  var construct = F2(function(arg2, mode){
+    entities:Dict.empty,
+    mode:initialMode};
+  var draw = function(gs){
     return function(){
-      switch (arg2.ctor) {
-        case '_Tuple2':
-          return Graphics.Collage.move({ctor:"_Tuple2", _0:Basics.toFloat(arg2._0), _1:Basics.toFloat(arg2._1)})(Build.blueprint(mode));
-      }_E.Case($moduleName,'on line 97, column 24 to 69')}();});
-  var clock = Time.fps(30);
-  var frameStamp = A2(Signal._op['<~'], Basics.fst, Time.timestamp(clock));
-  var canvasWH = {ctor:"_Tuple2", _0:400, _1:300};
-  var gamePointer = A2(Signal._op['<~'], Utils.convertPos(canvasWH), Mouse.position);
-  var space$ = F3(function(point, mode, objects){
-    return A2(Utils.spaceBlack, canvasWH, _J.toList([A2(construct, point, mode),objects,Draw.drawBuildArea(mode)]));});
-  var brakes = Keyboard.isDown(Char.toCode('x'));
-  var attitude = function(ec){
-    return Types.beam({
-      _:{
-      },
-      r:10})(_J.toList([{ctor:"_Tuple2", _0:{
-      _:{
-      },
-      offset:10,
-      theta:0}, _1:Types.part(Types.Engine({
-      _:{
-      },
-      config:ec,
-      r:4}))}]));};
-  var mods = _J.toList([{ctor:"_Tuple2", _0:{
-    _:{
-    },
-    offset:6,
-    theta:((3*Basics.pi)/2)}, _1:reverseL},{ctor:"_Tuple2", _0:{
-    _:{
-    },
-    offset:6,
-    theta:(Basics.pi/2)}, _1:reverseR},{ctor:"_Tuple2", _0:{
-    _:{
-    },
-    offset:42,
-    theta:((3*Basics.pi)/2)}, _1:attitude(Types.TurnLeft)},{ctor:"_Tuple2", _0:{
-    _:{
-    },
-    offset:42,
-    theta:(Basics.pi/2)}, _1:attitude(Types.TurnRight)},{ctor:"_Tuple2", _0:{
-    _:{
-    },
-    offset:0,
-    theta:0}, _1:Types.part(Types.Brain({
-    _:{
-    },
-    r:7}))},{ctor:"_Tuple2", _0:{
-    _:{
-    },
-    offset:25,
-    theta:0}, _1:Types.part(Types.FuelTank({
-    _:{
-    },
-    l:30,
-    w:14}))},{ctor:"_Tuple2", _0:{
-    _:{
-    },
-    offset:50,
-    theta:0}, _1:Types.part(Types.Engine({
-    _:{
-    },
-    config:Types.Forward,
-    r:13}))}]);
-  var simpleShip = A2(Types.beam, {
-    _:{
-    },
-    r:50}, mods);
-  var delta = Signal.sampleOn(Time.fps(30))(A2(Signal._op['~'], A2(Signal._op['<~'], Physics.netDelta, engines), Signal.constant(simpleShip)));
-  var state = A3(Signal.foldp, Physics.updateMotion, startPos, A2(Signal._op['~'], A2(Signal._op['<~'], F2(function(v0, v1){
-    return {ctor:"_Tuple2", _0:v0, _1:v1};}), brakes), delta));
-  var camera = A2(Signal._op['<~'], function($){
-    return Public.Vec2.Vec2.extractVec(function(_){
-      return _.pos;}($));}, state);
-  var myShip = A2(Signal._op['~'], A2(Signal._op['~'], A2(Signal._op['<~'], F3(function(engines, state, structure){
-    return {
-      _:{
-      },
-      controls:engines,
-      motion:state,
-      structure:structure};}), engines), state), Signal.constant(simpleShip));
-  var gameObjects = Signal.combine(_L.Cons(Signal.constant({
-    _:{
-    },
-    controls:_J.toList([]),
-    motion:{
-    _:{
-    },
-    omega:0,
-    pos:{
-    _:{
-    },
-    theta:1,
-    x:60,
-    y:50},
-    v:{
-    _:{
-    },
-    x:0,
-    y:0}},
-    structure:simpleShip}),_L.Cons(Signal.constant({
-    _:{
-    },
-    controls:_J.toList([]),
-    motion:{
-    _:{
-    },
-    omega:0,
-    pos:{
-    _:{
-    },
-    theta:4,
-    x:(0-80),
-    y:40},
-    v:{
-    _:{
-    },
-    x:0,
-    y:0}},
-    structure:simpleShip}),_L.Cons(Signal.constant({
-    _:{
-    },
-    controls:_J.toList([]),
-    motion:{
-    _:{
-    },
-    omega:0,
-    pos:{
-    _:{
-    },
-    theta:3,
-    x:120,
-    y:(0-20)},
-    v:{
-    _:{
-    },
-    x:0,
-    y:0}},
-    structure:simpleShip}),_J.toList([myShip])))));
-  var gameForms = A2(Signal._op['~'], A2(Signal._op['~'], A2(Signal._op['<~'], F3(function(time, es, camera){
-    return function(){
-      var modelM = Public.Vec2.Vec2.vecTranslate(Public.Vec2.Vec2.negVec(camera));
-      var forms = A2(List.map, Draw.drawEntity(time), es);
-      return A2(Graphics.Collage.groupTransform, modelM, forms);}();}), frameStamp), gameObjects), camera);
-  var space = A2(Signal._op['~'], A2(Signal._op['~'], A2(Signal._op['<~'], space$, gamePointer), mode), gameForms);
-  var main = Utils.combineSElems(_J.toList([space,Signal.constant(Text.plainText(_str('Ship position'))),A2(Signal._op['<~'], Text.asText, state),A2(Signal._op['<~'], Text.asText, Keyboard.keysDown),A2(Signal._op['<~'], Text.asText, brakes),A2(Signal._op['<~'], Text.asText, Keyboard.space),A2(Signal._op['<~'], Text.asText, A2(Signal._op['<~'], A2(Public.Vec2.Vec2.minimumDist, Public.Vec2.Vec2.origin, Public.Vec2.Vec2.fromIntPair({ctor:"_Tuple2", _0:50, _1:0})), A2(Signal._op['<~'], Public.Vec2.Vec2.fromIntPair, gamePointer))),Signal.constant(Text.asText(Types.labelBeams(simpleShip)))]));
-  return elm.Main = {
+      var entities = List.map(Draw.drawEntity(0))(Dict.values(function(_){
+        return _.entities;}(gs)));
+      return entities;}();};
+  var current = A3(Signal.foldp, function($){
+    return Public.State.State.execState(Step.step($));}, initialState, Trigger.triggers);
+  var main = Utils.combineSElems(_J.toList([A2(Signal._op['<~'], Text.asText, current),A2(Signal._op['<~'], function($){
+    return Utils.spaceBlack({ctor:"_Tuple2", _0:400, _1:400})(draw($));}, current)]));
+  return elm.Demo = {
     _op : _op, 
-    attitude : attitude, 
-    reverseL : reverseL, 
-    reverseR : reverseR, 
-    mods : mods, 
-    simpleShip : simpleShip, 
-    startPos : startPos, 
-    control : control, 
-    engines : engines, 
-    brakes : brakes, 
-    delta : delta, 
-    state : state, 
-    myShip : myShip, 
-    gameObjects : gameObjects, 
-    clock : clock, 
-    frameStamp : frameStamp, 
-    camera : camera, 
-    gameForms : gameForms, 
-    mode : mode, 
-    construct : construct, 
-    canvasWH : canvasWH, 
-    gamePointer : gamePointer, 
-    space$ : space$, 
-    space : space, 
+    initialState : initialState, 
+    initialMode : initialMode, 
+    current : current, 
+    draw : draw, 
     main : main};};
-Elm.Build = function(elm){
-  var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Build';
-  var Text = Elm.Text(elm);
-  var Text = Elm.Text(elm);
-  var Basics = Elm.Basics(elm);
-  var Signal = Elm.Signal(elm);
-  var List = Elm.List(elm);
-  var Maybe = Elm.Maybe(elm);
-  var Time = Elm.Time(elm);
-  var Prelude = Elm.Prelude(elm);
-  var Graphics = Graphics || {};
-  Graphics.Element = Elm.Graphics.Element(elm);
-  var Color = Elm.Color(elm);
-  var Graphics = Graphics || {};
-  Graphics.Collage = Elm.Graphics.Collage(elm);
-  var Char = Elm.Char(elm);
-  var Keyboard = Elm.Keyboard(elm);
-  var Draw = Elm.Draw(elm);
-  var Types = Elm.Types(elm);
-  var _op = {};
-  var updateMode = F2(function(key, mode){
-    return (_N.eq(key,Char.toCode('1')) ? Types.Inactive : (_N.eq(key,Char.toCode('2')) ? Types.BeamMode({
-      _:{
-      },
-      r:10}) : (_N.eq(key,Char.toCode('3')) ? Types.PartMode(Types.Brain({
-      _:{
-      },
-      r:5})) : (_N.eq(key,Char.toCode('4')) ? Types.PartMode(Types.FuelTank({
-      _:{
-      },
-      l:5,
-      w:5})) : (_N.eq(key,Char.toCode('5')) ? Types.PartMode(Types.Engine({
-      _:{
-      },
-      config:Types.Disabled,
-      r:5})) : (Basics.otherwise ? mode : _E.If($moduleName,'between lines 12 and 17')))))));});
-  var blueprint = function(mode){
-    return function(){
-      switch (mode.ctor) {
-        case 'BeamMode':
-          return A2(Draw.drawBeam, mode._0, _J.toList([]));
-        case 'Inactive':
-          return Graphics.Collage.group(_J.toList([]));
-        case 'PartMode':
-          return A3(Draw.drawPart, 0, _J.toList([]), mode._0);
-      }_E.Case($moduleName,'between lines 21 and 24')}();};
-  return elm.Build = {
-    _op : _op, 
-    updateMode : updateMode, 
-    blueprint : blueprint};};
 Elm.Draw = function(elm){
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Draw';
   var Text = Elm.Text(elm);
@@ -572,6 +328,52 @@ Elm.Physics = function(elm){
     netDelta : netDelta, 
     applyBrakes : applyBrakes, 
     updateMotion : updateMotion};};
+Elm.Step = function(elm){
+  var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Step';
+  var Text = Elm.Text(elm);
+  var Text = Elm.Text(elm);
+  var Basics = Elm.Basics(elm);
+  var Signal = Elm.Signal(elm);
+  var List = Elm.List(elm);
+  var Maybe = Elm.Maybe(elm);
+  var Time = Elm.Time(elm);
+  var Prelude = Elm.Prelude(elm);
+  var Graphics = Graphics || {};
+  Graphics.Element = Elm.Graphics.Element(elm);
+  var Color = Elm.Color(elm);
+  var Graphics = Graphics || {};
+  Graphics.Collage = Elm.Graphics.Collage(elm);
+  var Dict = Elm.Dict(elm);
+  var Trigger = Elm.Trigger(elm);
+  var Types = Elm.Types(elm);
+  var Public = Public || {};
+  Public.State = Public.State || {};
+  Public.State.State = Elm.Public.State.State(elm);
+  var Utils = Elm.Utils(elm);
+  var _op = {};
+  var step = function(t){
+    return Public.State.State.returnS({ctor:"_Tuple0"});};
+  var None = {ctor:"None"};
+  var Mode = F2(function(a, b){
+    return {
+      _:{
+      },
+      build:b,
+      pause:a};});
+  var GameState = F2(function(a, b){
+    return {
+      _:{
+      },
+      entities:a,
+      mode:b};});
+  var FuelTank = {ctor:"FuelTank"};
+  var Engine = {ctor:"Engine"};
+  return elm.Step = {
+    _op : _op, 
+    step : step, 
+    None : None, 
+    Engine : Engine, 
+    FuelTank : FuelTank};};
 Elm.Types = function(elm){
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Types';
   var Text = Elm.Text(elm);
@@ -989,6 +791,55 @@ Elm.Public.Vec2.Vec2 = function(elm){
     crossVecMag : crossVecMag, 
     vecTranslate : vecTranslate, 
     minimumDist : minimumDist};};
+Elm.Trigger = function(elm){
+  var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Trigger';
+  var Text = Elm.Text(elm);
+  var Text = Elm.Text(elm);
+  var Basics = Elm.Basics(elm);
+  var Signal = Elm.Signal(elm);
+  var List = Elm.List(elm);
+  var Maybe = Elm.Maybe(elm);
+  var Time = Elm.Time(elm);
+  var Prelude = Elm.Prelude(elm);
+  var Graphics = Graphics || {};
+  Graphics.Element = Elm.Graphics.Element(elm);
+  var Color = Elm.Color(elm);
+  var Graphics = Graphics || {};
+  Graphics.Collage = Elm.Graphics.Collage(elm);
+  var Mouse = Elm.Mouse(elm);
+  var Time = Elm.Time(elm);
+  var Utils = Elm.Utils(elm);
+  var _op = {};
+  var Position = function(a){
+    return {ctor:"Position", _0:a};};
+  var positions = A2(Signal._op['<~'], Position, Mouse.position);
+  var Pause = {ctor:"Pause"};
+  var Number = function(a){
+    return {ctor:"Number", _0:a};};
+  var Modal = function(a){
+    return {ctor:"Modal", _0:a};};
+  var FPS = function(a){
+    return {ctor:"FPS", _0:a};};
+  var ticks = A2(Signal._op['<~'], FPS, Time.fps(25));
+  var Exit = {ctor:"Exit"};
+  var modes = Signal.constant(Modal(Exit));
+  var Click = {ctor:"Click"};
+  var clicks = A2(Signal._op['<~'], Utils.cnst(Click), Mouse.clicks);
+  var triggers = Signal.merges(_J.toList([clicks,positions,modes,ticks]));
+  return elm.Trigger = {
+    _op : _op, 
+    triggers : triggers, 
+    clicks : clicks, 
+    positions : positions, 
+    modes : modes, 
+    ticks : ticks, 
+    Click : Click, 
+    Position : Position, 
+    Modal : Modal, 
+    FPS : FPS, 
+    Pause : Pause, 
+    Exit : Exit, 
+    Number : Number};};
 Elm.Utils = function(elm){
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Utils';
   var Text = Elm.Text(elm);
@@ -1035,7 +886,7 @@ Elm.Utils = function(elm){
     </head>
     <body>
         <script type="text/javascript">
-            Elm.fullscreen(Elm.Main)
+            Elm.fullscreen(Elm.Demo)
         </script>
         <noscript>
             
