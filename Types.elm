@@ -1,8 +1,8 @@
 module Types where
 
-import open State
-import open TagTree
-import open Vec2
+import open Public.State.State
+import open Public.TagTree.TagTree
+import open Public.Vec2.Vec2
 
 type Position = { x : Float, y : Float, theta : Float }
 

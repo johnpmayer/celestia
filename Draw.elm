@@ -6,9 +6,9 @@ import Matrix2D (Matrix2D)
 import Matrix2D as M
 
 import open Physics
-import open TagTree
+import open Public.TagTree.TagTree
 import open Types 
-import open Vec2
+import open Public.Vec2.Vec2
 
 translation : Float -> Float -> Matrix2D
 translation = M.matrix 1 0 0 1

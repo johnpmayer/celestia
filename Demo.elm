@@ -4,7 +4,7 @@ module Demo where
 import Dict (empty, values)
 
 import Draw (drawEntity)
-import State (execState)
+import Public.State.State (execState)
 import Step (GameState, Mode, None, step)
 import Trigger (triggers)
 import open Utils

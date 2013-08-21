@@ -6,7 +6,7 @@ import Dict (Dict)
 import Trigger (Trigger, Modal)
 import Types (Entity)
 
-import State as ST
+import Public.State.State as ST
 
 import open Utils
 

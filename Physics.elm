@@ -1,7 +1,7 @@
 module Physics where
 
-import open Vec2
-import open TagTree
+import open Public.Vec2.Vec2
+import open Public.TagTree.TagTree
 import open Types
 import open Utils
 
