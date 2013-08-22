@@ -6,7 +6,7 @@ import Dict (empty, values)
 import Draw (drawEntity)
 import Public.State.State (execState)
 import Step (GameState, Mode, None, step)
-import Trigger (triggers)
+import GameInputs (gameInputs)
 import open Utils
 
 {- Setup initial game state and initialize the loop -}
@@ -18,7 +18,7 @@ initialMode : Mode
 initialMode = { pause = False, build = None }
 
 current : Signal GameState
-current = foldp (execState . step) initialState triggers
+current = foldp (execState . step) initialState gameInputs
 
 {- Render the display -}
 

@@ -3,8 +3,7 @@ module Step where
 
 import Dict (Dict)
 
-import Trigger (Trigger, Modal)
-import Types (Entity)
+import open Types
 
 import Public.State.State as ST
 
@@ -18,7 +17,7 @@ data BuildMode = None | Engine | FuelTank
 
 type GameStep = ST.State GameState ()
 
-step : Trigger -> GameStep
+step : GameInput -> GameStep
 step t = ST.returnS ()
 
 

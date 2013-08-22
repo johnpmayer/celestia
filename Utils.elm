@@ -1,6 +1,8 @@
 
 module Utils where
 
+import open Types
+
 cnst : a -> b -> a
 cnst x = \a -> x
 
@@ -14,5 +16,12 @@ spaceBlack : (Int,Int) -> [Form] -> Element
 spaceBlack (w,h) stuff = collage w h <|
   (filled black <| rect (toFloat w) (toFloat h)) ::
   stuff
+
+controlEngines : { x:Int, y:Int } -> [ EngineConfig ]
+controlEngines input = 
+  (if input.y < 0 then [ Reverse ] else []) ++
+  (if input.y > 0 then [ Forward ] else []) ++
+  (if input.x > 0 then [ TurnRight ] else []) ++
+  (if input.x < 0 then [ TurnLeft ] else [])
 
 

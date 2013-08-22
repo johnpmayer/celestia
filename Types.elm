@@ -73,3 +73,18 @@ type Entity = { controls : [EngineConfig], motion : MotionState, structure : Str
 data BuildMode = Inactive
                | BeamMode Beam
                | PartMode Part
+
+{- GameInputs -}
+
+type GameInput = { engines : [EngineConfig], pointer : (Int,Int), trigger : Trigger }
+
+data Trigger 
+  = Click
+  | Modal Modal
+  | FPS Time
+
+data Modal
+  = Pause
+  | Exit
+  | Number Int
+
