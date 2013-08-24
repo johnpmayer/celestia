@@ -81,7 +81,7 @@ partThrusts ecs part =
   case part of
     (Engine engine) -> 
       if any (\ec -> ec == engine.config) ecs
-      then let force = -1.4 * engine.r
+      then let force = -8 * engine.r
            in [ { disp = origin, force = { x = force, y = 0 } } ]
       else [] 
     _ -> []
