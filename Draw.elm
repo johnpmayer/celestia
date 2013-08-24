@@ -58,7 +58,7 @@ drawBeam : Beam -> [Form] -> Form
 drawBeam beam subForms =
   let l = beam.r
       w = l * 0.05
-      beamForm = move (l * 0.5, 0) . filled (gray 0.5) <| rect l w
+      beamForm = move (l * 0.5, 0) . filled (gray) <| rect l w
   in group (beamForm :: subForms)
 
 drawStructure : Time -> [EngineConfig] -> Structure -> Form
