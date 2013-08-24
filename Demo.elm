@@ -21,18 +21,28 @@
 
 module Demo where
 
-import Dict (empty, values)
+import Dict (Dict)
+import Dict as D
 
 import Draw (drawEntity)
 import Public.State.State (execState)
 import Step (GameState, Mode, None, step)
 import GameInputs (gameInputs)
+import open Types
 import open Utils
+
+import Main (simpleShip)
 
 {- Setup initial game state and initialize the loop -}
 
+initialShip : Entity
+initialShip = { controls=[], motion={ pos = { x = 0, y = 0, theta = 0 }, v = { x = 0, y = 0 }, omega = 0 }, structure=simpleShip }
+
+initialEntities : Dict Int Entity
+initialEntities = D.singleton 0 initialShip
+
 initialState : GameState
-initialState = { entities = empty, mode = initialMode }
+initialState = { entities = initialEntities, mode = initialMode }
 
 initialMode : Mode
 initialMode = { pause = False, build = None }
@@ -44,10 +54,11 @@ current = foldp (execState . step) initialState gameInputs
 
 draw : GameState -> [Form]
 draw gs = 
-  let entities = map (drawEntity 0) . values . .entities <| gs
-  in entities
+  let entities = D.values <| gs.entities
+  in map (drawEntity 0) entities
 
 main = combineSElems <|
-  [ asText <~ current
-  , spaceBlack (400,400) . draw <~ current
+  [ spaceBlack (800,600) . draw <~ current
+  , asText <~ current
+  , asText <~ gameInputs
   ]

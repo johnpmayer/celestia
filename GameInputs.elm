@@ -26,12 +26,13 @@ import Mouse as M
 import Time as T
 
 import open Types 
-import Utils (cnst, controlEngines)
+import open Utils
 
 gameInputs : Signal GameInput
-gameInputs = GameInput 
+-- TODO gameInputs = GameInput
+gameInputs = (\engines pointer trigger -> { engines=engines, pointer=pointer,trigger=trigger}) 
           <~ (controlEngines <~ K.wasd) 
-          ~ M.position 
+          ~ ((convertPos (800,600)) <~ M.position)
           ~ triggers
 
 triggers : Signal Trigger

@@ -20,6 +20,8 @@
 
 module Types where
 
+import Dict (Dict)
+
 import open Public.State.State
 import open Public.TagTree.TagTree
 import open Public.Vec2.Vec2
@@ -107,4 +109,12 @@ data Modal
   = Pause
   | Exit
   | Number Int
+
+type GameState = { entities : Dict Int Entity, mode : Mode }
+
+type Mode = { pause : Bool, build : BuildMode }
+
+data BuildMode = None | Part
+
+type GameStep = State GameState ()
 
