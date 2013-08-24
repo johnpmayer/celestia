@@ -110,7 +110,7 @@ data Modal
   | Exit
   | Number Int
 
-type GameState = { entities : Dict Int Entity, mode : Mode }
+type GameState = { entities : Dict Int Entity, mode : Mode, focus : Int }
 
 type Mode = { pause : Bool, build : BuildMode }
 

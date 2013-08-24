@@ -30,19 +30,28 @@ import Step (GameState, Mode, None, step)
 import GameInputs (gameInputs)
 import open Types
 import open Utils
+import open Public.Vec2.Vec2
 
 import Main (simpleShip)
 
 {- Setup initial game state and initialize the loop -}
 
-initialShip : Entity
-initialShip = { controls=[], motion={ pos = { x = 0, y = 0, theta = 0 }, v = { x = 0, y = 0 }, omega = 0 }, structure=simpleShip }
+initialShips : [Entity]
+initialShips = 
+  [ { controls = [], motion = { pos = { x =   0, y =   0, theta = 0 }, v = { x = 0, y = 0 }, omega = 0 }, structure = simpleShip }
+  , { controls = [], motion = { pos = { x =  60, y =  50, theta = 1 }, v = { x = 0, y = 0 }, omega = 0 }, structure = simpleShip }
+  , { controls = [], motion = { pos = { x = -80, y =  40, theta = 4 }, v = { x = 0, y = 0 }, omega = 0 }, structure = simpleShip }
+  , { controls = [], motion = { pos = { x = 120, y = -20, theta = 3 }, v = { x = 0, y = 0 }, omega = 0 }, structure = simpleShip }
+  ]
 
 initialEntities : Dict Int Entity
-initialEntities = D.singleton 0 initialShip
+initialEntities = 
+  D.fromList .
+  zip [0,1,2,3] <|
+  initialShips
 
 initialState : GameState
-initialState = { entities = initialEntities, mode = initialMode }
+initialState = { entities = initialEntities, mode = initialMode, focus = 1 }
 
 initialMode : Mode
 initialMode = { pause = False, build = None }
@@ -55,7 +64,11 @@ current = foldp (execState . step) initialState gameInputs
 draw : GameState -> [Form]
 draw gs = 
   let entities = D.values <| gs.entities
-  in map (drawEntity 0) entities
+      camera = case D.lookup gs.focus gs.entities of
+        Nothing -> origin
+        Just e -> extractVec e.motion.pos
+      cameraTransform = vecTranslate <| negVec camera
+  in [groupTransform cameraTransform <| map (drawEntity 0) entities]
 
 main = combineSElems <|
   [ spaceBlack (800,600) . draw <~ current
