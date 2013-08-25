@@ -51,7 +51,7 @@ initialEntities =
   initialShips
 
 initialState : GameState
-initialState = { entities = initialEntities, mode = initialMode, focus = 1 }
+initialState = { entities = initialEntities, mode = initialMode, focus = 0 }
 
 initialMode : Mode
 initialMode = { pause = False, build = None }

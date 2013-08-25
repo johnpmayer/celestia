@@ -30,7 +30,7 @@ import open Utils
 
 gameInputs : Signal GameInput
 -- TODO gameInputs = GameInput
-gameInputs = (\engines pointer trigger -> { engines=engines, pointer=pointer,trigger=trigger}) 
+gameInputs = sampleOn triggers <| (\engines pointer trigger -> { engines=engines, pointer=pointer,trigger=trigger}) 
           <~ (controlEngines <~ K.wasd) 
           ~ ((convertPos (800,600)) <~ M.position)
           ~ triggers
