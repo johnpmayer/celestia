@@ -83,32 +83,8 @@ delta = sampleOn (fps 30) <| netDelta <~ engines ~ (constant simpleShip)
 state : Signal MotionState
 state = foldp updateMotion startPos ((,) <~ brakes ~ delta)
 
-myShip : Signal Entity
-myShip = (\engines state structure -> { controls = engines, motion = state, structure = structure }) <~ engines ~ state ~ (constant simpleShip)
-
-gameObjects : Signal [Entity]
-gameObjects = combine <| 
-  constant { controls = [], motion = { pos = { x=60,y=50,theta=1}, v = {x=0,y=0}, omega=0}, structure = simpleShip } ::
-  constant { controls = [], motion = { pos = { x=-80,y=40,theta=4}, v = {x=0,y=0}, omega=0}, structure = simpleShip } ::
-  constant { controls = [], motion = { pos = { x=120,y=-20,theta=3}, v = {x=0,y=0}, omega=0}, structure = simpleShip } ::
-  [ myShip ]
-
-clock : Signal Time
-clock = fps 30
-
-frameStamp : Signal Time
-frameStamp = fst <~ timestamp clock
-
 camera : Signal Vec2
 camera = (extractVec . .pos) <~ state
-
-gameForms : Signal Form
-gameForms = 
-  (\time es camera -> 
-    let modelM = vecTranslate <| negVec camera
-        forms = map (drawEntity time) es
-    in groupTransform modelM forms)
-    <~ frameStamp ~ gameObjects ~ camera
 
 mode : Signal BuildMode
 mode = foldp updateMode Inactive K.lastPressed
@@ -121,26 +97,3 @@ canvasWH = (400,300)
 
 gamePointer : Signal (Int,Int)
 gamePointer = (convertPos canvasWH) <~ M.position
-
-space' : (Int,Int) -> BuildMode -> Form -> Element
-space' point mode objects = spaceBlack canvasWH
-    [ (construct point mode)
-    , objects
-    , drawBuildArea mode
-    ]
-
-space : Signal Element
-space = space' <~ gamePointer ~ mode ~ gameForms
-
-main : Signal Element
-main = combineSElems <|
-  [ space 
-  , constant . plainText <| "Ship position"
-  , asText <~ state
-  , asText <~ K.keysDown
-  , asText <~ brakes
-  , asText <~ K.space
-  , asText <~ ((minimumDist origin (fromIntPair (50,0))) <~ (fromIntPair <~ gamePointer))
-  , constant . asText . labelBeams <| simpleShip
-  ]
-

@@ -22,6 +22,7 @@
 module Step where
 
 import Dict as D
+import open Either
 
 import open Types
 
@@ -72,8 +73,12 @@ focusControls input =
 
 entityPureStep : Entity -> Entity
 entityPureStep e =
-  let delta = netDelta e.controls e.structure
-      newMotion = updateMotion (False,delta) e.motion
+  let rest = {a={x=0,y=0},alpha=0}
+      newMotion = case e.controls of
+        Left _ -> updateMotion (True,rest) e.motion
+        Right engines -> 
+          let delta = netDelta engines e.structure
+          in updateMotion (False,delta) e.motion
   in { e | motion <- newMotion }
 
 physicsStep : GameStep

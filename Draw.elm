@@ -20,6 +20,8 @@
 
 module Draw where
 
+import open Either
+
 import Graphics.Collage
 
 import Transform2D (Transform2D)
@@ -72,7 +74,10 @@ drawEntity noise { controls, motion, structure } =
       rotM = T.rotation motion.pos.theta
       moveM = translation motion.pos.x motion.pos.y
       modelM = T.multiply moveM (T.multiply rotM comM)
-  in groupTransform modelM <| [ drawStructure noise controls structure ]
+      engines = case controls of
+        Left _ -> []
+        Right ecs -> ecs
+  in groupTransform modelM <| [ drawStructure noise engines structure ]
 
 drawBuildArea : BuildMode -> Form
 drawBuildArea mode = case mode of

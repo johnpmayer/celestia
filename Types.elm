@@ -21,6 +21,7 @@
 module Types where
 
 import Dict (Dict)
+import Either (Either)
 
 import open Public.State.State
 import open Public.TagTree.TagTree
@@ -88,7 +89,7 @@ type MotionState = { pos : Position, v : Vec2, omega : Float }
 
 type MotionDelta = { a : Vec2, alpha : Float }
 
-type Entity = { controls : [EngineConfig], motion : MotionState, structure : Structure }
+type Entity = { controls : Either Brakes [EngineConfig], motion : MotionState, structure : Structure }
 
 {- Build -}
 
@@ -98,7 +99,9 @@ data BuildMode = Inactive
 
 {- GameInputs -}
 
-type GameInput = { engines : [EngineConfig], pointer : (Int,Int), trigger : Trigger }
+type GameInput = { engines : Either Brakes [EngineConfig], pointer : (Int,Int), window : (Int,Int), trigger : Trigger }
+
+data Brakes = Brakes
 
 data Trigger 
   = Click

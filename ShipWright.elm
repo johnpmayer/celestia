@@ -24,10 +24,10 @@ module ShipWright where
 import Mouse as M
 
 import open Draw
-import open TagTree
+import open Public.TagTree.TagTree
 import open Types
 import open Utils
-import open Vec2
+import open Public.Vec2.Vec2
 
 dimensions = (800,600)
 

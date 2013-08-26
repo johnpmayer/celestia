@@ -21,19 +21,34 @@
 
 module GameInputs where
 
+import open Either
+
+import Char as C
 import Keyboard as K
 import Mouse as M
 import Time as T
+import Window as W
 
 import open Types 
 import open Utils
 
 gameInputs : Signal GameInput
 -- TODO gameInputs = GameInput
-gameInputs = sampleOn triggers <| (\engines pointer trigger -> { engines=engines, pointer=pointer,trigger=trigger}) 
-          <~ (controlEngines <~ K.wasd) 
-          ~ ((convertPos (800,600)) <~ M.position)
+gameInputs = sampleOn triggers <| (\engines pointer window trigger -> { engines=engines, pointer=pointer, window=window, trigger=trigger}) 
+          <~ engines
+          ~ pointer
+          ~ W.dimensions
           ~ triggers
+
+engines : Signal (Either Brakes [EngineConfig])
+engines =
+  let brakes = K.isDown . C.toCode <| 'x'
+      controls = controlEngines <~ K.wasd
+      override b ecs = if b then Left Brakes else Right ecs
+  in override <~ brakes ~ controls
+
+pointer : Signal (Int,Int)
+pointer = convertPos <~ W.dimensions ~ M.position
 
 triggers : Signal Trigger
 triggers = merges [ clicks, modes, ticks ]
