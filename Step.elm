@@ -24,6 +24,8 @@ module Step where
 import Dict as D
 import open Either
 
+import Char as C
+
 import open Types
 
 import Public.State.State as ST
@@ -37,11 +39,26 @@ step input =
   let (>>=) = ST.bindS
       pure = ST.returnS
   in case input.trigger of
-    Modal m -> pure ()
+    Modal m -> updateMode m
     Click -> rotateFocus
     FPS t ->
       (focusControls input) >>= (\_ ->
       physicsStep)
+
+updateMode : Modal -> GameStep
+updateMode m =
+  let (>>=) = ST.bindS
+      pure = ST.returnS
+  in
+    ST.get >>= (\state ->
+    let mode = state.mode
+        pause = case m of
+          Number n -> 
+            if n == C.toCode 'p'
+            then not state.mode.pause
+            else state.mode.pause
+          _ -> state.mode.pause
+    in ST.put { state | mode <- { mode | pause <- pause } })
 
 rotateFocus : GameStep
 rotateFocus =

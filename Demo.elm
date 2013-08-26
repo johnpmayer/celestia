@@ -77,5 +77,6 @@ main = combineSElems outward <|
   , combineSElems down
     [ (color white . asText) <~ gameInputs
     , (color white . asText . .focus) <~ current
+    , (color white . asText . .mode) <~ current
     ]
   ]

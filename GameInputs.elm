@@ -22,6 +22,7 @@
 module GameInputs where
 
 import open Either
+import open Dict
 
 import Char as C
 import Keyboard as K
@@ -56,8 +57,18 @@ triggers = merges [ clicks, modes, ticks ]
 clicks : Signal Trigger
 clicks = (cnst Click) <~ M.clicks
 
+watchKeys : Dict K.KeyCode Modal
+watchKeys = fromList
+  [ (1, Number 1)
+  , (2, Number 2)
+  , (3, Number 3)
+  , (4, Number 4)
+  , (5, Number 5)
+  , (27, Exit)
+  ]
+
 modes : Signal Trigger
-modes = constant <| Modal Exit
+modes = (Modal . Number) <~ K.lastPressed
 
 ticks : Signal Trigger
 ticks = FPS <~ (T.fps 25)
