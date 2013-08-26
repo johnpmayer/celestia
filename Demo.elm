@@ -72,8 +72,10 @@ draw gs =
       cameraTransform = vecTranslate <| negVec camera
   in [groupTransform cameraTransform <| map (drawEntity 0) entities]
 
-main = combineSElems <|
-  [ spaceBlack (800,600) . draw <~ current
-  , asText <~ current
-  , asText <~ gameInputs
+main = combineSElems outward <|
+  [ spaceBlack <~ (.window <~ gameInputs) ~ (draw <~ current)
+  , combineSElems down
+    [ (color white . asText) <~ gameInputs
+    , (color white . asText . .focus) <~ current
+    ]
   ]

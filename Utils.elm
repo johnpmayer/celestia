@@ -29,8 +29,8 @@ cnst x = \a -> x
 convertPos : (Int,Int) -> (Int,Int) -> (Int,Int)
 convertPos (w,h) (x,y) = (x - div w 2, div h 2 - y)
 
-combineSElems : [Signal Element] -> Signal Element
-combineSElems ses = flow down <~ combine ses
+combineSElems : Direction -> [Signal Element] -> Signal Element
+combineSElems dir ses = flow dir <~ combine ses
 
 spaceBlack : (Int,Int) -> [Form] -> Element
 spaceBlack (w,h) stuff = collage w h <|
