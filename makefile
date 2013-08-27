@@ -15,7 +15,7 @@ ${RUNTIME}: build
 	cp ${HOME}/.cabal/share/${ELM_VER}/elm-runtime.js build/
 
 build/index.html: build/Demo.html
-	(cd build; ln -sf Demo.html index.html)
+	cp build/Demo.html build/index.html
 
 build/Demo.html: ${RUNTIME} ${SOURCES}
 	${ELM} --make Demo.elm 
