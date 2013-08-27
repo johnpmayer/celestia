@@ -2315,6 +2315,52 @@ Elm.Native.Graphics.Input = function(elm) {
      return Tuple2(Signal.constant(element), events);
  }
 
+ function group(defaultValue, builder, commands) {
+   var events = Signal.constant(defaultValue);
+
+   function Merger (tag, update) {
+     this.recv = function(timestamp, changed, parentID) {
+       if (changed) {
+         var value = update()
+         var msg = {
+           ctor : "Event",
+           _0 : tag,
+           _1 : value
+         };
+         elm.notify(events.id, msg);
+       }
+     }
+   }
+
+   function add(timestamp, addData) {
+     var tag = addData._0;
+     var newInput = builder(addData._1);
+     var msg = {
+       ctor : "Added",
+       _0 : tag,
+       _1 : newInput.view.value
+     };
+     elm.notify(events.id, msg);
+     var listener = new Merger(tag, function(){
+       return newInput.events.value;
+     });
+     newInput.events.kids.push(listener);
+     listener.recv(timestamp, true, newInput.events.id);
+   }
+
+   function CommandListener() {
+     this.recv = function(timestamp, changed, parentID) {
+       if(changed) {
+         add(timestamp, commands.value);
+       }
+     }
+   }
+
+   commands.kids.push(new CommandListener());
+
+   return events;
+ }
+
  function buttons(defaultValue) {
      var events = Signal.constant(defaultValue);
 
@@ -2553,6 +2599,7 @@ Elm.Native.Graphics.Input = function(elm) {
  }
 
  return elm.Native.Graphics.Input = {
+     group:F3(group),
      buttons:buttons,
      customButtons:customButtons,
      hoverables:hoverables,
@@ -2566,6 +2613,7 @@ Elm.Native.Graphics.Input = function(elm) {
 };
 
 Elm.Color = function(elm){
+  if (elm.Color) return elm.Color;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Color';
   var Native = Native || {};
   Native.Color = Elm.Native.Color(elm);
@@ -2589,26 +2637,26 @@ Elm.Color = function(elm){
   var black = A4(Color, 0, 0, 0, 1);
   var blue = A4(Color, 52, 101, 164, 1);
   var brown = A4(Color, 193, 125, 17, 1);
-  var charcoal = A3(Color, 85, 87, 83);
+  var charcoal = A4(Color, 85, 87, 83, 1);
   var darkBlue = A4(Color, 32, 74, 135, 1);
   var darkBrown = A4(Color, 143, 89, 2, 1);
-  var darkCharcoal = A3(Color, 46, 52, 54);
-  var darkGray = A3(Color, 186, 189, 182);
+  var darkCharcoal = A4(Color, 46, 52, 54, 1);
+  var darkGray = A4(Color, 186, 189, 182, 1);
   var darkGreen = A4(Color, 78, 154, 6, 1);
-  var darkGrey = A3(Color, 186, 189, 182);
+  var darkGrey = A4(Color, 186, 189, 182, 1);
   var darkOrange = A4(Color, 206, 92, 0, 1);
   var darkPurple = A4(Color, 92, 53, 102, 1);
   var darkRed = A4(Color, 164, 0, 0, 1);
   var darkYellow = A4(Color, 196, 160, 0, 1);
-  var gray = A3(Color, 211, 215, 207);
+  var gray = A4(Color, 211, 215, 207, 1);
   var green = A4(Color, 115, 210, 22, 1);
-  var grey = A3(Color, 211, 215, 207);
+  var grey = A4(Color, 211, 215, 207, 1);
   var lightBlue = A4(Color, 114, 159, 207, 1);
   var lightBrown = A4(Color, 233, 185, 110, 1);
-  var lightCharcoal = A3(Color, 136, 138, 133);
-  var lightGray = A3(Color, 238, 238, 236);
+  var lightCharcoal = A4(Color, 136, 138, 133, 1);
+  var lightGray = A4(Color, 238, 238, 236, 1);
   var lightGreen = A4(Color, 138, 226, 52, 1);
-  var lightGrey = A3(Color, 238, 238, 236);
+  var lightGrey = A4(Color, 238, 238, 236, 1);
   var lightOrange = A4(Color, 252, 175, 62, 1);
   var lightPurple = A4(Color, 173, 127, 168, 1);
   var lightRed = A4(Color, 239, 41, 41, 1);
@@ -2668,6 +2716,7 @@ Elm.Color = function(elm){
     Linear : Linear, 
     Radial : Radial};};
 Elm.Basics = function(elm){
+  if (elm.Basics) return elm.Basics;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Basics';
   var Native = Native || {};
   Native.Basics = Elm.Native.Basics(elm);
@@ -2791,6 +2840,7 @@ Elm.Basics = function(elm){
     EQ : EQ, 
     GT : GT};};
 Elm.Set = function(elm){
+  if (elm.Set) return elm.Set;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Set';
   var Maybe = Elm.Maybe(elm);
   var Dict = Elm.Dict(elm);
@@ -2835,6 +2885,7 @@ Elm.Set = function(elm){
     toList : toList, 
     fromList : fromList};};
 Elm.Json = function(elm){
+  if (elm.Json) return elm.Json;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Json';
   var Basics = Elm.Basics(elm);
   var Dict = Elm.Dict(elm);
@@ -2878,6 +2929,7 @@ Elm.Json = function(elm){
     Array : Array, 
     Object : Object};};
 Elm.Touch = function(elm){
+  if (elm.Touch) return elm.Touch;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Touch';
   var Signal = Elm.Signal(elm);
   var Native = Native || {};
@@ -2899,8 +2951,10 @@ Elm.Touch = function(elm){
   return elm.Touch = {
     _op : _op, 
     touches : touches, 
-    taps : taps};};
+    taps : taps, 
+    Touch : Touch};};
 Elm.Dict = function(elm){
+  if (elm.Dict) return elm.Dict;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Dict';
   var Basics = Elm.Basics(elm);
   var Maybe = Elm.Maybe(elm);
@@ -3347,6 +3401,7 @@ Elm.Dict = function(elm){
     toList : toList, 
     fromList : fromList};};
 Elm.Char = function(elm){
+  if (elm.Char) return elm.Char;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Char';
   var Native = Native || {};
   Native.Char = Elm.Native.Char(elm);
@@ -3376,6 +3431,7 @@ Elm.Char = function(elm){
     toCode : toCode, 
     fromCode : fromCode};};
 Elm.Time = function(elm){
+  if (elm.Time) return elm.Time;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Time';
   var Basics = Elm.Basics(elm);
   var Native = Native || {};
@@ -3417,6 +3473,7 @@ Elm.Time = function(elm){
     timestamp : timestamp, 
     delay : delay};};
 Elm.Date = function(elm){
+  if (elm.Date) return elm.Date;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Date';
   var Basics = Elm.Basics(elm);
   var Native = Native || {};
@@ -3485,6 +3542,7 @@ Elm.Date = function(elm){
     Nov : Nov, 
     Dec : Dec};};
 Elm.Window = function(elm){
+  if (elm.Window) return elm.Window;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Window';
   var Signal = Elm.Signal(elm);
   var Native = Native || {};
@@ -3499,6 +3557,7 @@ Elm.Window = function(elm){
     width : width, 
     height : height};};
 Elm.Transform2D = function(elm){
+  if (elm.Transform2D) return elm.Transform2D;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Transform2D';
   var Native = Native || {};
   Native.Transform2D = Elm.Native.Transform2D(elm);
@@ -3516,6 +3575,7 @@ Elm.Transform2D = function(elm){
     multiply : multiply, 
     Transform2D : Transform2D};};
 Elm.Mouse = function(elm){
+  if (elm.Mouse) return elm.Mouse;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Mouse';
   var Signal = Elm.Signal(elm);
   var Native = Native || {};
@@ -3536,6 +3596,7 @@ Elm.Mouse = function(elm){
     isClicked : isClicked, 
     clicks : clicks};};
 Elm.Http = function(elm){
+  if (elm.Http) return elm.Http;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Http';
   var Basics = Elm.Basics(elm);
   var Signal = Elm.Signal(elm);
@@ -3572,20 +3633,23 @@ Elm.Http = function(elm){
     sendGet : sendGet, 
     Success : Success, 
     Waiting : Waiting, 
-    Failure : Failure};};
+    Failure : Failure, 
+    Request : Request};};
 Elm.Random = function(elm){
+  if (elm.Random) return elm.Random;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Random';
   var Signal = Elm.Signal(elm);
   var Native = Native || {};
   Native.Random = Elm.Native.Random(elm);
   var _op = {};
   var range = Native.Random.range;
-  var float = Native.Random.float;
+  var $float = Native.Random.$float;
   return elm.Random = {
     _op : _op, 
     range : range, 
-    float : float};};
+    $float : $float};};
 Elm.Keyboard = function(elm){
+  if (elm.Keyboard) return elm.Keyboard;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Keyboard';
   var Signal = Elm.Signal(elm);
   var Native = Native || {};
@@ -3614,6 +3678,7 @@ Elm.Keyboard = function(elm){
     keysDown : keysDown, 
     lastPressed : lastPressed};};
 Elm.JavaScript = function(elm){
+  if (elm.JavaScript) return elm.JavaScript;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'JavaScript';
   var Native = Native || {};
   Native.JavaScript = Elm.Native.JavaScript(elm);
@@ -3655,6 +3720,7 @@ Elm.JavaScript = function(elm){
     JSDomNode : JSDomNode, 
     JSObject : JSObject};};
 Elm.Automaton = function(elm){
+  if (elm.Automaton) return elm.Automaton;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Automaton';
   var Basics = Elm.Basics(elm);
   var Signal = Elm.Signal(elm);
@@ -3822,6 +3888,7 @@ Elm.Automaton = function(elm){
     average : average, 
     Step : Step};};
 Elm.Prelude = function(elm){
+  if (elm.Prelude) return elm.Prelude;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Prelude';
   var Basics = Elm.Basics(elm);
   var Maybe = Elm.Maybe(elm);
@@ -3839,6 +3906,7 @@ Elm.Prelude = function(elm){
     readInt : readInt, 
     readFloat : readFloat};};
 Elm.WebSocket = function(elm){
+  if (elm.WebSocket) return elm.WebSocket;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'WebSocket';
   var Signal = Elm.Signal(elm);
   var Basics = Elm.Basics(elm);
@@ -3850,6 +3918,7 @@ Elm.WebSocket = function(elm){
     _op : _op, 
     connect : connect};};
 Elm.Maybe = function(elm){
+  if (elm.Maybe) return elm.Maybe;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Maybe';
   var Basics = Elm.Basics(elm);
   var List = Elm.List(elm);
@@ -3884,6 +3953,7 @@ Elm.Maybe = function(elm){
     Just : Just, 
     Nothing : Nothing};};
 Elm.List = function(elm){
+  if (elm.List) return elm.List;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'List';
   var Basics = Elm.Basics(elm);
   var Native = Native || {};
@@ -4024,6 +4094,7 @@ Elm.List = function(elm){
     take : take, 
     drop : drop};};
 Elm.Text = function(elm){
+  if (elm.Text) return elm.Text;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Text';
   var Basics = Elm.Basics(elm);
   var Color = Elm.Color(elm);
@@ -4075,6 +4146,7 @@ Elm.Text = function(elm){
     asText : asText, 
     Text : Text};};
 Elm.Either = function(elm){
+  if (elm.Either) return elm.Either;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Either';
   var List = Elm.List(elm);
   var _op = {};
@@ -4152,6 +4224,7 @@ Elm.Either = function(elm){
     Left : Left, 
     Right : Right};};
 Elm.Signal = function(elm){
+  if (elm.Signal) return elm.Signal;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Signal';
   var Native = Native || {};
   Native.Signal = Elm.Native.Signal(elm);
@@ -4211,6 +4284,8 @@ Elm.Signal = function(elm){
     Signal : Signal};};
 Elm.JavaScript = Elm.JavaScript || {};
 Elm.JavaScript.Experimental = function(elm){
+  elm.JavaScript = elm.JavaScript || {};
+  if (elm.JavaScript.Experimental) return elm.JavaScript.Experimental;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'JavaScript.Experimental';
   var JavaScript = Elm.JavaScript(elm);
   var Native = Native || {};
@@ -4218,13 +4293,14 @@ Elm.JavaScript.Experimental = function(elm){
   var _op = {};
   var toRecord = Native.JavaScript.toRecord;
   var fromRecord = Native.JavaScript.fromRecord;
-  elm.JavaScript = elm.JavaScript || {};
   return elm.JavaScript.Experimental = {
     _op : _op, 
     toRecord : toRecord, 
     fromRecord : fromRecord};};
 Elm.Graphics = Elm.Graphics || {};
 Elm.Graphics.Input = function(elm){
+  elm.Graphics = elm.Graphics || {};
+  if (elm.Graphics.Input) return elm.Graphics.Input;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Graphics.Input';
   var Basics = Elm.Basics(elm);
   var Signal = Elm.Signal(elm);
@@ -4234,7 +4310,6 @@ Elm.Graphics.Input = function(elm){
   var List = Elm.List(elm);
   var Graphics = Graphics || {};
   Graphics.Element = Elm.Graphics.Element(elm);
-  var Color = Elm.Color(elm);
   var Maybe = Elm.Maybe(elm);
   var JavaScript = Elm.JavaScript(elm);
   var _op = {};
@@ -4245,6 +4320,7 @@ Elm.Graphics.Input = function(elm){
     return function(){
       var pool = hoverables(false);
       return {ctor:"_Tuple2", _0:A2(pool.hoverable, id, elem), _1:pool.events};}();};
+  var group = Native.Graphics.Input.group;
   var fields = Native.Graphics.Input.fields;
   var emptyFieldState = {
     _:{
@@ -4289,6 +4365,12 @@ Elm.Graphics.Input = function(elm){
     return function(){
       var pool = buttons({ctor:"_Tuple0"});
       return {ctor:"_Tuple2", _0:A2(pool.button, {ctor:"_Tuple0"}, txt), _1:pool.events};}();};
+  var Input = F2(function(a, b){
+    return {
+      _:{
+      },
+      events:b,
+      view:a};});
   var FieldState = F3(function(a, b, c){
     return {
       _:{
@@ -4296,10 +4378,16 @@ Elm.Graphics.Input = function(elm){
       selectionEnd:c,
       selectionStart:b,
       string:a};});
-  elm.Graphics = elm.Graphics || {};
+  var Event = F2(function(a, b){
+    return {ctor:"Event", _0:a, _1:b};});
+  var Added = F2(function(a, b){
+    return {ctor:"Added", _0:a, _1:b};});
+  var Add = F2(function(a, b){
+    return {ctor:"Add", _0:a, _1:b};});
   return elm.Graphics.Input = {
     _op : _op, 
     id : id, 
+    group : group, 
     buttons : buttons, 
     button : button, 
     customButtons : customButtons, 
@@ -4314,9 +4402,16 @@ Elm.Graphics.Input = function(elm){
     password : password, 
     email : email, 
     dropDown : dropDown, 
-    stringDropDown : stringDropDown};};
+    stringDropDown : stringDropDown, 
+    Add : Add, 
+    Added : Added, 
+    Event : Event, 
+    Input : Input, 
+    FieldState : FieldState};};
 Elm.Graphics = Elm.Graphics || {};
 Elm.Graphics.Collage = function(elm){
+  elm.Graphics = elm.Graphics || {};
+  if (elm.Graphics.Collage) return elm.Graphics.Collage;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Graphics.Collage';
   var Basics = Elm.Basics(elm);
   var List = Elm.List(elm);
@@ -4467,7 +4562,6 @@ Elm.Graphics.Collage = function(elm){
   var toForm = function(e){
     return form(FElement(e));};
   var Clipped = {ctor:"Clipped"};
-  elm.Graphics = elm.Graphics || {};
   return elm.Graphics.Collage = {
     _op : _op, 
     defaultLine : defaultLine, 
@@ -4513,9 +4607,13 @@ Elm.Graphics.Collage = function(elm){
     FShape : FShape, 
     FImage : FImage, 
     FElement : FElement, 
-    FGroup : FGroup};};
+    FGroup : FGroup, 
+    Form : Form, 
+    LineStyle : LineStyle};};
 Elm.Graphics = Elm.Graphics || {};
 Elm.Graphics.Element = function(elm){
+  elm.Graphics = elm.Graphics || {};
+  if (elm.Graphics.Element) return elm.Graphics.Element;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Graphics.Element';
   var Basics = Elm.Basics(elm);
   var Native = Native || {};
@@ -4546,7 +4644,7 @@ Elm.Graphics.Element = function(elm){
         },
         element:e.element,
         props:_N.replace([['opacity',o]], p)};}();});
-  var markdown = Native.Utils.undefined;
+  var markdown = Native.Utils.$undefined;
   var link = F2(function(href, e){
     return function(){
       var p = e.props;
@@ -4805,7 +4903,6 @@ Elm.Graphics.Element = function(elm){
   var bottomLeft = _N.replace([['vertical',N]], topLeft);
   var bottomRight = _N.replace([['horizontal',P]], bottomLeft);
   var topRight = _N.replace([['horizontal',P]], topLeft);
-  elm.Graphics = elm.Graphics || {};
   return elm.Graphics.Element = {
     _op : _op, 
     widthOf : widthOf, 
@@ -4878,7 +4975,10 @@ Elm.Graphics.Element = function(elm){
     DLeft : DLeft, 
     DRight : DRight, 
     DIn : DIn, 
-    DOut : DOut};};
+    DOut : DOut, 
+    Properties : Properties, 
+    Element : Element, 
+    Position : Position};};
 (function() {
 'use strict';
 
@@ -5370,6 +5470,11 @@ function formToMatrix(form) {
    return matrix;
 }
 
+function str(n) {
+    if (n < 0.00001 && n > -0.00001) return 0;
+    return n;
+}
+
 function makeTransform(w, h, form, matrices) {
     var props = form.form._0.props;
     var m = A6( Transform.matrix, 1, 0, 0, 1,
@@ -5379,9 +5484,9 @@ function makeTransform(w, h, form, matrices) {
     for (var i = 0; i < len; ++i) { m = A2( Transform.multiply, m, matrices[i] ); }
     m = A2( Transform.multiply, m, formToMatrix(form) );
 
-    return 'matrix(' +   m[0]  + ',' +   m[3]  + ',' +
-                       (-m[1]) + ',' + (-m[4]) + ',' +
-                         m[2]  + ',' +   m[5]  + ')';
+    return 'matrix(' + str( m[0]) + ',' + str( m[3]) + ',' +
+                       str(-m[1]) + ',' + str(-m[4]) + ',' +
+                       str( m[2]) + ',' + str( m[5]) + ')';
 }
 
 function stepperHelp(list) {

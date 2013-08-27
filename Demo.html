@@ -6,12 +6,13 @@
         <title>
             Demo
         </title>
-        <script type="text/javascript" src="/elm-runtime.js">
+        <script type="text/javascript" src="elm-runtime.js">
             
         </script>
         <script type="text/javascript">
             
 Elm.Demo = function(elm){
+  if (elm.Demo) return elm.Demo;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Demo';
   var Text = Elm.Text(elm);
   var Text = Elm.Text(elm);
@@ -26,6 +27,7 @@ Elm.Demo = function(elm){
   var Color = Elm.Color(elm);
   var Graphics = Graphics || {};
   Graphics.Collage = Elm.Graphics.Collage(elm);
+  var Either = Elm.Either(elm);
   var Dict = Elm.Dict(elm);
   var Dict = Elm.Dict(elm);
   var Draw = Elm.Draw(elm);
@@ -44,7 +46,7 @@ Elm.Demo = function(elm){
   var initialShips = _J.toList([{
     _:{
     },
-    controls:_J.toList([]),
+    controls:Either.Right(_J.toList([])),
     motion:{
     _:{
     },
@@ -63,7 +65,7 @@ Elm.Demo = function(elm){
     structure:Main.simpleShip},{
     _:{
     },
-    controls:_J.toList([]),
+    controls:Either.Right(_J.toList([])),
     motion:{
     _:{
     },
@@ -82,7 +84,7 @@ Elm.Demo = function(elm){
     structure:Main.simpleShip},{
     _:{
     },
-    controls:_J.toList([]),
+    controls:Either.Right(_J.toList([])),
     motion:{
     _:{
     },
@@ -101,7 +103,7 @@ Elm.Demo = function(elm){
     structure:Main.simpleShip},{
     _:{
     },
-    controls:_J.toList([]),
+    controls:Either.Right(_J.toList([])),
     motion:{
     _:{
     },
@@ -128,7 +130,7 @@ Elm.Demo = function(elm){
     _:{
     },
     entities:initialEntities,
-    focus:1,
+    focus:0,
     mode:initialMode};
   var draw = function(gs){
     return function(){
@@ -140,13 +142,18 @@ Elm.Demo = function(elm){
             return Public.Vec2.Vec2.extractVec(case0._0.motion.pos);
           case 'Nothing':
             return Public.Vec2.Vec2.origin;
-        }_E.Case($moduleName,'between lines 67 and 70')}();
+        }_E.Case($moduleName,'between lines 69 and 72')}();
       var cameraTransform = Public.Vec2.Vec2.vecTranslate(Public.Vec2.Vec2.negVec(camera));
       return _J.toList([Graphics.Collage.groupTransform(cameraTransform)(A2(List.map, Draw.drawEntity(0), entities))]);}();};
   var current = A3(Signal.foldp, function($){
     return Public.State.State.execState(Step.step($));}, initialState, GameInputs.gameInputs);
-  var main = Utils.combineSElems(_J.toList([A2(Signal._op['<~'], function($){
-    return Utils.spaceBlack({ctor:"_Tuple2", _0:800, _1:600})(draw($));}, current),A2(Signal._op['<~'], Text.asText, current),A2(Signal._op['<~'], Text.asText, GameInputs.gameInputs)]));
+  var main = Utils.combineSElems(Graphics.Element.outward)(_J.toList([A2(Signal._op['~'], A2(Signal._op['<~'], Utils.spaceBlack, A2(Signal._op['<~'], function(_){
+    return _.window;}, GameInputs.gameInputs)), A2(Signal._op['<~'], draw, current)),A2(Utils.combineSElems, Graphics.Element.down, _J.toList([A2(Signal._op['<~'], function($){
+    return Graphics.Element.color(Color.white)(Text.asText($));}, GameInputs.gameInputs),A2(Signal._op['<~'], function($){
+    return Graphics.Element.color(Color.white)(Text.asText(function(_){
+      return _.focus;}($)));}, current),A2(Signal._op['<~'], function($){
+    return Graphics.Element.color(Color.white)(Text.asText(function(_){
+      return _.mode;}($)));}, current)]))]));
   return elm.Demo = {
     _op : _op, 
     initialShips : initialShips, 
@@ -157,6 +164,7 @@ Elm.Demo = function(elm){
     draw : draw, 
     main : main};};
 Elm.Main = function(elm){
+  if (elm.Main) return elm.Main;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Main';
   var Text = Elm.Text(elm);
   var Text = Elm.Text(elm);
@@ -231,13 +239,9 @@ Elm.Main = function(elm){
       switch (arg2.ctor) {
         case '_Tuple2':
           return Graphics.Collage.move({ctor:"_Tuple2", _0:Basics.toFloat(arg2._0), _1:Basics.toFloat(arg2._1)})(Build.blueprint(mode));
-      }_E.Case($moduleName,'on line 117, column 24 to 69')}();});
-  var clock = Time.fps(30);
-  var frameStamp = A2(Signal._op['<~'], Basics.fst, Time.timestamp(clock));
+      }_E.Case($moduleName,'on line 93, column 24 to 69')}();});
   var canvasWH = {ctor:"_Tuple2", _0:400, _1:300};
   var gamePointer = A2(Signal._op['<~'], Utils.convertPos(canvasWH), Mouse.position);
-  var space$ = F3(function(point, mode, objects){
-    return A2(Utils.spaceBlack, canvasWH, _J.toList([A2(construct, point, mode),objects,Draw.drawBuildArea(mode)]));});
   var brakes = Keyboard.isDown(Char.toCode('x'));
   var attitude = function(ec){
     return Types.beam({
@@ -302,78 +306,6 @@ Elm.Main = function(elm){
   var camera = A2(Signal._op['<~'], function($){
     return Public.Vec2.Vec2.extractVec(function(_){
       return _.pos;}($));}, state);
-  var myShip = A2(Signal._op['~'], A2(Signal._op['~'], A2(Signal._op['<~'], F3(function(engines, state, structure){
-    return {
-      _:{
-      },
-      controls:engines,
-      motion:state,
-      structure:structure};}), engines), state), Signal.constant(simpleShip));
-  var gameObjects = Signal.combine(_L.Cons(Signal.constant({
-    _:{
-    },
-    controls:_J.toList([]),
-    motion:{
-    _:{
-    },
-    omega:0,
-    pos:{
-    _:{
-    },
-    theta:1,
-    x:60,
-    y:50},
-    v:{
-    _:{
-    },
-    x:0,
-    y:0}},
-    structure:simpleShip}),_L.Cons(Signal.constant({
-    _:{
-    },
-    controls:_J.toList([]),
-    motion:{
-    _:{
-    },
-    omega:0,
-    pos:{
-    _:{
-    },
-    theta:4,
-    x:(0-80),
-    y:40},
-    v:{
-    _:{
-    },
-    x:0,
-    y:0}},
-    structure:simpleShip}),_L.Cons(Signal.constant({
-    _:{
-    },
-    controls:_J.toList([]),
-    motion:{
-    _:{
-    },
-    omega:0,
-    pos:{
-    _:{
-    },
-    theta:3,
-    x:120,
-    y:(0-20)},
-    v:{
-    _:{
-    },
-    x:0,
-    y:0}},
-    structure:simpleShip}),_J.toList([myShip])))));
-  var gameForms = A2(Signal._op['~'], A2(Signal._op['~'], A2(Signal._op['<~'], F3(function(time, es, camera){
-    return function(){
-      var modelM = Public.Vec2.Vec2.vecTranslate(Public.Vec2.Vec2.negVec(camera));
-      var forms = A2(List.map, Draw.drawEntity(time), es);
-      return A2(Graphics.Collage.groupTransform, modelM, forms);}();}), frameStamp), gameObjects), camera);
-  var space = A2(Signal._op['~'], A2(Signal._op['~'], A2(Signal._op['<~'], space$, gamePointer), mode), gameForms);
-  var main = Utils.combineSElems(_J.toList([space,Signal.constant(Text.plainText(_str('Ship position'))),A2(Signal._op['<~'], Text.asText, state),A2(Signal._op['<~'], Text.asText, Keyboard.keysDown),A2(Signal._op['<~'], Text.asText, brakes),A2(Signal._op['<~'], Text.asText, Keyboard.space),A2(Signal._op['<~'], Text.asText, A2(Signal._op['<~'], A2(Public.Vec2.Vec2.minimumDist, Public.Vec2.Vec2.origin, Public.Vec2.Vec2.fromIntPair({ctor:"_Tuple2", _0:50, _1:0})), A2(Signal._op['<~'], Public.Vec2.Vec2.fromIntPair, gamePointer))),Signal.constant(Text.asText(Types.labelBeams(simpleShip)))]));
   return elm.Main = {
     _op : _op, 
     attitude : attitude, 
@@ -387,20 +319,13 @@ Elm.Main = function(elm){
     brakes : brakes, 
     delta : delta, 
     state : state, 
-    myShip : myShip, 
-    gameObjects : gameObjects, 
-    clock : clock, 
-    frameStamp : frameStamp, 
     camera : camera, 
-    gameForms : gameForms, 
     mode : mode, 
     construct : construct, 
     canvasWH : canvasWH, 
-    gamePointer : gamePointer, 
-    space$ : space$, 
-    space : space, 
-    main : main};};
+    gamePointer : gamePointer};};
 Elm.Build = function(elm){
+  if (elm.Build) return elm.Build;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Build';
   var Text = Elm.Text(elm);
   var Text = Elm.Text(elm);
@@ -451,6 +376,7 @@ Elm.Build = function(elm){
     updateMode : updateMode, 
     blueprint : blueprint};};
 Elm.Draw = function(elm){
+  if (elm.Draw) return elm.Draw;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Draw';
   var Text = Elm.Text(elm);
   var Text = Elm.Text(elm);
@@ -465,6 +391,7 @@ Elm.Draw = function(elm){
   var Color = Elm.Color(elm);
   var Graphics = Graphics || {};
   Graphics.Collage = Elm.Graphics.Collage(elm);
+  var Either = Elm.Either(elm);
   var Graphics = Graphics || {};
   Graphics.Collage = Elm.Graphics.Collage(elm);
   var Transform2D = Elm.Transform2D(elm);
@@ -489,10 +416,10 @@ Elm.Draw = function(elm){
             return Graphics.Collage.filled(Color.blue)(Graphics.Collage.circle(part._0.r));
           case 'Engine':
             return Graphics.Collage.group(_L.Cons(Graphics.Collage.rotate(Basics.pi)(Graphics.Collage.filled(Color.red)(A2(Graphics.Collage.ngon, 3, part._0.r))),(A2(List.any, function(ec){
-              return _N.eq(ec,part._0.config);}, ecs) ? _J.toList([Graphics.Collage.move({ctor:"_Tuple2", _0:(0.4*part._0.r), _1:0})(Graphics.Collage.rotate(Basics.pi)(Graphics.Collage.filled(gasColor)(A2(Graphics.Collage.ngon, 3, (part._0.r*0.8)))))]) : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'between lines 48 and 50')))));
+              return _N.eq(ec,part._0.config);}, ecs) ? _J.toList([Graphics.Collage.move({ctor:"_Tuple2", _0:(0.4*part._0.r), _1:0})(Graphics.Collage.rotate(Basics.pi)(Graphics.Collage.filled(gasColor)(A2(Graphics.Collage.ngon, 3, (part._0.r*0.8)))))]) : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'between lines 50 and 52')))));
           case 'FuelTank':
             return Graphics.Collage.filled(Color.green)(A2(Graphics.Collage.rect, part._0.l, part._0.w));
-        }_E.Case($moduleName,'between lines 40 and 50')}();}();});
+        }_E.Case($moduleName,'between lines 42 and 52')}();}();});
   var drawBuildArea = function(mode){
     return function(){
       switch (mode.ctor) {
@@ -518,10 +445,18 @@ Elm.Draw = function(elm){
       return function(){
         var rotM = Transform2D.rotation(arg1.motion.pos.theta);
         var moveM = A2(translation, arg1.motion.pos.x, arg1.motion.pos.y);
+        var engines = function(){
+          var case7 = arg1.controls;
+          switch (case7.ctor) {
+            case 'Left':
+              return _J.toList([]);
+            case 'Right':
+              return case7._0;
+          }_E.Case($moduleName,'between lines 77 and 80')}();
         var comOffset = Public.Vec2.Vec2.scaleVec((0-1))(Physics.centerOfMass(arg1.structure));
         var comM = A2(translation, comOffset.x, comOffset.y);
         var modelM = A2(Transform2D.multiply, moveM, A2(Transform2D.multiply, rotM, comM));
-        return Graphics.Collage.groupTransform(modelM)(_J.toList([A3(drawStructure, noise, arg1.controls, arg1.structure)]));}();}();});
+        return Graphics.Collage.groupTransform(modelM)(_J.toList([A3(drawStructure, noise, engines, arg1.structure)]));}();}();});
   return elm.Draw = {
     _op : _op, 
     translation : translation, 
@@ -532,6 +467,7 @@ Elm.Draw = function(elm){
     drawEntity : drawEntity, 
     drawBuildArea : drawBuildArea};};
 Elm.GameInputs = function(elm){
+  if (elm.GameInputs) return elm.GameInputs;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'GameInputs';
   var Text = Elm.Text(elm);
   var Text = Elm.Text(elm);
@@ -546,31 +482,49 @@ Elm.GameInputs = function(elm){
   var Color = Elm.Color(elm);
   var Graphics = Graphics || {};
   Graphics.Collage = Elm.Graphics.Collage(elm);
+  var Either = Elm.Either(elm);
+  var Dict = Elm.Dict(elm);
+  var Char = Elm.Char(elm);
   var Keyboard = Elm.Keyboard(elm);
   var Mouse = Elm.Mouse(elm);
   var Time = Elm.Time(elm);
+  var Window = Elm.Window(elm);
   var Types = Elm.Types(elm);
   var Utils = Elm.Utils(elm);
   var _op = {};
+  var watchKeys = Dict.fromList(_J.toList([{ctor:"_Tuple2", _0:1, _1:Types.Number(1)},{ctor:"_Tuple2", _0:2, _1:Types.Number(2)},{ctor:"_Tuple2", _0:3, _1:Types.Number(3)},{ctor:"_Tuple2", _0:4, _1:Types.Number(4)},{ctor:"_Tuple2", _0:5, _1:Types.Number(5)},{ctor:"_Tuple2", _0:27, _1:Types.Exit}]));
   var ticks = A2(Signal._op['<~'], Types.FPS, Time.fps(25));
-  var modes = Signal.constant(Types.Modal(Types.Exit));
+  var pointer = A2(Signal._op['~'], A2(Signal._op['<~'], Utils.convertPos, Window.dimensions), Mouse.position);
+  var modes = A2(Signal._op['<~'], function($){
+    return Types.Modal(Types.Number($));}, Keyboard.lastPressed);
+  var engines = function(){
+    var override = F2(function(b, ecs){
+      return (b ? Either.Left(Types.Brakes) : (Basics.otherwise ? Either.Right(ecs) : _E.If($moduleName,'on line 48, column 24 to 60')));});
+    var controls = A2(Signal._op['<~'], Utils.controlEngines, Keyboard.wasd);
+    var brakes = Keyboard.isDown(Char.toCode('x'));
+    return A2(Signal._op['~'], A2(Signal._op['<~'], override, brakes), controls);}();
   var clicks = A2(Signal._op['<~'], Utils.cnst(Types.Click), Mouse.clicks);
   var triggers = Signal.merges(_J.toList([clicks,modes,ticks]));
-  var gameInputs = A2(Signal._op['~'], A2(Signal._op['~'], A2(Signal._op['<~'], F3(function(engines, pointer, trigger){
+  var gameInputs = Signal.sampleOn(triggers)(A2(Signal._op['~'], A2(Signal._op['~'], A2(Signal._op['~'], A2(Signal._op['<~'], F4(function(engines, pointer, window, trigger){
     return {
       _:{
       },
       engines:engines,
       pointer:pointer,
-      trigger:trigger};}), A2(Signal._op['<~'], Utils.controlEngines, Keyboard.wasd)), A2(Signal._op['<~'], Utils.convertPos({ctor:"_Tuple2", _0:800, _1:600}), Mouse.position)), triggers);
+      trigger:trigger,
+      window:window};}), engines), pointer), Window.dimensions), triggers));
   return elm.GameInputs = {
     _op : _op, 
     gameInputs : gameInputs, 
+    engines : engines, 
+    pointer : pointer, 
     triggers : triggers, 
     clicks : clicks, 
+    watchKeys : watchKeys, 
     modes : modes, 
     ticks : ticks};};
 Elm.Step = function(elm){
+  if (elm.Step) return elm.Step;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Step';
   var Text = Elm.Text(elm);
   var Text = Elm.Text(elm);
@@ -586,6 +540,8 @@ Elm.Step = function(elm){
   var Graphics = Graphics || {};
   Graphics.Collage = Elm.Graphics.Collage(elm);
   var Dict = Elm.Dict(elm);
+  var Either = Elm.Either(elm);
+  var Char = Elm.Char(elm);
   var Types = Elm.Types(elm);
   var Public = Public || {};
   Public.State = Public.State || {};
@@ -593,6 +549,20 @@ Elm.Step = function(elm){
   var Utils = Elm.Utils(elm);
   var Physics = Elm.Physics(elm);
   var _op = {};
+  var updateMode = function(m){
+    return function(){
+      var pure = Public.State.State.returnS;
+      _op['>>='] = Public.State.State.bindS;
+      return A2(_op['>>='], Public.State.State.get, function(state){
+        return function(){
+          var pause = function(){
+            switch (m.ctor) {
+              case 'Number':
+                return (_N.eq(m._0,Char.toCode('p')) ? Basics.not(state.mode.pause) : (Basics.otherwise ? state.mode.pause : _E.If($moduleName,'between lines 57 and 59')));
+            }
+            return state.mode.pause;}();
+          var mode = state.mode;
+          return Public.State.State.put(_N.replace([['mode',_N.replace([['pause',pause]], mode)]], state));}();});}();};
   var rotateFocus = function(){
     var pure = Public.State.State.returnS;
     _op['>>='] = Public.State.State.bindS;
@@ -621,11 +591,28 @@ Elm.Step = function(elm){
                   return Public.State.State.put(newState);}();
               case 'Nothing':
                 return pure({ctor:"_Tuple0"});
-            }_E.Case($moduleName,'between lines 65 and 71')}();}();});}();};
+            }_E.Case($moduleName,'between lines 83 and 89')}();}();});}();};
   var entityPureStep = function(e){
     return function(){
-      var delta = A2(Physics.netDelta, e.controls, e.structure);
-      var newMotion = A2(Physics.updateMotion, {ctor:"_Tuple2", _0:false, _1:delta}, e.motion);
+      var rest = {
+        _:{
+        },
+        a:{
+        _:{
+        },
+        x:0,
+        y:0},
+        alpha:0};
+      var newMotion = function(){
+        var case4 = e.controls;
+        switch (case4.ctor) {
+          case 'Left':
+            return A2(Physics.updateMotion, {ctor:"_Tuple2", _0:true, _1:rest}, e.motion);
+          case 'Right':
+            return function(){
+              var delta = A2(Physics.netDelta, case4._0, e.structure);
+              return A2(Physics.updateMotion, {ctor:"_Tuple2", _0:false, _1:delta}, e.motion);}();
+        }_E.Case($moduleName,'between lines 94 and 99')}();
       return _N.replace([['motion',newMotion]], e);}();};
   var physicsStep = function(){
     var pure = Public.State.State.returnS;
@@ -640,8 +627,8 @@ Elm.Step = function(elm){
       var pure = Public.State.State.returnS;
       _op['>>='] = Public.State.State.bindS;
       return function(){
-        var case2 = input.trigger;
-        switch (case2.ctor) {
+        var case7 = input.trigger;
+        switch (case7.ctor) {
           case 'Click':
             return rotateFocus;
           case 'FPS':
@@ -649,16 +636,18 @@ Elm.Step = function(elm){
               return function(){
                 return physicsStep;}();});
           case 'Modal':
-            return pure({ctor:"_Tuple0"});
-        }_E.Case($moduleName,'between lines 38 and 43')}();}();};
+            return updateMode(case7._0);
+        }_E.Case($moduleName,'between lines 41 and 46')}();}();};
   return elm.Step = {
     _op : _op, 
     step : step, 
+    updateMode : updateMode, 
     rotateFocus : rotateFocus, 
     focusControls : focusControls, 
     entityPureStep : entityPureStep, 
     physicsStep : physicsStep};};
 Elm.Physics = function(elm){
+  if (elm.Physics) return elm.Physics;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Physics';
   var Text = Elm.Text(elm);
   var Text = Elm.Text(elm);
@@ -845,6 +834,7 @@ Elm.Physics = function(elm){
     applyBrakes : applyBrakes, 
     updateMotion : updateMotion};};
 Elm.Utils = function(elm){
+  if (elm.Utils) return elm.Utils;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Utils';
   var Text = Elm.Text(elm);
   var Text = Elm.Text(elm);
@@ -879,8 +869,8 @@ Elm.Utils = function(elm){
       }_E.Case($moduleName,'on line 30, column 27 to 51')}();});
   var controlEngines = function(input){
     return _L.append(((_N.cmp(input.y,0)<0) ? _J.toList([Types.Reverse]) : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'on line 42, column 4 to 43'))),_L.append(((_N.cmp(input.y,0)>0) ? _J.toList([Types.Forward]) : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'on line 43, column 4 to 43'))),_L.append(((_N.cmp(input.x,0)>0) ? _J.toList([Types.TurnRight]) : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'on line 44, column 4 to 45'))),((_N.cmp(input.x,0)<0) ? _J.toList([Types.TurnLeft]) : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'on line 45, column 4 to 44'))))));};
-  var combineSElems = function(ses){
-    return A2(Signal._op['<~'], Graphics.Element.flow(Graphics.Element.down), Signal.combine(ses));};
+  var combineSElems = F2(function(dir, ses){
+    return A2(Signal._op['<~'], Graphics.Element.flow(dir), Signal.combine(ses));});
   var cnst = F2(function(x, a){
     return x;});
   return elm.Utils = {
@@ -891,6 +881,7 @@ Elm.Utils = function(elm){
     spaceBlack : spaceBlack, 
     controlEngines : controlEngines};};
 Elm.Types = function(elm){
+  if (elm.Types) return elm.Types;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Types';
   var Text = Elm.Text(elm);
   var Text = Elm.Text(elm);
@@ -906,6 +897,7 @@ Elm.Types = function(elm){
   var Graphics = Graphics || {};
   Graphics.Collage = Elm.Graphics.Collage(elm);
   var Dict = Elm.Dict(elm);
+  var Either = Elm.Either(elm);
   var Public = Public || {};
   Public.State = Public.State || {};
   Public.State.State = Elm.Public.State.State(elm);
@@ -999,13 +991,14 @@ Elm.Types = function(elm){
       entities:a,
       focus:c,
       mode:b};});
-  var GameInput = F3(function(a, b, c){
+  var GameInput = F4(function(a, b, c, d){
     return {
       _:{
       },
       engines:a,
       pointer:b,
-      trigger:c};});
+      trigger:d,
+      window:c};});
   var FuelTank = function(a){
     return {ctor:"FuelTank", _0:a};};
   var Forward = {ctor:"Forward"};
@@ -1023,6 +1016,7 @@ Elm.Types = function(elm){
     return {ctor:"Engine", _0:a};};
   var Disabled = {ctor:"Disabled"};
   var Click = {ctor:"Click"};
+  var Brakes = {ctor:"Brakes"};
   var Brain = function(a){
     return {ctor:"Brain", _0:a};};
   var BeamMode = function(a){
@@ -1056,6 +1050,7 @@ Elm.Types = function(elm){
     Inactive : Inactive, 
     BeamMode : BeamMode, 
     PartMode : PartMode, 
+    Brakes : Brakes, 
     Click : Click, 
     Modal : Modal, 
     FPS : FPS, 
@@ -1063,10 +1058,25 @@ Elm.Types = function(elm){
     Exit : Exit, 
     Number : Number, 
     None : None, 
-    Part : Part};};
+    Part : Part, 
+    Position : Position, 
+    Attach : Attach, 
+    PointMass : PointMass, 
+    Beam : Beam, 
+    LabelBeamExt : LabelBeamExt, 
+    Thrust : Thrust, 
+    MotionState : MotionState, 
+    MotionDelta : MotionDelta, 
+    Entity : Entity, 
+    GameInput : GameInput, 
+    GameState : GameState, 
+    Mode : Mode};};
 Elm.Public = Elm.Public || {};
 Elm.Public.TagTree = Elm.Public.TagTree || {};
 Elm.Public.TagTree.TagTree = function(elm){
+  elm.Public = elm.Public || {};
+  elm.Public.TagTree = elm.Public.TagTree || {};
+  if (elm.Public.TagTree.TagTree) return elm.Public.TagTree.TagTree;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Public.TagTree.TagTree';
   var Text = Elm.Text(elm);
   var Text = Elm.Text(elm);
@@ -1143,8 +1153,6 @@ Elm.Public.TagTree.TagTree = function(elm){
               return A2(Public.State.State.bindS, uNode(tree._0), function(node$){
                 return Public.State.State.returnS(A2(Node, node$, subs$));});});
         }_E.Case($moduleName,'between lines 62 and 67')}();}();});
-  elm.Public = elm.Public || {};
-  elm.Public.TagTree = elm.Public.TagTree || {};
   return elm.Public.TagTree.TagTree = {
     _op : _op, 
     foldTagTree : foldTagTree, 
@@ -1155,6 +1163,9 @@ Elm.Public.TagTree.TagTree = function(elm){
 Elm.Public = Elm.Public || {};
 Elm.Public.State = Elm.Public.State || {};
 Elm.Public.State.State = function(elm){
+  elm.Public = elm.Public || {};
+  elm.Public.State = elm.Public.State || {};
+  if (elm.Public.State.State) return elm.Public.State.State;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Public.State.State';
   var Text = Elm.Text(elm);
   var Text = Elm.Text(elm);
@@ -1217,8 +1228,6 @@ Elm.Public.State.State = function(elm){
   var mapMS = function(f){
     return function($){
       return sequenceS(List.map(f)($));};};
-  elm.Public = elm.Public || {};
-  elm.Public.State = elm.Public.State || {};
   return elm.Public.State.State = {
     _op : _op, 
     get : get, 
@@ -1229,10 +1238,14 @@ Elm.Public.State.State = function(elm){
     bindS : bindS, 
     sequenceS : sequenceS, 
     mapMS : mapMS, 
-    fmapS : fmapS};};
+    fmapS : fmapS, 
+    State : State};};
 Elm.Public = Elm.Public || {};
 Elm.Public.Vec2 = Elm.Public.Vec2 || {};
 Elm.Public.Vec2.Vec2 = function(elm){
+  elm.Public = elm.Public || {};
+  elm.Public.Vec2 = elm.Public.Vec2 || {};
+  if (elm.Public.Vec2.Vec2) return elm.Public.Vec2.Vec2;
   var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Public.Vec2.Vec2';
   var Text = Elm.Text(elm);
   var Text = Elm.Text(elm);
@@ -1324,8 +1337,6 @@ Elm.Public.Vec2.Vec2 = function(elm){
     return A2(List.foldl, addVec, origin)(List.map(extractVec)($));};
   var Vec2Ext = F3(function(a, b, c){
     return _N.insert('y', b, _N.insert('x', a, c));});
-  elm.Public = elm.Public || {};
-  elm.Public.Vec2 = elm.Public.Vec2 || {};
   return elm.Public.Vec2.Vec2 = {
     _op : _op, 
     origin : origin, 
@@ -1346,7 +1357,8 @@ Elm.Public.Vec2.Vec2 = function(elm){
     dotVec : dotVec, 
     crossVecMag : crossVecMag, 
     vecTranslate : vecTranslate, 
-    minimumDist : minimumDist};};
+    minimumDist : minimumDist, 
+    Vec2Ext : Vec2Ext};};
         </script>
     </head>
     <body>
