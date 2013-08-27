@@ -1,1 +1,1372 @@
-Demo.html
+<!DOCTYPE HTML>
+
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>
+            Demo
+        </title>
+        <script type="text/javascript" src="elm-runtime.js">
+            
+        </script>
+        <script type="text/javascript">
+            
+Elm.Demo = function(elm){
+  if (elm.Demo) return elm.Demo;
+  var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Demo';
+  var Text = Elm.Text(elm);
+  var Text = Elm.Text(elm);
+  var Basics = Elm.Basics(elm);
+  var Signal = Elm.Signal(elm);
+  var List = Elm.List(elm);
+  var Maybe = Elm.Maybe(elm);
+  var Time = Elm.Time(elm);
+  var Prelude = Elm.Prelude(elm);
+  var Graphics = Graphics || {};
+  Graphics.Element = Elm.Graphics.Element(elm);
+  var Color = Elm.Color(elm);
+  var Graphics = Graphics || {};
+  Graphics.Collage = Elm.Graphics.Collage(elm);
+  var Either = Elm.Either(elm);
+  var Dict = Elm.Dict(elm);
+  var Dict = Elm.Dict(elm);
+  var Draw = Elm.Draw(elm);
+  var Public = Public || {};
+  Public.State = Public.State || {};
+  Public.State.State = Elm.Public.State.State(elm);
+  var Step = Elm.Step(elm);
+  var GameInputs = Elm.GameInputs(elm);
+  var Types = Elm.Types(elm);
+  var Utils = Elm.Utils(elm);
+  var Public = Public || {};
+  Public.Vec2 = Public.Vec2 || {};
+  Public.Vec2.Vec2 = Elm.Public.Vec2.Vec2(elm);
+  var Main = Elm.Main(elm);
+  var _op = {};
+  var initialShips = _J.toList([{
+    _:{
+    },
+    controls:Either.Right(_J.toList([])),
+    motion:{
+    _:{
+    },
+    omega:0,
+    pos:{
+    _:{
+    },
+    theta:0,
+    x:0,
+    y:0},
+    v:{
+    _:{
+    },
+    x:0,
+    y:0}},
+    structure:Main.simpleShip},{
+    _:{
+    },
+    controls:Either.Right(_J.toList([])),
+    motion:{
+    _:{
+    },
+    omega:0,
+    pos:{
+    _:{
+    },
+    theta:1,
+    x:60,
+    y:50},
+    v:{
+    _:{
+    },
+    x:0,
+    y:0}},
+    structure:Main.simpleShip},{
+    _:{
+    },
+    controls:Either.Right(_J.toList([])),
+    motion:{
+    _:{
+    },
+    omega:0,
+    pos:{
+    _:{
+    },
+    theta:4,
+    x:(0-80),
+    y:40},
+    v:{
+    _:{
+    },
+    x:0,
+    y:0}},
+    structure:Main.simpleShip},{
+    _:{
+    },
+    controls:Either.Right(_J.toList([])),
+    motion:{
+    _:{
+    },
+    omega:0,
+    pos:{
+    _:{
+    },
+    theta:3,
+    x:120,
+    y:(0-20)},
+    v:{
+    _:{
+    },
+    x:0,
+    y:0}},
+    structure:Main.simpleShip}]);
+  var initialMode = {
+    _:{
+    },
+    build:Types.None,
+    pause:false};
+  var initialEntities = Dict.fromList(List.zip(_J.toList([0,1,2,3]))(initialShips));
+  var initialState = {
+    _:{
+    },
+    entities:initialEntities,
+    focus:0,
+    mode:initialMode};
+  var draw = function(gs){
+    return function(){
+      var entities = Dict.values(gs.entities);
+      var camera = function(){
+        var case0 = A2(Dict.lookup, gs.focus, gs.entities);
+        switch (case0.ctor) {
+          case 'Just':
+            return Public.Vec2.Vec2.extractVec(case0._0.motion.pos);
+          case 'Nothing':
+            return Public.Vec2.Vec2.origin;
+        }_E.Case($moduleName,'between lines 69 and 72')}();
+      var cameraTransform = Public.Vec2.Vec2.vecTranslate(Public.Vec2.Vec2.negVec(camera));
+      return _J.toList([Graphics.Collage.groupTransform(cameraTransform)(A2(List.map, Draw.drawEntity(0), entities))]);}();};
+  var current = A3(Signal.foldp, function($){
+    return Public.State.State.execState(Step.step($));}, initialState, GameInputs.gameInputs);
+  var main = Utils.combineSElems(Graphics.Element.outward)(_J.toList([A2(Signal._op['~'], A2(Signal._op['<~'], Utils.spaceBlack, A2(Signal._op['<~'], function(_){
+    return _.window;}, GameInputs.gameInputs)), A2(Signal._op['<~'], draw, current)),A2(Utils.combineSElems, Graphics.Element.down, _J.toList([A2(Signal._op['<~'], function($){
+    return Graphics.Element.color(Color.white)(Text.asText($));}, GameInputs.gameInputs),A2(Signal._op['<~'], function($){
+    return Graphics.Element.color(Color.white)(Text.asText(function(_){
+      return _.focus;}($)));}, current),A2(Signal._op['<~'], function($){
+    return Graphics.Element.color(Color.white)(Text.asText(function(_){
+      return _.mode;}($)));}, current)]))]));
+  return elm.Demo = {
+    _op : _op, 
+    initialShips : initialShips, 
+    initialEntities : initialEntities, 
+    initialState : initialState, 
+    initialMode : initialMode, 
+    current : current, 
+    draw : draw, 
+    main : main};};
+Elm.Main = function(elm){
+  if (elm.Main) return elm.Main;
+  var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Main';
+  var Text = Elm.Text(elm);
+  var Text = Elm.Text(elm);
+  var Basics = Elm.Basics(elm);
+  var Signal = Elm.Signal(elm);
+  var List = Elm.List(elm);
+  var Maybe = Elm.Maybe(elm);
+  var Time = Elm.Time(elm);
+  var Prelude = Elm.Prelude(elm);
+  var Graphics = Graphics || {};
+  Graphics.Element = Elm.Graphics.Element(elm);
+  var Color = Elm.Color(elm);
+  var Graphics = Graphics || {};
+  Graphics.Collage = Elm.Graphics.Collage(elm);
+  var Char = Elm.Char(elm);
+  var Keyboard = Elm.Keyboard(elm);
+  var Mouse = Elm.Mouse(elm);
+  var Build = Elm.Build(elm);
+  var Draw = Elm.Draw(elm);
+  var Physics = Elm.Physics(elm);
+  var Types = Elm.Types(elm);
+  var Utils = Elm.Utils(elm);
+  var Public = Public || {};
+  Public.Vec2 = Public.Vec2 || {};
+  Public.Vec2.Vec2 = Elm.Public.Vec2.Vec2(elm);
+  var _op = {};
+  var startPos = {
+    _:{
+    },
+    omega:0,
+    pos:{
+    _:{
+    },
+    theta:0,
+    x:0,
+    y:0},
+    v:{
+    _:{
+    },
+    x:0,
+    y:0}};
+  var reverseR = Types.beam({
+    _:{
+    },
+    r:10})(_J.toList([{ctor:"_Tuple2", _0:{
+    _:{
+    },
+    offset:10,
+    theta:(Basics.pi/2)}, _1:Types.part(Types.Engine({
+    _:{
+    },
+    config:Types.Reverse,
+    r:4}))}]));
+  var reverseL = Types.beam({
+    _:{
+    },
+    r:10})(_J.toList([{ctor:"_Tuple2", _0:{
+    _:{
+    },
+    offset:10,
+    theta:((0-Basics.pi)/2)}, _1:Types.part(Types.Engine({
+    _:{
+    },
+    config:Types.Reverse,
+    r:4}))}]));
+  var mode = A3(Signal.foldp, Build.updateMode, Types.Inactive, Keyboard.lastPressed);
+  var control = function(input){
+    return _L.append(((_N.cmp(input.y,0)<0) ? _J.toList([Types.Reverse]) : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'on line 69, column 4 to 43'))),_L.append(((_N.cmp(input.y,0)>0) ? _J.toList([Types.Forward]) : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'on line 70, column 4 to 43'))),_L.append(((_N.cmp(input.x,0)>0) ? _J.toList([Types.TurnRight]) : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'on line 71, column 4 to 45'))),((_N.cmp(input.x,0)<0) ? _J.toList([Types.TurnLeft]) : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'on line 72, column 4 to 44'))))));};
+  var engines = A2(Signal._op['<~'], control, Keyboard.wasd);
+  var construct = F2(function(arg2, mode){
+    return function(){
+      switch (arg2.ctor) {
+        case '_Tuple2':
+          return Graphics.Collage.move({ctor:"_Tuple2", _0:Basics.toFloat(arg2._0), _1:Basics.toFloat(arg2._1)})(Build.blueprint(mode));
+      }_E.Case($moduleName,'on line 93, column 24 to 69')}();});
+  var canvasWH = {ctor:"_Tuple2", _0:400, _1:300};
+  var gamePointer = A2(Signal._op['<~'], Utils.convertPos(canvasWH), Mouse.position);
+  var brakes = Keyboard.isDown(Char.toCode('x'));
+  var attitude = function(ec){
+    return Types.beam({
+      _:{
+      },
+      r:10})(_J.toList([{ctor:"_Tuple2", _0:{
+      _:{
+      },
+      offset:10,
+      theta:0}, _1:Types.part(Types.Engine({
+      _:{
+      },
+      config:ec,
+      r:4}))}]));};
+  var mods = _J.toList([{ctor:"_Tuple2", _0:{
+    _:{
+    },
+    offset:6,
+    theta:((3*Basics.pi)/2)}, _1:reverseL},{ctor:"_Tuple2", _0:{
+    _:{
+    },
+    offset:6,
+    theta:(Basics.pi/2)}, _1:reverseR},{ctor:"_Tuple2", _0:{
+    _:{
+    },
+    offset:42,
+    theta:((3*Basics.pi)/2)}, _1:attitude(Types.TurnLeft)},{ctor:"_Tuple2", _0:{
+    _:{
+    },
+    offset:42,
+    theta:(Basics.pi/2)}, _1:attitude(Types.TurnRight)},{ctor:"_Tuple2", _0:{
+    _:{
+    },
+    offset:0,
+    theta:0}, _1:Types.part(Types.Brain({
+    _:{
+    },
+    r:7}))},{ctor:"_Tuple2", _0:{
+    _:{
+    },
+    offset:25,
+    theta:0}, _1:Types.part(Types.FuelTank({
+    _:{
+    },
+    l:30,
+    w:14}))},{ctor:"_Tuple2", _0:{
+    _:{
+    },
+    offset:50,
+    theta:0}, _1:Types.part(Types.Engine({
+    _:{
+    },
+    config:Types.Forward,
+    r:13}))}]);
+  var simpleShip = A2(Types.beam, {
+    _:{
+    },
+    r:50}, mods);
+  var delta = Signal.sampleOn(Time.fps(30))(A2(Signal._op['~'], A2(Signal._op['<~'], Physics.netDelta, engines), Signal.constant(simpleShip)));
+  var state = A3(Signal.foldp, Physics.updateMotion, startPos, A2(Signal._op['~'], A2(Signal._op['<~'], F2(function(v0, v1){
+    return {ctor:"_Tuple2", _0:v0, _1:v1};}), brakes), delta));
+  var camera = A2(Signal._op['<~'], function($){
+    return Public.Vec2.Vec2.extractVec(function(_){
+      return _.pos;}($));}, state);
+  return elm.Main = {
+    _op : _op, 
+    attitude : attitude, 
+    reverseL : reverseL, 
+    reverseR : reverseR, 
+    mods : mods, 
+    simpleShip : simpleShip, 
+    startPos : startPos, 
+    control : control, 
+    engines : engines, 
+    brakes : brakes, 
+    delta : delta, 
+    state : state, 
+    camera : camera, 
+    mode : mode, 
+    construct : construct, 
+    canvasWH : canvasWH, 
+    gamePointer : gamePointer};};
+Elm.Build = function(elm){
+  if (elm.Build) return elm.Build;
+  var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Build';
+  var Text = Elm.Text(elm);
+  var Text = Elm.Text(elm);
+  var Basics = Elm.Basics(elm);
+  var Signal = Elm.Signal(elm);
+  var List = Elm.List(elm);
+  var Maybe = Elm.Maybe(elm);
+  var Time = Elm.Time(elm);
+  var Prelude = Elm.Prelude(elm);
+  var Graphics = Graphics || {};
+  Graphics.Element = Elm.Graphics.Element(elm);
+  var Color = Elm.Color(elm);
+  var Graphics = Graphics || {};
+  Graphics.Collage = Elm.Graphics.Collage(elm);
+  var Char = Elm.Char(elm);
+  var Keyboard = Elm.Keyboard(elm);
+  var Draw = Elm.Draw(elm);
+  var Types = Elm.Types(elm);
+  var _op = {};
+  var updateMode = F2(function(key, mode){
+    return (_N.eq(key,Char.toCode('1')) ? Types.Inactive : (_N.eq(key,Char.toCode('2')) ? Types.BeamMode({
+      _:{
+      },
+      r:10}) : (_N.eq(key,Char.toCode('3')) ? Types.PartMode(Types.Brain({
+      _:{
+      },
+      r:5})) : (_N.eq(key,Char.toCode('4')) ? Types.PartMode(Types.FuelTank({
+      _:{
+      },
+      l:5,
+      w:5})) : (_N.eq(key,Char.toCode('5')) ? Types.PartMode(Types.Engine({
+      _:{
+      },
+      config:Types.Disabled,
+      r:5})) : (Basics.otherwise ? mode : _E.If($moduleName,'between lines 32 and 37')))))));});
+  var blueprint = function(mode){
+    return function(){
+      switch (mode.ctor) {
+        case 'BeamMode':
+          return A2(Draw.drawBeam, mode._0, _J.toList([]));
+        case 'Inactive':
+          return Graphics.Collage.group(_J.toList([]));
+        case 'PartMode':
+          return A3(Draw.drawPart, 0, _J.toList([]), mode._0);
+      }_E.Case($moduleName,'between lines 41 and 44')}();};
+  return elm.Build = {
+    _op : _op, 
+    updateMode : updateMode, 
+    blueprint : blueprint};};
+Elm.Draw = function(elm){
+  if (elm.Draw) return elm.Draw;
+  var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Draw';
+  var Text = Elm.Text(elm);
+  var Text = Elm.Text(elm);
+  var Basics = Elm.Basics(elm);
+  var Signal = Elm.Signal(elm);
+  var List = Elm.List(elm);
+  var Maybe = Elm.Maybe(elm);
+  var Time = Elm.Time(elm);
+  var Prelude = Elm.Prelude(elm);
+  var Graphics = Graphics || {};
+  Graphics.Element = Elm.Graphics.Element(elm);
+  var Color = Elm.Color(elm);
+  var Graphics = Graphics || {};
+  Graphics.Collage = Elm.Graphics.Collage(elm);
+  var Either = Elm.Either(elm);
+  var Graphics = Graphics || {};
+  Graphics.Collage = Elm.Graphics.Collage(elm);
+  var Transform2D = Elm.Transform2D(elm);
+  var Transform2D = Elm.Transform2D(elm);
+  var Physics = Elm.Physics(elm);
+  var Public = Public || {};
+  Public.TagTree = Public.TagTree || {};
+  Public.TagTree.TagTree = Elm.Public.TagTree.TagTree(elm);
+  var Types = Elm.Types(elm);
+  var Public = Public || {};
+  Public.Vec2 = Public.Vec2 || {};
+  Public.Vec2.Vec2 = Elm.Public.Vec2.Vec2(elm);
+  var _op = {};
+  var translation = A4(Transform2D.matrix, 1, 0, 0, 1);
+  var drawPart = F3(function(noise, ecs, part){
+    return function(){
+      var hashedNoise = A2(Basics.mod, Basics.truncate(noise), 150);
+      var gasColor = A3(Color.rgb, 255, (255-hashedNoise), 0);
+      return function(){
+        switch (part.ctor) {
+          case 'Brain':
+            return Graphics.Collage.filled(Color.blue)(Graphics.Collage.circle(part._0.r));
+          case 'Engine':
+            return Graphics.Collage.group(_L.Cons(Graphics.Collage.rotate(Basics.pi)(Graphics.Collage.filled(Color.red)(A2(Graphics.Collage.ngon, 3, part._0.r))),(A2(List.any, function(ec){
+              return _N.eq(ec,part._0.config);}, ecs) ? _J.toList([Graphics.Collage.move({ctor:"_Tuple2", _0:(0.4*part._0.r), _1:0})(Graphics.Collage.rotate(Basics.pi)(Graphics.Collage.filled(gasColor)(A2(Graphics.Collage.ngon, 3, (part._0.r*0.8)))))]) : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'between lines 50 and 52')))));
+          case 'FuelTank':
+            return Graphics.Collage.filled(Color.green)(A2(Graphics.Collage.rect, part._0.l, part._0.w));
+        }_E.Case($moduleName,'between lines 42 and 52')}();}();});
+  var drawBuildArea = function(mode){
+    return function(){
+      switch (mode.ctor) {
+        case 'Inactive':
+          return Graphics.Collage.group(_J.toList([]));
+      }
+      return Graphics.Collage.filled(A4(Color.rgba, 255, 255, 0, 0.2))(A2(Graphics.Collage.oval, 200, 200));}();};
+  var drawBeam = F2(function(beam, subForms){
+    return function(){
+      var l = beam.r;
+      var w = (l*5.0e-2);
+      var beamForm = Graphics.Collage.move({ctor:"_Tuple2", _0:(l*0.5), _1:0})(Graphics.Collage.filled(Color.white)(A2(Graphics.Collage.rect, l, w)));
+      return Graphics.Collage.group(_L.Cons(beamForm,subForms));}();});
+  var drawAttach = F2(function(arg2, subForm){
+    return function(){
+      return function(){
+        var modelM = A2(Transform2D.multiply, A2(translation, arg2.offset, 0), Transform2D.rotation(arg2.theta));
+        return A2(Graphics.Collage.groupTransform, modelM, _J.toList([subForm]));}();}();});
+  var drawStructure = F3(function(noise, ec, structure){
+    return A4(Public.TagTree.TagTree.foldTagTree, A2(drawPart, noise, ec), drawBeam, drawAttach, structure);});
+  var drawEntity = F2(function(noise, arg1){
+    return function(){
+      return function(){
+        var rotM = Transform2D.rotation(arg1.motion.pos.theta);
+        var moveM = A2(translation, arg1.motion.pos.x, arg1.motion.pos.y);
+        var engines = function(){
+          var case7 = arg1.controls;
+          switch (case7.ctor) {
+            case 'Left':
+              return _J.toList([]);
+            case 'Right':
+              return case7._0;
+          }_E.Case($moduleName,'between lines 77 and 80')}();
+        var comOffset = Public.Vec2.Vec2.scaleVec((0-1))(Physics.centerOfMass(arg1.structure));
+        var comM = A2(translation, comOffset.x, comOffset.y);
+        var modelM = A2(Transform2D.multiply, moveM, A2(Transform2D.multiply, rotM, comM));
+        return Graphics.Collage.groupTransform(modelM)(_J.toList([A3(drawStructure, noise, engines, arg1.structure)]));}();}();});
+  return elm.Draw = {
+    _op : _op, 
+    translation : translation, 
+    drawPart : drawPart, 
+    drawAttach : drawAttach, 
+    drawBeam : drawBeam, 
+    drawStructure : drawStructure, 
+    drawEntity : drawEntity, 
+    drawBuildArea : drawBuildArea};};
+Elm.GameInputs = function(elm){
+  if (elm.GameInputs) return elm.GameInputs;
+  var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'GameInputs';
+  var Text = Elm.Text(elm);
+  var Text = Elm.Text(elm);
+  var Basics = Elm.Basics(elm);
+  var Signal = Elm.Signal(elm);
+  var List = Elm.List(elm);
+  var Maybe = Elm.Maybe(elm);
+  var Time = Elm.Time(elm);
+  var Prelude = Elm.Prelude(elm);
+  var Graphics = Graphics || {};
+  Graphics.Element = Elm.Graphics.Element(elm);
+  var Color = Elm.Color(elm);
+  var Graphics = Graphics || {};
+  Graphics.Collage = Elm.Graphics.Collage(elm);
+  var Either = Elm.Either(elm);
+  var Dict = Elm.Dict(elm);
+  var Char = Elm.Char(elm);
+  var Keyboard = Elm.Keyboard(elm);
+  var Mouse = Elm.Mouse(elm);
+  var Time = Elm.Time(elm);
+  var Window = Elm.Window(elm);
+  var Types = Elm.Types(elm);
+  var Utils = Elm.Utils(elm);
+  var _op = {};
+  var watchKeys = Dict.fromList(_J.toList([{ctor:"_Tuple2", _0:1, _1:Types.Number(1)},{ctor:"_Tuple2", _0:2, _1:Types.Number(2)},{ctor:"_Tuple2", _0:3, _1:Types.Number(3)},{ctor:"_Tuple2", _0:4, _1:Types.Number(4)},{ctor:"_Tuple2", _0:5, _1:Types.Number(5)},{ctor:"_Tuple2", _0:27, _1:Types.Exit}]));
+  var ticks = A2(Signal._op['<~'], Types.FPS, Time.fps(25));
+  var pointer = A2(Signal._op['~'], A2(Signal._op['<~'], Utils.convertPos, Window.dimensions), Mouse.position);
+  var modes = A2(Signal._op['<~'], function($){
+    return Types.Modal(Types.Number($));}, Keyboard.lastPressed);
+  var engines = function(){
+    var override = F2(function(b, ecs){
+      return (b ? Either.Left(Types.Brakes) : (Basics.otherwise ? Either.Right(ecs) : _E.If($moduleName,'on line 48, column 24 to 60')));});
+    var controls = A2(Signal._op['<~'], Utils.controlEngines, Keyboard.wasd);
+    var brakes = Keyboard.isDown(Char.toCode('x'));
+    return A2(Signal._op['~'], A2(Signal._op['<~'], override, brakes), controls);}();
+  var clicks = A2(Signal._op['<~'], Utils.cnst(Types.Click), Mouse.clicks);
+  var triggers = Signal.merges(_J.toList([clicks,modes,ticks]));
+  var gameInputs = Signal.sampleOn(triggers)(A2(Signal._op['~'], A2(Signal._op['~'], A2(Signal._op['~'], A2(Signal._op['<~'], F4(function(engines, pointer, window, trigger){
+    return {
+      _:{
+      },
+      engines:engines,
+      pointer:pointer,
+      trigger:trigger,
+      window:window};}), engines), pointer), Window.dimensions), triggers));
+  return elm.GameInputs = {
+    _op : _op, 
+    gameInputs : gameInputs, 
+    engines : engines, 
+    pointer : pointer, 
+    triggers : triggers, 
+    clicks : clicks, 
+    watchKeys : watchKeys, 
+    modes : modes, 
+    ticks : ticks};};
+Elm.Step = function(elm){
+  if (elm.Step) return elm.Step;
+  var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Step';
+  var Text = Elm.Text(elm);
+  var Text = Elm.Text(elm);
+  var Basics = Elm.Basics(elm);
+  var Signal = Elm.Signal(elm);
+  var List = Elm.List(elm);
+  var Maybe = Elm.Maybe(elm);
+  var Time = Elm.Time(elm);
+  var Prelude = Elm.Prelude(elm);
+  var Graphics = Graphics || {};
+  Graphics.Element = Elm.Graphics.Element(elm);
+  var Color = Elm.Color(elm);
+  var Graphics = Graphics || {};
+  Graphics.Collage = Elm.Graphics.Collage(elm);
+  var Dict = Elm.Dict(elm);
+  var Either = Elm.Either(elm);
+  var Char = Elm.Char(elm);
+  var Types = Elm.Types(elm);
+  var Public = Public || {};
+  Public.State = Public.State || {};
+  Public.State.State = Elm.Public.State.State(elm);
+  var Utils = Elm.Utils(elm);
+  var Physics = Elm.Physics(elm);
+  var _op = {};
+  var updateMode = function(m){
+    return function(){
+      var pure = Public.State.State.returnS;
+      _op['>>='] = Public.State.State.bindS;
+      return A2(_op['>>='], Public.State.State.get, function(state){
+        return function(){
+          var pause = function(){
+            switch (m.ctor) {
+              case 'Number':
+                return (_N.eq(m._0,Char.toCode('p')) ? Basics.not(state.mode.pause) : (Basics.otherwise ? state.mode.pause : _E.If($moduleName,'between lines 57 and 59')));
+            }
+            return state.mode.pause;}();
+          var mode = state.mode;
+          return Public.State.State.put(_N.replace([['mode',_N.replace([['pause',pause]], mode)]], state));}();});}();};
+  var rotateFocus = function(){
+    var pure = Public.State.State.returnS;
+    _op['>>='] = Public.State.State.bindS;
+    return A2(_op['>>='], Public.State.State.get, function(state){
+      return function(){
+        var focus = state.focus;
+        var newFocus = A2(Basics.mod, (focus+1), 4);
+        var newState = _N.replace([['focus',newFocus]], state);
+        return Public.State.State.put(newState);}();});}();
+  var focusControls = function(input){
+    return function(){
+      var pure = Public.State.State.returnS;
+      _op['>>='] = Public.State.State.bindS;
+      return A2(_op['>>='], Public.State.State.get, function(state){
+        return function(){
+          var focus = state.focus;
+          var entities = state.entities;
+          var myShip = A2(Dict.lookup, focus, entities);
+          return function(){
+            switch (myShip.ctor) {
+              case 'Just':
+                return function(){
+                  var newMyShip = _N.replace([['controls',input.engines]], myShip._0);
+                  var newEntities = A3(Dict.insert, focus, newMyShip, entities);
+                  var newState = _N.replace([['entities',newEntities]], state);
+                  return Public.State.State.put(newState);}();
+              case 'Nothing':
+                return pure({ctor:"_Tuple0"});
+            }_E.Case($moduleName,'between lines 83 and 89')}();}();});}();};
+  var entityPureStep = function(e){
+    return function(){
+      var rest = {
+        _:{
+        },
+        a:{
+        _:{
+        },
+        x:0,
+        y:0},
+        alpha:0};
+      var newMotion = function(){
+        var case4 = e.controls;
+        switch (case4.ctor) {
+          case 'Left':
+            return A2(Physics.updateMotion, {ctor:"_Tuple2", _0:true, _1:rest}, e.motion);
+          case 'Right':
+            return function(){
+              var delta = A2(Physics.netDelta, case4._0, e.structure);
+              return A2(Physics.updateMotion, {ctor:"_Tuple2", _0:false, _1:delta}, e.motion);}();
+        }_E.Case($moduleName,'between lines 94 and 99')}();
+      return _N.replace([['motion',newMotion]], e);}();};
+  var physicsStep = function(){
+    var pure = Public.State.State.returnS;
+    _op['>>='] = Public.State.State.bindS;
+    return A2(_op['>>='], Public.State.State.get, function(state){
+      return function(){
+        var newEntities = A2(Dict.map, entityPureStep, state.entities);
+        var newState = _N.replace([['entities',newEntities]], state);
+        return Public.State.State.put(newState);}();});}();
+  var step = function(input){
+    return function(){
+      var pure = Public.State.State.returnS;
+      _op['>>='] = Public.State.State.bindS;
+      return function(){
+        var case7 = input.trigger;
+        switch (case7.ctor) {
+          case 'Click':
+            return rotateFocus;
+          case 'FPS':
+            return A2(_op['>>='], focusControls(input), function(arg1){
+              return function(){
+                return physicsStep;}();});
+          case 'Modal':
+            return updateMode(case7._0);
+        }_E.Case($moduleName,'between lines 41 and 46')}();}();};
+  return elm.Step = {
+    _op : _op, 
+    step : step, 
+    updateMode : updateMode, 
+    rotateFocus : rotateFocus, 
+    focusControls : focusControls, 
+    entityPureStep : entityPureStep, 
+    physicsStep : physicsStep};};
+Elm.Physics = function(elm){
+  if (elm.Physics) return elm.Physics;
+  var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Physics';
+  var Text = Elm.Text(elm);
+  var Text = Elm.Text(elm);
+  var Basics = Elm.Basics(elm);
+  var Signal = Elm.Signal(elm);
+  var List = Elm.List(elm);
+  var Maybe = Elm.Maybe(elm);
+  var Time = Elm.Time(elm);
+  var Prelude = Elm.Prelude(elm);
+  var Graphics = Graphics || {};
+  Graphics.Element = Elm.Graphics.Element(elm);
+  var Color = Elm.Color(elm);
+  var Graphics = Graphics || {};
+  Graphics.Collage = Elm.Graphics.Collage(elm);
+  var Public = Public || {};
+  Public.Vec2 = Public.Vec2 || {};
+  Public.Vec2.Vec2 = Elm.Public.Vec2.Vec2(elm);
+  var Public = Public || {};
+  Public.TagTree = Public.TagTree || {};
+  Public.TagTree.TagTree = Elm.Public.TagTree.TagTree(elm);
+  var Types = Elm.Types(elm);
+  var Utils = Elm.Utils(elm);
+  var _op = {};
+  var torqueMag = function(t){
+    return A2(Public.Vec2.Vec2.crossVecMag, t.disp, t.force);};
+  var sumMasses = function($){
+    return List.sum(List.map(function(pm){
+      return pm.m;})($));};
+  var rotInertiaContrib = function(pm){
+    return function(){
+      var r = Public.Vec2.Vec2.magnitude(pm);
+      return ((pm.m*r)*r);}();};
+  var partThrusts = F2(function(ecs, part){
+    return function(){
+      switch (part.ctor) {
+        case 'Engine':
+          return (A2(List.any, function(ec){
+            return _N.eq(ec,part._0.config);}, ecs) ? function(){
+            var force = ((0-8)*part._0.r);
+            return _J.toList([{
+              _:{
+              },
+              disp:Public.Vec2.Vec2.origin,
+              force:{
+              _:{
+              },
+              x:force,
+              y:0}}]);}() : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'between lines 83 and 86')));
+      }
+      return _J.toList([]);}();});
+  var partMasses = function(part){
+    return function(){
+      var m = function(){
+        switch (part.ctor) {
+          case 'Brain':
+            return ((3*part._0.r)*part._0.r);
+          case 'Engine':
+            return ((2*part._0.r)*part._0.r);
+          case 'FuelTank':
+            return ((1.5*part._0.l)*part._0.w);
+        }_E.Case($moduleName,'between lines 38 and 42')}();
+      return _J.toList([{
+        _:{
+        },
+        m:m,
+        x:0,
+        y:0}]);}();};
+  var massContrib = function(pm){
+    return Public.Vec2.Vec2.scaleVec(pm.m)(Public.Vec2.Vec2.extractVec(pm));};
+  var beamThrusts = Utils.cnst(List.concat);
+  var beamMasses = Utils.cnst(List.concat);
+  var attachThrusts = F2(function(attach, ts){
+    return function(){
+      var rotateForce = function(t){
+        return _N.replace([['force',A2(Public.Vec2.Vec2.rotVec, attach.theta, t.force)]], t);};
+      var rotateDisp = function(t){
+        return _N.replace([['disp',A2(Public.Vec2.Vec2.rotVec, attach.theta, t.disp)]], t);};
+      var offsetDisp = function(t){
+        return _N.replace([['disp',A2(Public.Vec2.Vec2.addVec, {
+          _:{
+          },
+          x:attach.offset,
+          y:0}, t.disp)]], t);};
+      return List.map(function($){
+        return offsetDisp(rotateDisp(rotateForce($)));})(ts);}();});
+  var structureThrusts = function(ec){
+    return A3(Public.TagTree.TagTree.foldTagTree, partThrusts(ec), beamThrusts, attachThrusts);};
+  var netForce = F2(function(ec, s){
+    return Public.Vec2.Vec2.sumVec(List.map(function(_){
+      return _.force;})(A2(structureThrusts, ec, s)));});
+  var attachMasses = function(attach){
+    return List.map(Types.translateAttach(attach));};
+  var structureMasses = A3(Public.TagTree.TagTree.foldTagTree, partMasses, beamMasses, attachMasses);
+  var totalMass = function($){
+    return sumMasses(structureMasses($));};
+  var centerOfMass = function(structure){
+    return Public.Vec2.Vec2.scaleVec((1/totalMass(structure)))(Public.Vec2.Vec2.sumVec(List.map(massContrib)(structureMasses(structure))));};
+  var netTorque = F2(function(ec, s){
+    return function(){
+      var thrusts = A2(structureThrusts, ec, s);
+      var com = centerOfMass(s);
+      var center = function(thrust){
+        return _N.replace([['disp',A2(Public.Vec2.Vec2.subVec, com, thrust.disp)]], thrust);};
+      var torqueForces = A2(List.map, center, thrusts);
+      return List.sum(List.map(torqueMag)(torqueForces));}();});
+  var rotInertia = function(structure){
+    return List.sum(List.map(rotInertiaContrib)(List.map(Public.Vec2.Vec2.subVec(centerOfMass(structure)))(structureMasses(structure))));};
+  var netRotAcceleration = F2(function(ec, s){
+    return (A2(netTorque, ec, s)/rotInertia(s));});
+  var netAcceleration = F2(function(ec, s){
+    return Public.Vec2.Vec2.scaleVec((1/totalMass(s)))(A2(netForce, ec, s));});
+  var netDelta = F2(function(ec, s){
+    return {
+      _:{
+      },
+      a:A2(netAcceleration, ec, s),
+      alpha:A2(netRotAcceleration, ec, s)};});
+  var applyBrakes = function(state){
+    return function(){
+      var w = state.omega;
+      var vy = state.v.y;
+      var vx = state.v.x;
+      var rotfactor = 5.0e-4;
+      var posfactor = 1.0e-2;
+      var damp = F2(function(factor, n){
+        return (((_N.cmp(n,factor)<0)&&(_N.cmp(n,((0-1)*factor))>0)) ? 0 : (Basics.otherwise ? ((_N.cmp(n,0)>0) ? (n-factor) : (Basics.otherwise ? (n+factor) : _E.If($moduleName,'between lines 136 and 138'))) : _E.If($moduleName,'between lines 133 and 138')));});
+      return {
+        _:{
+        },
+        newOmega:A2(damp, rotfactor, w),
+        newV:{
+        _:{
+        },
+        x:A2(damp, posfactor, vx),
+        y:A2(damp, posfactor, vy)}};}();};
+  var updateMotion = F2(function(arg2, state){
+    return function(){
+      switch (arg2.ctor) {
+        case '_Tuple2':
+          return (arg2._0 ? function(){
+            var statePos = state.pos;
+            var fakeDelta = applyBrakes(state);
+            var newOmega = fakeDelta.newOmega;
+            var midOmega = ((state.omega+newOmega)/2);
+            var newTheta = (state.pos.theta+midOmega);
+            var midTheta = ((state.pos.theta+newTheta)/2);
+            var newV = fakeDelta.newV;
+            var midV = A2(Public.Vec2.Vec2.midVec, state.v, newV);
+            var newPos = Public.Vec2.Vec2.addVec(midV)(_N.replace([['theta',newTheta]], statePos));
+            return _N.replace([['pos',newPos],['v',newV],['omega',newOmega]], state);}() : (Basics.otherwise ? function(){
+            var statePos = state.pos;
+            var newOmega = (arg2._1.alpha+state.omega);
+            var midOmega = ((state.omega+newOmega)/2);
+            var newTheta = (state.pos.theta+midOmega);
+            var midTheta = ((state.pos.theta+newTheta)/2);
+            var absA = A2(Public.Vec2.Vec2.rotVec, midTheta, arg2._1.a);
+            var newV = A2(Public.Vec2.Vec2.addVec, absA, state.v);
+            var midV = A2(Public.Vec2.Vec2.midVec, state.v, newV);
+            var newPos = Public.Vec2.Vec2.addVec(midV)(_N.replace([['theta',newTheta]], statePos));
+            return _N.replace([['pos',newPos],['v',newV],['omega',newOmega]], state);}() : _E.If($moduleName,'between lines 144 and 166')));
+      }_E.Case($moduleName,'between lines 144 and 166')}();});
+  return elm.Physics = {
+    _op : _op, 
+    sumMasses : sumMasses, 
+    massContrib : massContrib, 
+    partMasses : partMasses, 
+    beamMasses : beamMasses, 
+    attachMasses : attachMasses, 
+    structureMasses : structureMasses, 
+    totalMass : totalMass, 
+    centerOfMass : centerOfMass, 
+    rotInertiaContrib : rotInertiaContrib, 
+    rotInertia : rotInertia, 
+    partThrusts : partThrusts, 
+    beamThrusts : beamThrusts, 
+    attachThrusts : attachThrusts, 
+    structureThrusts : structureThrusts, 
+    netForce : netForce, 
+    netAcceleration : netAcceleration, 
+    torqueMag : torqueMag, 
+    netTorque : netTorque, 
+    netRotAcceleration : netRotAcceleration, 
+    netDelta : netDelta, 
+    applyBrakes : applyBrakes, 
+    updateMotion : updateMotion};};
+Elm.Utils = function(elm){
+  if (elm.Utils) return elm.Utils;
+  var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Utils';
+  var Text = Elm.Text(elm);
+  var Text = Elm.Text(elm);
+  var Basics = Elm.Basics(elm);
+  var Signal = Elm.Signal(elm);
+  var List = Elm.List(elm);
+  var Maybe = Elm.Maybe(elm);
+  var Time = Elm.Time(elm);
+  var Prelude = Elm.Prelude(elm);
+  var Graphics = Graphics || {};
+  Graphics.Element = Elm.Graphics.Element(elm);
+  var Color = Elm.Color(elm);
+  var Graphics = Graphics || {};
+  Graphics.Collage = Elm.Graphics.Collage(elm);
+  var Types = Elm.Types(elm);
+  var _op = {};
+  var spaceBlack = F2(function(arg2, stuff){
+    return function(){
+      switch (arg2.ctor) {
+        case '_Tuple2':
+          return A2(Graphics.Collage.collage, arg2._0, arg2._1)(_L.Cons(Graphics.Collage.filled(Color.black)(A2(Graphics.Collage.rect, Basics.toFloat(arg2._0), Basics.toFloat(arg2._1))),stuff));
+      }_E.Case($moduleName,'between lines 36 and 38')}();});
+  var convertPos = F2(function(arg2, arg1){
+    return function(){
+      switch (arg1.ctor) {
+        case '_Tuple2':
+          return function(){
+            switch (arg2.ctor) {
+              case '_Tuple2':
+                return {ctor:"_Tuple2", _0:(arg1._0-A2(Basics.div, arg2._0, 2)), _1:(A2(Basics.div, arg2._1, 2)-arg1._1)};
+            }_E.Case($moduleName,'on line 30, column 27 to 51')}();
+      }_E.Case($moduleName,'on line 30, column 27 to 51')}();});
+  var controlEngines = function(input){
+    return _L.append(((_N.cmp(input.y,0)<0) ? _J.toList([Types.Reverse]) : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'on line 42, column 4 to 43'))),_L.append(((_N.cmp(input.y,0)>0) ? _J.toList([Types.Forward]) : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'on line 43, column 4 to 43'))),_L.append(((_N.cmp(input.x,0)>0) ? _J.toList([Types.TurnRight]) : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'on line 44, column 4 to 45'))),((_N.cmp(input.x,0)<0) ? _J.toList([Types.TurnLeft]) : (Basics.otherwise ? _J.toList([]) : _E.If($moduleName,'on line 45, column 4 to 44'))))));};
+  var combineSElems = F2(function(dir, ses){
+    return A2(Signal._op['<~'], Graphics.Element.flow(dir), Signal.combine(ses));});
+  var cnst = F2(function(x, a){
+    return x;});
+  return elm.Utils = {
+    _op : _op, 
+    cnst : cnst, 
+    convertPos : convertPos, 
+    combineSElems : combineSElems, 
+    spaceBlack : spaceBlack, 
+    controlEngines : controlEngines};};
+Elm.Types = function(elm){
+  if (elm.Types) return elm.Types;
+  var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Types';
+  var Text = Elm.Text(elm);
+  var Text = Elm.Text(elm);
+  var Basics = Elm.Basics(elm);
+  var Signal = Elm.Signal(elm);
+  var List = Elm.List(elm);
+  var Maybe = Elm.Maybe(elm);
+  var Time = Elm.Time(elm);
+  var Prelude = Elm.Prelude(elm);
+  var Graphics = Graphics || {};
+  Graphics.Element = Elm.Graphics.Element(elm);
+  var Color = Elm.Color(elm);
+  var Graphics = Graphics || {};
+  Graphics.Collage = Elm.Graphics.Collage(elm);
+  var Dict = Elm.Dict(elm);
+  var Either = Elm.Either(elm);
+  var Public = Public || {};
+  Public.State = Public.State || {};
+  Public.State.State = Elm.Public.State.State(elm);
+  var Public = Public || {};
+  Public.TagTree = Public.TagTree || {};
+  Public.TagTree.TagTree = Elm.Public.TagTree.TagTree(elm);
+  var Public = Public || {};
+  Public.Vec2 = Public.Vec2 || {};
+  Public.Vec2.Vec2 = Elm.Public.Vec2.Vec2(elm);
+  var _op = {};
+  var translateAttach = F2(function(attach, vext){
+    return function(){
+      var dY = (attach.offset*Basics.sin(attach.theta));
+      var dX = (attach.offset*Basics.cos(attach.theta));
+      return A2(Public.Vec2.Vec2.addVec, {
+        _:{
+        },
+        x:dX,
+        y:dY}, vext);}();});
+  var part = Public.TagTree.TagTree.Leaf;
+  var fresh = A2(Public.State.State.bindS, Public.State.State.get, function(i){
+    return A2(Public.State.State.bindS, Public.State.State.put((i+1)), function(arg1){
+      return function(){
+        return Public.State.State.returnS(i);}();});});
+  var labelBeams = function(s){
+    return function(){
+      var labelBeam = function(beam){
+        return A2(Public.State.State.fmapS, function(i){
+          return _N.insert('id', i, beam);}, fresh);};
+      var modifyStructure = A3(Public.TagTree.TagTree.walkModify, Public.State.State.returnS, labelBeam, Public.State.State.returnS);
+      return A2(Public.State.State.evalState, modifyStructure(s), 0);}();};
+  var beam = Public.TagTree.TagTree.Node;
+  var TurnRight = {ctor:"TurnRight"};
+  var TurnLeft = {ctor:"TurnLeft"};
+  var Thrust = F2(function(a, b){
+    return {
+      _:{
+      },
+      disp:a,
+      force:b};});
+  var Reverse = {ctor:"Reverse"};
+  var Position = F3(function(a, b, c){
+    return {
+      _:{
+      },
+      theta:c,
+      x:a,
+      y:b};});
+  var PointMass = F3(function(a, b, c){
+    return {
+      _:{
+      },
+      m:c,
+      x:a,
+      y:b};});
+  var Pause = {ctor:"Pause"};
+  var PartMode = function(a){
+    return {ctor:"PartMode", _0:a};};
+  var Part = {ctor:"Part"};
+  var Number = function(a){
+    return {ctor:"Number", _0:a};};
+  var None = {ctor:"None"};
+  var MotionState = F3(function(a, b, c){
+    return {
+      _:{
+      },
+      omega:c,
+      pos:a,
+      v:b};});
+  var MotionDelta = F2(function(a, b){
+    return {
+      _:{
+      },
+      a:a,
+      alpha:b};});
+  var Mode = F2(function(a, b){
+    return {
+      _:{
+      },
+      build:b,
+      pause:a};});
+  var Modal = function(a){
+    return {ctor:"Modal", _0:a};};
+  var LabelBeamExt = F2(function(a, b){
+    return _N.insert('id', a, b);});
+  var Inactive = {ctor:"Inactive"};
+  var GameState = F3(function(a, b, c){
+    return {
+      _:{
+      },
+      entities:a,
+      focus:c,
+      mode:b};});
+  var GameInput = F4(function(a, b, c, d){
+    return {
+      _:{
+      },
+      engines:a,
+      pointer:b,
+      trigger:d,
+      window:c};});
+  var FuelTank = function(a){
+    return {ctor:"FuelTank", _0:a};};
+  var Forward = {ctor:"Forward"};
+  var FPS = function(a){
+    return {ctor:"FPS", _0:a};};
+  var Exit = {ctor:"Exit"};
+  var Entity = F3(function(a, b, c){
+    return {
+      _:{
+      },
+      controls:a,
+      motion:b,
+      structure:c};});
+  var Engine = function(a){
+    return {ctor:"Engine", _0:a};};
+  var Disabled = {ctor:"Disabled"};
+  var Click = {ctor:"Click"};
+  var Brakes = {ctor:"Brakes"};
+  var Brain = function(a){
+    return {ctor:"Brain", _0:a};};
+  var BeamMode = function(a){
+    return {ctor:"BeamMode", _0:a};};
+  var Beam = function(a){
+    return {
+      _:{
+      },
+      r:a};};
+  var Attach = F2(function(a, b){
+    return {
+      _:{
+      },
+      offset:a,
+      theta:b};});
+  return elm.Types = {
+    _op : _op, 
+    translateAttach : translateAttach, 
+    beam : beam, 
+    part : part, 
+    fresh : fresh, 
+    labelBeams : labelBeams, 
+    Disabled : Disabled, 
+    Forward : Forward, 
+    Reverse : Reverse, 
+    TurnLeft : TurnLeft, 
+    TurnRight : TurnRight, 
+    Brain : Brain, 
+    FuelTank : FuelTank, 
+    Engine : Engine, 
+    Inactive : Inactive, 
+    BeamMode : BeamMode, 
+    PartMode : PartMode, 
+    Brakes : Brakes, 
+    Click : Click, 
+    Modal : Modal, 
+    FPS : FPS, 
+    Pause : Pause, 
+    Exit : Exit, 
+    Number : Number, 
+    None : None, 
+    Part : Part, 
+    Position : Position, 
+    Attach : Attach, 
+    PointMass : PointMass, 
+    Beam : Beam, 
+    LabelBeamExt : LabelBeamExt, 
+    Thrust : Thrust, 
+    MotionState : MotionState, 
+    MotionDelta : MotionDelta, 
+    Entity : Entity, 
+    GameInput : GameInput, 
+    GameState : GameState, 
+    Mode : Mode};};
+Elm.Public = Elm.Public || {};
+Elm.Public.TagTree = Elm.Public.TagTree || {};
+Elm.Public.TagTree.TagTree = function(elm){
+  elm.Public = elm.Public || {};
+  elm.Public.TagTree = elm.Public.TagTree || {};
+  if (elm.Public.TagTree.TagTree) return elm.Public.TagTree.TagTree;
+  var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Public.TagTree.TagTree';
+  var Text = Elm.Text(elm);
+  var Text = Elm.Text(elm);
+  var Basics = Elm.Basics(elm);
+  var Signal = Elm.Signal(elm);
+  var List = Elm.List(elm);
+  var Maybe = Elm.Maybe(elm);
+  var Time = Elm.Time(elm);
+  var Prelude = Elm.Prelude(elm);
+  var Graphics = Graphics || {};
+  Graphics.Element = Elm.Graphics.Element(elm);
+  var Color = Elm.Color(elm);
+  var Graphics = Graphics || {};
+  Graphics.Collage = Elm.Graphics.Collage(elm);
+  var Public = Public || {};
+  Public.State = Public.State || {};
+  Public.State.State = Elm.Public.State.State(elm);
+  var _op = {};
+  var Node = F2(function(a, b){
+    return {ctor:"Node", _0:a, _1:b};});
+  var Leaf = function(a){
+    return {ctor:"Leaf", _0:a};};
+  var foldTagTree = F4(function(fLeaf, fNode, fEdge, tree){
+    return function(){
+      var y = A3(foldTagTree, fLeaf, fNode, fEdge);
+      var fChild = function(arg1){
+        return function(){
+          switch (arg1.ctor) {
+            case '_Tuple2':
+              return fEdge(arg1._0)(y(arg1._1));
+          }_E.Case($moduleName,'on line 32, column 30 to 51')}();};
+      return function(){
+        switch (tree.ctor) {
+          case 'Leaf':
+            return fLeaf(tree._0);
+          case 'Node':
+            return fNode(tree._0)(A2(List.map, fChild, tree._1));
+        }_E.Case($moduleName,'between lines 33 and 35')}();}();});
+  var foldTagTree$ = F3(function(fLeaf, fNode, tree){
+    return function(){
+      var y = A2(foldTagTree$, fLeaf, fNode);
+      return function(){
+        switch (tree.ctor) {
+          case 'Leaf':
+            return fLeaf(tree._0);
+          case 'Node':
+            return function(){
+              var mapAttach = F2(function(f, arg1){
+                return function(){
+                  switch (arg1.ctor) {
+                    case '_Tuple2':
+                      return {ctor:"_Tuple2", _0:arg1._0, _1:f(arg1._1)};
+                  }_E.Case($moduleName,'on line 46, column 38 to 49')}();});
+              var subs$ = A2(List.map, mapAttach(y), tree._1);
+              return A2(fNode, tree._0, subs$);}();
+        }_E.Case($moduleName,'between lines 43 and 48')}();}();});
+  var walkModify = F4(function(uLeaf, uNode, uEdge, tree){
+    return function(){
+      var y = A3(walkModify, uLeaf, uNode, uEdge);
+      var uSub = function(arg1){
+        return function(){
+          switch (arg1.ctor) {
+            case '_Tuple2':
+              return A2(Public.State.State.bindS, uEdge(arg1._0), function(edge$){
+                return A2(Public.State.State.bindS, y(arg1._1), function(sub$){
+                  return Public.State.State.returnS({ctor:"_Tuple2", _0:edge$, _1:sub$});});});
+          }_E.Case($moduleName,'between lines 59 and 61')}();};
+      return function(){
+        switch (tree.ctor) {
+          case 'Leaf':
+            return Public.State.State.fmapS(Leaf)(uLeaf(tree._0));
+          case 'Node':
+            return A2(Public.State.State.bindS, A2(Public.State.State.mapMS, uSub, tree._1), function(subs$){
+              return A2(Public.State.State.bindS, uNode(tree._0), function(node$){
+                return Public.State.State.returnS(A2(Node, node$, subs$));});});
+        }_E.Case($moduleName,'between lines 62 and 67')}();}();});
+  return elm.Public.TagTree.TagTree = {
+    _op : _op, 
+    foldTagTree : foldTagTree, 
+    foldTagTree$ : foldTagTree$, 
+    walkModify : walkModify, 
+    Leaf : Leaf, 
+    Node : Node};};
+Elm.Public = Elm.Public || {};
+Elm.Public.State = Elm.Public.State || {};
+Elm.Public.State.State = function(elm){
+  elm.Public = elm.Public || {};
+  elm.Public.State = elm.Public.State || {};
+  if (elm.Public.State.State) return elm.Public.State.State;
+  var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Public.State.State';
+  var Text = Elm.Text(elm);
+  var Text = Elm.Text(elm);
+  var Basics = Elm.Basics(elm);
+  var Signal = Elm.Signal(elm);
+  var List = Elm.List(elm);
+  var Maybe = Elm.Maybe(elm);
+  var Time = Elm.Time(elm);
+  var Prelude = Elm.Prelude(elm);
+  var Graphics = Graphics || {};
+  Graphics.Element = Elm.Graphics.Element(elm);
+  var Color = Elm.Color(elm);
+  var Graphics = Graphics || {};
+  Graphics.Collage = Elm.Graphics.Collage(elm);
+  var _op = {};
+  var execState = function(st){
+    return function($){
+      return Basics.snd(st.runState($));};};
+  var evalState = function(st){
+    return function($){
+      return Basics.fst(st.runState($));};};
+  var State = function(a){
+    return {
+      _:{
+      },
+      runState:a};};
+  var bindS = F2(function(st, f){
+    return State(function(s){
+      return function(){
+        var _0 = st.runState(s);
+        var s$ = function(){
+          switch (_0.ctor) {
+            case '_Tuple2':
+              return _0._1;
+          }_E.Case($moduleName,'on line 41, column 25 to 38')}();
+        var x = function(){
+          switch (_0.ctor) {
+            case '_Tuple2':
+              return _0._0;
+          }_E.Case($moduleName,'on line 41, column 25 to 38')}();
+        return f(x).runState(s$);}();});});
+  var get = State(function(s){
+    return {ctor:"_Tuple2", _0:s, _1:s};});
+  var put = function(s$){
+    return State(function(s){
+      return {ctor:"_Tuple2", _0:{ctor:"_Tuple0"}, _1:s$};});};
+  var returnS = function(x){
+    return State(function(s){
+      return {ctor:"_Tuple2", _0:x, _1:s};});};
+  var fmapS = F2(function(f, st){
+    return A2(bindS, st, function(x){
+      return returnS(f(x));});});
+  var sequenceS = function(ms){
+    return function(){
+      var k = F2(function(m, m$){
+        return A2(bindS, m, function(x){
+          return A2(bindS, m$, function(xs){
+            return returnS(_L.Cons(x,xs));});});});
+      return A3(List.foldr, k, returnS(_J.toList([])), ms);}();};
+  var mapMS = function(f){
+    return function($){
+      return sequenceS(List.map(f)($));};};
+  return elm.Public.State.State = {
+    _op : _op, 
+    get : get, 
+    put : put, 
+    evalState : evalState, 
+    execState : execState, 
+    returnS : returnS, 
+    bindS : bindS, 
+    sequenceS : sequenceS, 
+    mapMS : mapMS, 
+    fmapS : fmapS, 
+    State : State};};
+Elm.Public = Elm.Public || {};
+Elm.Public.Vec2 = Elm.Public.Vec2 || {};
+Elm.Public.Vec2.Vec2 = function(elm){
+  elm.Public = elm.Public || {};
+  elm.Public.Vec2 = elm.Public.Vec2 || {};
+  if (elm.Public.Vec2.Vec2) return elm.Public.Vec2.Vec2;
+  var N = Elm.Native, _N = N.Utils(elm), _L = N.List(elm), _E = N.Error(elm), _J = N.JavaScript(elm), _str = _J.toString, $moduleName = 'Public.Vec2.Vec2';
+  var Text = Elm.Text(elm);
+  var Text = Elm.Text(elm);
+  var Basics = Elm.Basics(elm);
+  var Signal = Elm.Signal(elm);
+  var List = Elm.List(elm);
+  var Maybe = Elm.Maybe(elm);
+  var Time = Elm.Time(elm);
+  var Prelude = Elm.Prelude(elm);
+  var Graphics = Graphics || {};
+  Graphics.Element = Elm.Graphics.Element(elm);
+  var Color = Elm.Color(elm);
+  var Graphics = Graphics || {};
+  Graphics.Collage = Elm.Graphics.Collage(elm);
+  var Transform2D = Elm.Transform2D(elm);
+  var _op = {};
+  var vecTranslate = function(v){
+    return A6(Transform2D.matrix, 1, 0, 0, 1, v.x, v.y);};
+  var scaleVec = F2(function(a, v){
+    return _N.replace([['x',(v.x*a)],['y',(v.y*a)]], v);});
+  var rotVec = F2(function(theta, v){
+    return function(){
+      var newY = ((v.x*Basics.sin(theta))+(v.y*Basics.cos(theta)));
+      var newX = ((v.x*Basics.cos(theta))-(v.y*Basics.sin(theta)));
+      return _N.replace([['x',newX],['y',newY]], v);}();});
+  var origin = {
+    _:{
+    },
+    x:0,
+    y:0};
+  var negVec = scaleVec((0-1));
+  var magnitude = function(v){
+    return Basics.sqrt(((v.x*v.x)+(v.y*v.y)));};
+  var magSquared = function(v){
+    return ((v.x*v.x)+(v.y*v.y));};
+  var fromIntPair = function(arg1){
+    return function(){
+      switch (arg1.ctor) {
+        case '_Tuple2':
+          return {
+            _:{
+            },
+            x:Basics.toFloat(arg1._0),
+            y:Basics.toFloat(arg1._1)};
+      }_E.Case($moduleName,'on line 31, column 23 to 51')}();};
+  var extractVec = function(v){
+    return {
+      _:{
+      },
+      x:v.x,
+      y:v.y};};
+  var dotVec = F2(function(v1, v2){
+    return ((v1.x*v2.x)+(v1.y*v2.y));});
+  var crossVecMag = F2(function(v1, v2){
+    return ((v1.x*v2.y)-(v1.y*v2.x));});
+  var addVec = F2(function(v1, v2){
+    return function(){
+      var newY = (v1.y+v2.y);
+      var newX = (v1.x+v2.x);
+      return _N.replace([['x',newX],['y',newY]], v2);}();});
+  var addVec2 = addVec;
+  var midVec = F2(function(v1, v2){
+    return scaleVec((1/2))(A2(addVec, v1, v2));});
+  var subVec = function(v1){
+    return addVec(A2(scaleVec, (0-1), v1));};
+  var distance = F2(function(v1, v2){
+    return magnitude(A2(subVec, v2, v1));});
+  var distanceSquared = F2(function(v1, v2){
+    return magSquared(A2(subVec, v2, v1));});
+  var minimumDist = F3(function(v, w, p){
+    return function(){
+      var l2 = A2(distanceSquared, v, w);
+      return (_N.eq(l2,0) ? {
+        _:{
+        },
+        offset:0,
+        r:A2(distance, v, p)} : (Basics.otherwise ? function(){
+        var t = (A2(dotVec, A2(subVec, v, p), A2(subVec, v, w))/l2);
+        var tFix = A3(Basics.clamp, 0, 1, t);
+        var r = ((_N.cmp(t,0)<0) ? A2(distance, p, v) : (Basics.otherwise ? ((_N.cmp(t,1)>0) ? A2(distance, p, w) : (Basics.otherwise ? function(){
+          var projection = addVec(v)(scaleVec(t)(A2(subVec, v, w)));
+          return A2(distance, p, projection);}() : _E.If($moduleName,'between lines 100 and 104'))) : _E.If($moduleName,'between lines 97 and 104')));
+        return {
+          _:{
+          },
+          offset:(tFix*Basics.sqrt(l2)),
+          r:r};}() : _E.If($moduleName,'between lines 93 and 106')));}();});
+  var sumVec = function($){
+    return A2(List.foldl, addVec, origin)(List.map(extractVec)($));};
+  var Vec2Ext = F3(function(a, b, c){
+    return _N.insert('y', b, _N.insert('x', a, c));});
+  return elm.Public.Vec2.Vec2 = {
+    _op : _op, 
+    origin : origin, 
+    fromIntPair : fromIntPair, 
+    scaleVec : scaleVec, 
+    negVec : negVec, 
+    rotVec : rotVec, 
+    addVec : addVec, 
+    subVec : subVec, 
+    addVec2 : addVec2, 
+    midVec : midVec, 
+    extractVec : extractVec, 
+    sumVec : sumVec, 
+    magnitude : magnitude, 
+    magSquared : magSquared, 
+    distance : distance, 
+    distanceSquared : distanceSquared, 
+    dotVec : dotVec, 
+    crossVecMag : crossVecMag, 
+    vecTranslate : vecTranslate, 
+    minimumDist : minimumDist, 
+    Vec2Ext : Vec2Ext};};
+        </script>
+    </head>
+    <body>
+        <script type="text/javascript">
+            Elm.fullscreen(Elm.Demo)
+        </script>
+        <noscript>
+            
+        </noscript>
+    </body>
+</html>
