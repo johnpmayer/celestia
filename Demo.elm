@@ -62,25 +62,31 @@ initialState : GameState
 initialState = { entities = initialEntities, mode = initialMode, focus = 0 }
 
 initialMode : Mode
-initialMode = { pause = False, build = None }
+initialMode = { pause = False, build = initialBuildMode }
+
+initialPlacement : Maybe LabelDist
+initialPlacement = Nothing
+
+initialBuildMode : BuildMode
+initialBuildMode = { entity = floor 4, placement = initialPlacement, part = Engine { r = 5, config = Forward } }
 
 current : Signal GameState
 current = foldp (execState . step) initialState gameInputs
---current = constant initialState
 
 {- Render the display -}
 
-draw : GameState -> [Form]
-draw gs = 
+draw : Float -> GameState -> [Form]
+draw n gs = 
   let entities = D.values <| gs.entities
       camera = case D.lookup gs.focus gs.entities of
         Nothing -> origin
         Just e -> extractVec e.motion.pos
       cameraTransform = vecTranslate <| negVec camera
-  in [groupTransform cameraTransform <| map (drawEntity 0) entities]
+      entityForms = map (drawEntity <| n) entities
+  in [groupTransform cameraTransform <| entityForms]
 
 main = combineSElems outward <|
-  [ spaceBlack <~ (.window <~ gameInputs) ~ (draw <~ current)
+  [ spaceBlack <~ (.window <~ gameInputs) ~ (draw <~ (fst <~ timestamp gameInputs) ~ current)
   , combineSElems down
     [ (color white . asText) <~ gameInputs
     , (color white . asText . .focus) <~ current

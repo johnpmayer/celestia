@@ -67,6 +67,7 @@ watchKeymap = D.fromList
   , (C.toCode '4', Number 4)
   , (C.toCode '5', Number 5)
   , (C.toCode 'p', Pause)
+  , (C.toCode 'c', Cycle)
   , (27, Exit)
   ]
 

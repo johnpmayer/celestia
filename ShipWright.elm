@@ -49,11 +49,13 @@ display = drawStructure 0 []
 space = (\sfs -> spaceBlack dimensions <~ combine sfs)
   [ display <~ shipWith ]
 
+{-
 main = combineSElems <|
   [ space
   , (asText . buildPoints . labelBeams) <~ ship
   , asText <~ (bestPlacement <~ gamePointer ~ ship)
   ]
+-}
 
 {- Hard Stuff -}
 
@@ -70,8 +72,6 @@ buildPoints =
         in { bp | start <- place bp.start, end <- place bp.end }
       attachPoints attach = map (attachPoint attach)
   in foldTagTree partPoints beamPoints attachPoints
-
-type LabelDist = { id:Int, r:Float, offset:Float }
 
 pointDist : (Int,Int) -> BuildPoint -> LabelDist
 pointDist (x,y) bp = 

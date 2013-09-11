@@ -21,18 +21,16 @@
 
 module Step where
 
+import Char as C
 import Dict as D
 import open Either
 
-import Char as C
-
-import open Types
-
 import Public.State.State as ST
 
+import open Types
 import open Utils
-
 import open Physics
+import open ShipWright
 
 step : GameInput -> GameStep
 step input = 
@@ -40,22 +38,26 @@ step input =
       pure = ST.returnS
   in case input.trigger of
     Modal m -> updateMode m
-    Click -> rotateFocus
+    Click -> build
     FPS t ->
       (focusControls input) >>= (\_ ->
       physicsStep)
+
+build : GameStep
+build = ST.returnS ()
 
 updateMode : Modal -> GameStep
 updateMode m =
   let (>>=) = ST.bindS
       pure = ST.returnS
   in
-    ST.get >>= (\state ->
-    let mode = state.mode
-        pause = case m of
-          Pause -> not state.mode.pause
-          _ -> state.mode.pause
-    in ST.put { state | mode <- { mode | pause <- pause } })
+    case m of
+      Cycle -> rotateFocus
+      Pause -> 
+        ST.get >>= (\state ->
+        let mode = state.mode
+            pause = not state.mode.pause
+        in ST.put { state | mode <- { mode | pause <- pause } })
 
 rotateFocus : GameStep
 rotateFocus =

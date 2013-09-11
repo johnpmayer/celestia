@@ -113,6 +113,7 @@ data Trigger
 
 data Modal
   = Pause
+  | Cycle
   | Exit
   | Number Int
 
@@ -120,7 +121,9 @@ type GameState = { entities : Dict Int Entity, mode : Mode, focus : Int }
 
 type Mode = { pause : Bool, build : BuildMode }
 
-data BuildMode = None | Part
+type LabelDist = { id:Int, r:Float, offset:Float }
+
+type BuildMode = { entity : Int, placement : Maybe LabelDist, part : Part }
 
 type GameStep = State GameState ()
 
