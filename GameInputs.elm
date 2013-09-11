@@ -22,10 +22,12 @@
 module GameInputs where
 
 import open Either
-import open Dict
 
 import Char as C
+import Dict as D
+import Dict (Dict)
 import Keyboard as K
+import Keyboard (KeyCode)
 import Mouse as M
 import Time as T
 import Window as W
@@ -57,18 +59,25 @@ triggers = merges [ clicks, modes, ticks ]
 clicks : Signal Trigger
 clicks = (cnst Click) <~ M.clicks
 
-watchKeys : Dict K.KeyCode Modal
-watchKeys = fromList
-  [ (1, Number 1)
-  , (2, Number 2)
-  , (3, Number 3)
-  , (4, Number 4)
-  , (5, Number 5)
+watchKeymap : Dict KeyCode Modal
+watchKeymap = D.fromList
+  [ (C.toCode '1', Number 1)
+  , (C.toCode '2', Number 2)
+  , (C.toCode '3', Number 3)
+  , (C.toCode '4', Number 4)
+  , (C.toCode '5', Number 5)
+  , (C.toCode 'p', Pause)
   , (27, Exit)
   ]
 
+modeKeysDown : Signal Modal
+modeKeysDown =
+  let watchKeys = D.toList watchKeymap
+      keysDown = map (\(kc,modal) -> lift (cnst modal) . keepIf id True <| K.isDown kc) watchKeys
+  in merges keysDown
+
 modes : Signal Trigger
-modes = (Modal . Number) <~ K.lastPressed
+modes = Modal <~ modeKeysDown
 
 ticks : Signal Trigger
 ticks = FPS <~ (T.fps 25)

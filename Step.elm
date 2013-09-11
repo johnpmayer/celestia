@@ -53,10 +53,7 @@ updateMode m =
     ST.get >>= (\state ->
     let mode = state.mode
         pause = case m of
-          Number n -> 
-            if n == C.toCode 'p'
-            then not state.mode.pause
-            else state.mode.pause
+          Pause -> not state.mode.pause
           _ -> state.mode.pause
     in ST.put { state | mode <- { mode | pause <- pause } })
 

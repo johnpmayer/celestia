@@ -26,10 +26,12 @@ import open Either
 import Dict (Dict)
 import Dict as D
 
+import open Physics
+
 import Draw (drawEntity)
 import Public.State.State (execState)
 import Step (GameState, Mode, None, step)
-import GameInputs (gameInputs)
+import GameInputs (gameInputs, modes)
 import open Types
 import open Utils
 import open Public.Vec2.Vec2
@@ -37,6 +39,12 @@ import open Public.Vec2.Vec2
 import Main (simpleShip)
 
 {- Setup initial game state and initialize the loop -}
+
+spine : Structure
+spine = beam {r = 200} [] 
+
+station : Entity
+station = { controls = Right [], motion = { pos = { x = -100, y = 200, theta = 0 }, v = { x = 0, y = 0 }, omega = 0 }, structure = spine }
 
 initialShips : [Entity]
 initialShips = 
@@ -48,9 +56,7 @@ initialShips =
 
 initialEntities : Dict Int Entity
 initialEntities = 
-  D.fromList .
-  zip [0,1,2,3] <|
-  initialShips
+  D.fromList <| (4, station) :: (zip [0,1,2,3] initialShips)
 
 initialState : GameState
 initialState = { entities = initialEntities, mode = initialMode, focus = 0 }
@@ -60,6 +66,7 @@ initialMode = { pause = False, build = None }
 
 current : Signal GameState
 current = foldp (execState . step) initialState gameInputs
+--current = constant initialState
 
 {- Render the display -}
 
@@ -78,5 +85,6 @@ main = combineSElems outward <|
     [ (color white . asText) <~ gameInputs
     , (color white . asText . .focus) <~ current
     , (color white . asText . .mode) <~ current
+    , (color white . asText) <~ modes
     ]
   ]

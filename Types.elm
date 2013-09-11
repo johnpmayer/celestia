@@ -39,8 +39,6 @@ translateAttach attach vext =
       dY = attach.offset * sin attach.theta
   in addVec { x = dX, y = dY } vext
 
-type PointMass = { x : Float, y : Float, m : Float}
-
 type Beam = { r : Float }
 
 type StructureExt a = TagTree Part a Attach
@@ -82,6 +80,11 @@ labelBeams s =
   in evalState (modifyStructure s) 0
 
 {- Physics -}
+
+type PointMass = Vec2Ext { m : Float }
+
+data Moment = Point PointMass 
+            | ParallelAxis (Vec2Ext { m : Float, localMoment : Float })
 
 type Thrust = { disp : Vec2, force : Vec2 }
 

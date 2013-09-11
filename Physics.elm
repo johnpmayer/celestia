@@ -42,7 +42,7 @@ partMasses part =
   in [{ x=0, y=0, m=m }]
 
 beamMasses : Beam -> [[PointMass]] -> [PointMass]
-beamMasses = cnst concat 
+beamMasses beam subs = {x = beam.r / 2, y = 0, m = 0.1 * beam.r} :: concat subs 
 
 attachMasses : Attach -> [PointMass] -> [PointMass]
 attachMasses attach = map (translateAttach attach)
@@ -61,6 +61,46 @@ centerOfMass structure =
   structureMasses <|
   structure
 
+partMoment : Part -> [Moment]
+partMoment = map Point . partMasses
+
+beamMoment : Beam -> [[Moment]] -> [Moment]
+beamMoment beam subs = 
+  let m = 0.1 * beam.r
+      parallel = { x = beam.r / 2, y = 0, m = m, localMoment = (1/12) * m * beam.r * beam.r }
+  in ParallelAxis parallel :: concat subs
+
+momentMapVec : (Vec2 -> Vec2) -> Moment -> Moment
+momentMapVec f m = case m of
+  Point pm -> 
+    let pmv = extractVec pm
+        pmf = f pmv
+    in Point <| { pm | x <- pmf.x, y <- pmf.y }
+  ParallelAxis pa -> 
+    let pav = extractVec pa
+        paf = f pav
+    in ParallelAxis <| { pa | x <- paf.x, y <- paf.y }
+
+translateMoment : Attach -> Moment -> Moment
+translateMoment a m = case m of
+  Point pm -> Point <| translateAttach a pm
+  ParallelAxis pa -> ParallelAxis <| translateAttach a pa
+
+attachMoment : Attach -> [Moment] -> [Moment]
+attachMoment attach = map (translateMoment attach)
+
+structureMoments : Structure -> [Moment]
+structureMoments = foldTagTree partMoment beamMoment attachMoment
+
+momentContrib : Moment -> Float
+momentContrib m = case m of
+  Point pm -> 
+    let r = magnitude pm
+    in pm.m * r * r
+  ParallelAxis pa ->
+    let r = magnitude pa
+    in pa.m * r * r + pa.localMoment
+
 rotInertiaContrib : PointMass -> Float
 rotInertiaContrib pm =
   let r = magnitude pm
@@ -69,9 +109,9 @@ rotInertiaContrib pm =
 rotInertia : Structure -> Float
 rotInertia structure = 
   sum .
-  map rotInertiaContrib .
-  map (subVec <| centerOfMass structure) .
-  structureMasses <|
+  map momentContrib .
+  map (momentMapVec (subVec <| centerOfMass structure)) .
+  structureMoments <|
   structure
 
 {- Thrust -}
