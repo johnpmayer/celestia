@@ -94,12 +94,6 @@ type MotionDelta = { a : Vec2, alpha : Float }
 
 type Entity = { controls : Either Brakes [EngineConfig], motion : MotionState, structure : Structure }
 
-{- Build -}
-
-data BuildMode = Inactive
-               | BeamMode Beam
-               | PartMode Part
-
 {- GameInputs -}
 
 type GameInput = { engines : Either Brakes [EngineConfig], pointer : (Int,Int), window : (Int,Int), trigger : Trigger }

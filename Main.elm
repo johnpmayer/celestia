@@ -25,7 +25,6 @@ import Char (toCode)
 import Keyboard as K
 import Mouse as M
 
-import open Build
 import open Draw 
 import open Physics 
 import open Types 
@@ -85,12 +84,6 @@ state = foldp updateMotion startPos ((,) <~ brakes ~ delta)
 
 camera : Signal Vec2
 camera = (extractVec . .pos) <~ state
-
-mode : Signal BuildMode
-mode = foldp updateMode Inactive K.lastPressed
-
-construct : (Int,Int) -> BuildMode -> Form
-construct (x,y) mode = move (toFloat x, toFloat y) <| blueprint mode
 
 canvasWH : (Int,Int)
 canvasWH = (400,300)

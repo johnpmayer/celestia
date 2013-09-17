@@ -80,6 +80,6 @@ drawEntity noise { controls, motion, structure } =
   in groupTransform modelM <| [ drawStructure noise engines structure ]
 
 drawBuildArea : BuildMode -> Form
-drawBuildArea mode = case mode of
-  Inactive -> group []
-  _        -> filled (rgba 255 255 0 0.2) <| oval 200 200
+drawBuildArea mode = case mode.placement of
+  Nothing -> group []
+  _       -> filled (rgba 255 255 0 0.2) <| oval 200 200
