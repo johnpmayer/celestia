@@ -68,16 +68,14 @@ drawStructure noise ec structure =
   foldTagTree (drawPart noise ec) drawBeam drawAttach structure
 
 drawEntity : Time -> Entity -> Form
-drawEntity noise { controls, motion, structure } = 
-  let comOffset = scaleVec -1 <| centerOfMass structure
-      comM = translation comOffset.x comOffset.y
-      rotM = T.rotation motion.pos.theta
+drawEntity noise { controls, motion, cache } = 
+  let rotM = T.rotation motion.pos.theta
       moveM = translation motion.pos.x motion.pos.y
-      modelM = T.multiply moveM (T.multiply rotM comM)
+      modelM = T.multiply moveM rotM
       engines = case controls of
         Left _ -> []
         Right ecs -> ecs
-  in groupTransform modelM <| [ drawStructure noise engines structure ]
+  in groupTransform modelM <| [ drawStructure noise engines cache.structure ]
 
 drawBuildArea : BuildMode -> Form
 drawBuildArea mode = case mode.placement of

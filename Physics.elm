@@ -114,6 +114,13 @@ rotInertia structure =
   structureMoments <|
   structure
 
+genCache : Structure -> EntityCache
+genCache s = EntityCache
+  s
+  (centerOfMass s)
+  (totalMass s)
+  (rotInertia s)
+
 {- Thrust -}
 
 partThrusts : [EngineConfig] -> Part -> [Thrust]
@@ -139,28 +146,35 @@ attachThrusts attach ts =
 structureThrusts : [EngineConfig] -> Structure -> [Thrust]
 structureThrusts ec = foldTagTree (partThrusts ec) beamThrusts attachThrusts
 
-netForce : [EngineConfig] -> Structure -> Vec2
-netForce ec s = sumVec . map .force <| structureThrusts ec s
+{- Entity Physics -}
 
-netAcceleration : [EngineConfig] -> Structure -> Vec2
-netAcceleration ec s = scaleVec (1 / totalMass s) <| netForce ec s
+netForce : [EngineConfig] -> EntityCache -> Vec2
+netForce controls cache = 
+  sumVec . map .force <| structureThrusts controls cache.structure
+
+netAcceleration : [EngineConfig] -> EntityCache -> Vec2
+netAcceleration controls cache = 
+  scaleVec (1 / cache.totalMass) <| netForce controls cache
 
 torqueMag : Thrust -> Float
 torqueMag t = crossVecMag t.disp t.force
 
-netTorque : [EngineConfig] -> Structure -> Float
-netTorque ec s =
-  let com = centerOfMass s
-      thrusts = structureThrusts ec s
+netTorque : [EngineConfig] -> EntityCache -> Float
+netTorque controls cache =
+  let com = cache.comOffset
+      thrusts = structureThrusts controls cache.structure
       center thrust = { thrust | disp <- subVec com thrust.disp }
       torqueForces = map center thrusts
   in sum . map torqueMag <| torqueForces 
 
-netRotAcceleration : [EngineConfig] -> Structure -> Float
-netRotAcceleration ec s = netTorque ec s / rotInertia s
+netRotAcceleration : [EngineConfig] -> EntityCache -> Float
+netRotAcceleration controls cache = 
+  netTorque controls cache / cache.rotInertia
 
-netDelta : [EngineConfig] -> Structure -> MotionDelta
-netDelta ec s = { a = netAcceleration ec s, alpha = netRotAcceleration ec s }
+netDelta : [EngineConfig] -> EntityCache -> MotionDelta
+netDelta controls cache = MotionDelta
+  (netAcceleration controls cache)
+  (netRotAcceleration controls cache)
 
 applyBrakes : MotionState -> { newOmega : Float, newV : { x : Float, y : Float } }
 applyBrakes state = 

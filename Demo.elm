@@ -44,14 +44,14 @@ spine : Structure
 spine = beam {r = 200} [] 
 
 station : Entity
-station = { controls = Right [], motion = { pos = { x = -100, y = 200, theta = 0 }, v = { x = 0, y = 0 }, omega = 0 }, structure = spine }
+station = { controls = Right [], motion = { pos = { x = 0, y = 200, theta = 0 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genCache spine }
 
 initialShips : [Entity]
 initialShips = 
-  [ { controls = Right [], motion = { pos = { x =   0, y =   0, theta = 0 }, v = { x = 0, y = 0 }, omega = 0 }, structure = simpleShip }
-  , { controls = Right [], motion = { pos = { x =  60, y =  50, theta = 1 }, v = { x = 0, y = 0 }, omega = 0 }, structure = simpleShip }
-  , { controls = Right [], motion = { pos = { x = -80, y =  40, theta = 4 }, v = { x = 0, y = 0 }, omega = 0 }, structure = simpleShip }
-  , { controls = Right [], motion = { pos = { x = 120, y = -20, theta = 3 }, v = { x = 0, y = 0 }, omega = 0 }, structure = simpleShip }
+  [ { controls = Right [], motion = { pos = { x =   0, y =   0, theta = 0 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genCache simpleShip }
+  , { controls = Right [], motion = { pos = { x =  60, y =  50, theta = 1 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genCache simpleShip }
+  , { controls = Right [], motion = { pos = { x = -80, y =  40, theta = 4 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genCache simpleShip }
+  , { controls = Right [], motion = { pos = { x = 120, y = -20, theta = 3 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genCache simpleShip }
   ]
 
 initialEntities : Dict Int Entity

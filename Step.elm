@@ -93,7 +93,7 @@ entityPureStep e =
       newMotion = case e.controls of
         Left _ -> updateMotion (True,rest) e.motion
         Right engines -> 
-          let delta = netDelta engines e.structure
+          let delta = netDelta engines e.cache
           in updateMotion (False,delta) e.motion
   in { e | motion <- newMotion }
 

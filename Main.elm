@@ -76,15 +76,6 @@ engines = control <~ K.wasd
 brakes : Signal Bool
 brakes = K.isDown <| toCode 'x'
 
-delta : Signal MotionDelta
-delta = sampleOn (fps 30) <| netDelta <~ engines ~ (constant simpleShip)
-
-state : Signal MotionState
-state = foldp updateMotion startPos ((,) <~ brakes ~ delta)
-
-camera : Signal Vec2
-camera = (extractVec . .pos) <~ state
-
 canvasWH : (Int,Int)
 canvasWH = (400,300)
 
