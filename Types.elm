@@ -27,8 +27,6 @@ import open Public.State.State
 import open Public.TagTree.TagTree
 import open Public.Vec2.Vec2
 
-type Position = { x : Float, y : Float, theta : Float }
-
 {- Structures -}
 
 type Attach = { offset : Float, theta : Float }
@@ -87,6 +85,8 @@ data Moment = Point PointMass
             | ParallelAxis (Vec2Ext { m : Float, localMoment : Float })
 
 type Thrust = { disp : Vec2, force : Vec2 }
+
+type Position = Vec2Ext { theta : Float }
 
 type MotionState = { pos : Position, v : Vec2, omega : Float }
 
