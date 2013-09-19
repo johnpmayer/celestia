@@ -193,28 +193,28 @@ applyBrakes state =
   in { newOmega = damp rotfactor w
      ,  newV = { x = damp posfactor vx, y = damp posfactor vy } }
 
-updateMotion : (Bool,MotionDelta) -> MotionState -> MotionState
-updateMotion (brakes,delta) state = 
-  if brakes
-  then 
-    let fakeDelta = applyBrakes state
-        newOmega = fakeDelta.newOmega
-        midOmega = (state.omega + newOmega) / 2
-        newTheta = state.pos.theta + midOmega
-        midTheta = (state.pos.theta + newTheta) / 2
-        newV = fakeDelta.newV
-        midV = midVec state.v newV
-        statePos = state.pos
-        newPos = addVec midV <| { statePos | theta <- newTheta }
-    in { state | pos <- newPos, v <- newV, omega <- newOmega }
-  else
-    let newOmega = delta.alpha + state.omega
-        midOmega = (state.omega + newOmega) / 2
-        newTheta = state.pos.theta + midOmega
-        midTheta = (state.pos.theta + newTheta) / 2
-        absA = rotVec midTheta delta.a
-        newV = addVec absA state.v
-        midV = midVec state.v newV
-        statePos = state.pos
-        newPos = addVec midV <| { statePos | theta <- newTheta }
-    in { state | pos <- newPos, v <- newV, omega <- newOmega }
+updateBrakes : EntityCache -> MotionState -> MotionState
+updateBrakes cache state =
+  let brakeTheta = clamp (-0.001) 0.001 state.omega
+      brakeVelX = clamp (-0.1) 0.1 state.v.x
+      brakeVelY = clamp (-0.1) 0.1 state.v.y
+      fakeDelta = { a = { x = -brakeVelX, y = -brakeVelY }, alpha = -brakeTheta }
+  in updateMotion cache fakeDelta state
+
+updateMotion : EntityCache -> MotionDelta -> MotionState -> MotionState
+updateMotion cache delta state = 
+  let newOmega = delta.alpha + state.omega
+      midOmega = (state.omega + newOmega) / 2
+      oldTheta = state.pos.theta
+      newTheta = oldTheta + midOmega
+      midTheta = (oldTheta + newTheta) / 2
+      absA = rotVec midTheta delta.a
+      newV = addVec absA state.v
+      midV = midVec state.v newV
+      oldRootPos = state.pos
+      oldComOffset = rotVec oldTheta cache.comOffset
+      oldComPos = addVec oldComOffset oldRootPos
+      newComPos = addVec midV <| { oldComPos | theta <- newTheta }
+      newComOffset = rotVec newTheta cache.comOffset
+      newRootPos = subVec newComOffset newComPos
+  in { state | pos <- newRootPos, v <- newV, omega <- newOmega }

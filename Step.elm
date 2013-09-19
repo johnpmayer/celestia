@@ -89,12 +89,11 @@ focusControls input =
 
 entityPureStep : Entity -> Entity
 entityPureStep e =
-  let rest = {a={x=0,y=0},alpha=0}
-      newMotion = case e.controls of
-        Left _ -> updateMotion (True,rest) e.motion
+  let newMotion = case e.controls of
+        Left _ -> updateBrakes e.cache e.motion
         Right engines -> 
           let delta = netDelta engines e.cache
-          in updateMotion (False,delta) e.motion
+          in updateMotion e.cache delta e.motion
   in { e | motion <- newMotion }
 
 physicsStep : GameStep
