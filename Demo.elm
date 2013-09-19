@@ -80,7 +80,10 @@ draw n gs =
   let entities = D.values <| gs.entities
       camera = case D.lookup gs.focus gs.entities of
         Nothing -> origin
-        Just e -> extractVec e.motion.pos
+        Just e -> 
+          let rootPos = extractVec e.motion.pos
+              comOffset = rotVec e.motion.pos.theta e.cache.comOffset
+          in addVec comOffset rootPos 
       cameraTransform = vecTranslate <| negVec camera
       entityForms = map (drawEntity <| n) entities
   in [groupTransform cameraTransform <| entityForms]
