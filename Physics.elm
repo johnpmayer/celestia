@@ -196,9 +196,10 @@ applyBrakes state =
 updateBrakes : EntityCache -> MotionState -> MotionState
 updateBrakes cache state =
   let brakeTheta = clamp (-0.001) 0.001 state.omega
+      -- TODO clamp the magnitude of v, rather than the components of v individually?
       brakeVelX = clamp (-0.1) 0.1 state.v.x
       brakeVelY = clamp (-0.1) 0.1 state.v.y
-      fakeDelta = { a = { x = -brakeVelX, y = -brakeVelY }, alpha = -brakeTheta }
+      fakeDelta = { a = rotVec -state.pos.theta { x = -brakeVelX, y = -brakeVelY }, alpha = -brakeTheta }
   in updateMotion cache fakeDelta state
 
 updateMotion : EntityCache -> MotionDelta -> MotionState -> MotionState
@@ -207,8 +208,7 @@ updateMotion cache delta state =
       midOmega = (state.omega + newOmega) / 2
       oldTheta = state.pos.theta
       newTheta = oldTheta + midOmega
-      midTheta = (oldTheta + newTheta) / 2
-      absA = rotVec midTheta delta.a
+      absA = rotVec oldTheta delta.a
       newV = addVec absA state.v
       midV = midVec state.v newV
       oldRootPos = state.pos
