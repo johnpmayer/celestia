@@ -6,7 +6,7 @@
         <title>
             Demo
         </title>
-        <script type="text/javascript" src="elm-runtime.js">
+        <script type="text/javascript" src="/elm-runtime.js">
             
         </script>
         <script type="text/javascript">
@@ -52,11 +52,11 @@
              var Main = Elm.Main(elm);
              var _op = {};
              var spine = A2(Types.beam,{_: {}, r: 200},_J.toList([]));
-             var station = {_: {}, controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 0, x: 0 - 100, y: 200}, v: {_: {}, x: 0, y: 0}}, structure: spine};
-             var initialShips = _J.toList([{_: {}, controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 0, x: 0, y: 0}, v: {_: {}, x: 0, y: 0}}, structure: Main.simpleShip},
-                                           {_: {}, controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 1, x: 60, y: 50}, v: {_: {}, x: 0, y: 0}}, structure: Main.simpleShip},
-                                           {_: {}, controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 4, x: 0 - 80, y: 40}, v: {_: {}, x: 0, y: 0}}, structure: Main.simpleShip},
-                                           {_: {}, controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 3, x: 120, y: 0 - 20}, v: {_: {}, x: 0, y: 0}}, structure: Main.simpleShip}]);
+             var station = {_: {}, cache: Physics.genCache(spine), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 0, x: 0, y: 200}, v: {_: {}, x: 0, y: 0}}};
+             var initialShips = _J.toList([{_: {}, cache: Physics.genCache(Main.simpleShip), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 0, x: 0, y: 0}, v: {_: {}, x: 0, y: 0}}},
+                                           {_: {}, cache: Physics.genCache(Main.simpleShip), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 1, x: 60, y: 50}, v: {_: {}, x: 0, y: 0}}},
+                                           {_: {}, cache: Physics.genCache(Main.simpleShip), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 4, x: 0 - 80, y: 40}, v: {_: {}, x: 0, y: 0}}},
+                                           {_: {}, cache: Physics.genCache(Main.simpleShip), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 3, x: 120, y: 0 - 20}, v: {_: {}, x: 0, y: 0}}}]);
              var initialPlacement = Maybe.Nothing;
              var initialEntities = Dict.fromList({ctor: "::", _0: {ctor: "_Tuple2", _0: 4, _1: station}, _1: A2(List.zip,
                                                                                                                 _J.toList([0,
@@ -81,11 +81,20 @@
                                                      switch (_case0.ctor)
                                                      {case
                                                       "Just" :
-                                                        return Public.Vec2.Vec2.extractVec(_case0._0.motion.pos);
+                                                        return function ()
+                                                               {
+                                                                 var rootPos = Public.Vec2.Vec2.extractVec(_case0._0.motion.pos);
+                                                                 var comOffset = A2(Public.Vec2.Vec2.rotVec,
+                                                                                    _case0._0.motion.pos.theta,
+                                                                                    _case0._0.cache.comOffset);
+                                                                 return A2(Public.Vec2.Vec2.addVec,
+                                                                           comOffset,
+                                                                           rootPos);
+                                                               }();
                                                       case
                                                       "Nothing" :
                                                         return Public.Vec2.Vec2.origin;}
-                                                     _E.Case($moduleName,"between lines 81 and 84");
+                                                     _E.Case($moduleName,"between lines 81 and 87");
                                                    }();
                                       var cameraTransform = Public.Vec2.Vec2.vecTranslate(Public.Vec2.Vec2.negVec(camera));
                                       return _J.toList([Graphics.Collage.groupTransform(cameraTransform)(entityForms)]);
@@ -285,15 +294,14 @@
                                   {
                                     return function ()
                                            {
-                                             var rest = {_: {}, a: {_: {}, x: 0, y: 0}, alpha: 0};
                                              var newMotion = function ()
                                                              {
                                                                var _case3 = e.controls;
                                                                switch (_case3.ctor)
                                                                {case
                                                                 "Left" :
-                                                                  return A2(Physics.updateMotion,
-                                                                            {ctor: "_Tuple2", _0: true, _1: rest},
+                                                                  return A2(Physics.updateBrakes,
+                                                                            e.cache,
                                                                             e.motion);
                                                                 case
                                                                 "Right" :
@@ -301,13 +309,14 @@
                                                                          {
                                                                            var delta = A2(Physics.netDelta,
                                                                                           _case3._0,
-                                                                                          e.structure);
-                                                                           return A2(Physics.updateMotion,
-                                                                                     {ctor: "_Tuple2", _0: false, _1: delta},
+                                                                                          e.cache);
+                                                                           return A3(Physics.updateMotion,
+                                                                                     e.cache,
+                                                                                     delta,
                                                                                      e.motion);
                                                                          }();}
                                                                _E.Case($moduleName,
-                                                                       "between lines 93 and 98");
+                                                                       "between lines 92 and 97");
                                                              }();
                                              return _N.replace([["motion",newMotion]],e);
                                            }();
@@ -609,32 +618,7 @@
                                    {ctor: "_Tuple2", _0: {_: {}, offset: 25, theta: 0}, _1: Types.part(Types.FuelTank({_: {}, l: 30, w: 14}))},
                                    {ctor: "_Tuple2", _0: {_: {}, offset: 50, theta: 0}, _1: Types.part(Types.Engine({_: {}, config: Types.Forward, r: 13}))}]);
              var simpleShip = A2(Types.beam,{_: {}, r: 50},mods);
-             var delta = Signal.sampleOn(Time.fps(30))(A2(Signal._op["~"],
-                                                          A2(Signal._op["<~"],
-                                                             Physics.netDelta,
-                                                             engines),
-                                                          Signal.constant(simpleShip)));
-             var state = A3(Signal.foldp,
-                            Physics.updateMotion,
-                            startPos,
-                            A2(Signal._op["~"],
-                               A2(Signal._op["<~"],
-                                  F2(function (v0,v1)
-                                     {
-                                       return {ctor: "_Tuple2", _0: v0, _1: v1};
-                                     }),
-                                  brakes),
-                               delta));
-             var camera = A2(Signal._op["<~"],
-                             function ($)
-                             {
-                               return Public.Vec2.Vec2.extractVec(function (_)
-                                                                  {
-                                                                    return _.pos;
-                                                                  }($));
-                             },
-                             state);
-             elm.Main = {_op: _op, attitude: attitude, reverseL: reverseL, reverseR: reverseR, mods: mods, simpleShip: simpleShip, startPos: startPos, control: control, engines: engines, brakes: brakes, delta: delta, state: state, camera: camera, canvasWH: canvasWH, gamePointer: gamePointer};
+             elm.Main = {_op: _op, attitude: attitude, reverseL: reverseL, reverseR: reverseR, mods: mods, simpleShip: simpleShip, startPos: startPos, control: control, engines: engines, brakes: brakes, canvasWH: canvasWH, gamePointer: gamePointer};
              return elm.Main;
            };Elm.Draw = function (elm)
            {
@@ -774,6 +758,9 @@
                                                      var moveM = A2(translation,
                                                                     arg0.motion.pos.x,
                                                                     arg0.motion.pos.y);
+                                                     var modelM = A2(Transform2D.multiply,
+                                                                     moveM,
+                                                                     rotM);
                                                      var engines = function ()
                                                                    {
                                                                      var _case7 = arg0.controls;
@@ -785,21 +772,12 @@
                                                                       "Right" :
                                                                         return _case7._0;}
                                                                      _E.Case($moduleName,
-                                                                             "between lines 77 and 80");
+                                                                             "between lines 75 and 78");
                                                                    }();
-                                                     var comOffset = Public.Vec2.Vec2.scaleVec(0 - 1)(Physics.centerOfMass(arg0.structure));
-                                                     var comM = A2(translation,
-                                                                   comOffset.x,
-                                                                   comOffset.y);
-                                                     var modelM = A2(Transform2D.multiply,
-                                                                     moveM,
-                                                                     A2(Transform2D.multiply,
-                                                                        rotM,
-                                                                        comM));
                                                      return Graphics.Collage.groupTransform(modelM)(_J.toList([A3(drawStructure,
                                                                                                                   noise,
                                                                                                                   engines,
-                                                                                                                  arg0.structure)]));
+                                                                                                                  arg0.cache.structure)]));
                                                    }();
                                           }();
                                  });
@@ -943,6 +921,67 @@
                 var Types = Elm.Types(elm);
                 var Utils = Elm.Utils(elm);
                 var _op = {};
+                var updateMotion = F3(function (cache,delta,state)
+                                      {
+                                        return function ()
+                                               {
+                                                 var oldTheta = state.pos.theta;
+                                                 var oldRootPos = state.pos;
+                                                 var oldComOffset = A2(Public.Vec2.Vec2.rotVec,
+                                                                       oldTheta,
+                                                                       cache.comOffset);
+                                                 var oldComPos = A2(Public.Vec2.Vec2.addVec,
+                                                                    oldComOffset,
+                                                                    oldRootPos);
+                                                 var newOmega = delta.alpha + state.omega;
+                                                 var midOmega = (state.omega + newOmega) / 2;
+                                                 var newTheta = oldTheta + midOmega;
+                                                 var newComOffset = A2(Public.Vec2.Vec2.rotVec,
+                                                                       newTheta,
+                                                                       cache.comOffset);
+                                                 var absA = A2(Public.Vec2.Vec2.rotVec,
+                                                               oldTheta,
+                                                               delta.a);
+                                                 var newV = A2(Public.Vec2.Vec2.addVec,
+                                                               absA,
+                                                               state.v);
+                                                 var midV = A2(Public.Vec2.Vec2.midVec,
+                                                               state.v,
+                                                               newV);
+                                                 var newComPos = Public.Vec2.Vec2.addVec(midV)(_N.replace([["theta",
+                                                                                                            newTheta]],
+                                                                                                          oldComPos));
+                                                 var newRootPos = A2(Public.Vec2.Vec2.subVec,
+                                                                     newComOffset,
+                                                                     newComPos);
+                                                 return _N.replace([["pos",newRootPos],
+                                                                    ["v",newV],
+                                                                    ["omega",newOmega]],
+                                                                   state);
+                                               }();
+                                      });
+                var updateBrakes = F2(function (cache,state)
+                                      {
+                                        return function ()
+                                               {
+                                                 var brakeVelY = A3(Basics.clamp,
+                                                                    0 - 0.1,
+                                                                    0.1,
+                                                                    state.v.y);
+                                                 var brakeVelX = A3(Basics.clamp,
+                                                                    0 - 0.1,
+                                                                    0.1,
+                                                                    state.v.x);
+                                                 var brakeTheta = A3(Basics.clamp,
+                                                                     0 - 1.0e-3,
+                                                                     1.0e-3,
+                                                                     state.omega);
+                                                 var fakeDelta = {_: {}, a: A2(Public.Vec2.Vec2.rotVec,
+                                                                               0 - state.pos.theta,
+                                                                               {_: {}, x: 0 - brakeVelX, y: 0 - brakeVelY}), alpha: 0 - brakeTheta};
+                                                 return A3(updateMotion,cache,fakeDelta,state);
+                                               }();
+                                      });
                 var translateMoment = F2(function (a,m)
                                          {
                                            return function ()
@@ -1139,14 +1178,52 @@
                                                    beamThrusts,
                                                    attachThrusts);
                                        };
-                var netForce = F2(function (ec,s)
+                var netForce = F2(function (controls,cache)
                                   {
                                     return Public.Vec2.Vec2.sumVec(List.map(function (_)
                                                                             {
                                                                               return _.force;
                                                                             })(A2(structureThrusts,
-                                                                                  ec,
-                                                                                  s)));
+                                                                                  controls,
+                                                                                  cache.structure)));
+                                  });
+                var netAcceleration = F2(function (controls,cache)
+                                         {
+                                           return Public.Vec2.Vec2.scaleVec(1 / cache.totalMass)(A2(netForce,
+                                                                                                    controls,
+                                                                                                    cache));
+                                         });
+                var netTorque = F2(function (controls,cache)
+                                   {
+                                     return function ()
+                                            {
+                                              var thrusts = A2(structureThrusts,
+                                                               controls,
+                                                               cache.structure);
+                                              var com = cache.comOffset;
+                                              var center = function (thrust)
+                                                           {
+                                                             return _N.replace([["disp",
+                                                                                 A2(Public.Vec2.Vec2.subVec,
+                                                                                    com,
+                                                                                    thrust.disp)]],
+                                                                               thrust);
+                                                           };
+                                              var torqueForces = A2(List.map,center,thrusts);
+                                              return List.sum(List.map(torqueMag)(torqueForces));
+                                            }();
+                                   });
+                var netRotAcceleration = F2(function (controls,cache)
+                                            {
+                                              return A2(netTorque,
+                                                        controls,
+                                                        cache) / cache.rotInertia;
+                                            });
+                var netDelta = F2(function (controls,cache)
+                                  {
+                                    return A2(Types.MotionDelta,
+                                              A2(netAcceleration,controls,cache),
+                                              A2(netRotAcceleration,controls,cache));
                                   });
                 var attachMoment = function (attach)
                                    {
@@ -1172,44 +1249,18 @@
                                    {
                                      return Public.Vec2.Vec2.scaleVec(1 / totalMass(structure))(Public.Vec2.Vec2.sumVec(List.map(massContrib)(structureMasses(structure))));
                                    };
-                var netTorque = F2(function (ec,s)
-                                   {
-                                     return function ()
-                                            {
-                                              var thrusts = A2(structureThrusts,ec,s);
-                                              var com = centerOfMass(s);
-                                              var center = function (thrust)
-                                                           {
-                                                             return _N.replace([["disp",
-                                                                                 A2(Public.Vec2.Vec2.subVec,
-                                                                                    com,
-                                                                                    thrust.disp)]],
-                                                                               thrust);
-                                                           };
-                                              var torqueForces = A2(List.map,center,thrusts);
-                                              return List.sum(List.map(torqueMag)(torqueForces));
-                                            }();
-                                   });
                 var rotInertia = function (structure)
                                  {
                                    return List.sum(List.map(momentContrib)(List.map(momentMapVec(Public.Vec2.Vec2.subVec(centerOfMass(structure))))(structureMoments(structure))));
                                  };
-                var netRotAcceleration = F2(function (ec,s)
-                                            {
-                                              return A2(netTorque,ec,s) / rotInertia(s);
-                                            });
-                var netAcceleration = F2(function (ec,s)
-                                         {
-                                           return Public.Vec2.Vec2.scaleVec(1 / totalMass(s))(A2(netForce,
-                                                                                                 ec,
-                                                                                                 s));
-                                         });
-                var netDelta = F2(function (ec,s)
-                                  {
-                                    return {_: {}, a: A2(netAcceleration,
-                                                         ec,
-                                                         s), alpha: A2(netRotAcceleration,ec,s)};
-                                  });
+                var genCache = function (s)
+                               {
+                                 return A4(Types.EntityCache,
+                                           s,
+                                           centerOfMass(s),
+                                           totalMass(s),
+                                           rotInertia(s));
+                               };
                 var applyBrakes = function (state)
                                   {
                                     return function ()
@@ -1235,66 +1286,7 @@
                                                                                                             vy)}};
                                            }();
                                   };
-                var updateMotion = F2(function (arg1,state)
-                                      {
-                                        return function ()
-                                               {
-                                                 switch (arg1.ctor)
-                                                 {case
-                                                  "_Tuple2" :
-                                                    return arg1._0 ? function ()
-                                                                     {
-                                                                       var statePos = state.pos;
-                                                                       var fakeDelta = applyBrakes(state);
-                                                                       var newOmega = fakeDelta.newOmega;
-                                                                       var midOmega = (state.omega + newOmega) / 2;
-                                                                       var newTheta = state.pos.theta + midOmega;
-                                                                       var midTheta = (state.pos.theta + newTheta) / 2;
-                                                                       var newV = fakeDelta.newV;
-                                                                       var midV = A2(Public.Vec2.Vec2.midVec,
-                                                                                     state.v,
-                                                                                     newV);
-                                                                       var newPos = Public.Vec2.Vec2.addVec(midV)(_N.replace([["theta",
-                                                                                                                               newTheta]],
-                                                                                                                             statePos));
-                                                                       return _N.replace([["pos",
-                                                                                           newPos],
-                                                                                          ["v",
-                                                                                           newV],
-                                                                                          ["omega",
-                                                                                           newOmega]],
-                                                                                         state);
-                                                                     }() : function ()
-                                                                           {
-                                                                             var statePos = state.pos;
-                                                                             var newOmega = arg1._1.alpha + state.omega;
-                                                                             var midOmega = (state.omega + newOmega) / 2;
-                                                                             var newTheta = state.pos.theta + midOmega;
-                                                                             var midTheta = (state.pos.theta + newTheta) / 2;
-                                                                             var absA = A2(Public.Vec2.Vec2.rotVec,
-                                                                                           midTheta,
-                                                                                           arg1._1.a);
-                                                                             var newV = A2(Public.Vec2.Vec2.addVec,
-                                                                                           absA,
-                                                                                           state.v);
-                                                                             var midV = A2(Public.Vec2.Vec2.midVec,
-                                                                                           state.v,
-                                                                                           newV);
-                                                                             var newPos = Public.Vec2.Vec2.addVec(midV)(_N.replace([["theta",
-                                                                                                                                     newTheta]],
-                                                                                                                                   statePos));
-                                                                             return _N.replace([["pos",
-                                                                                                 newPos],
-                                                                                                ["v",
-                                                                                                 newV],
-                                                                                                ["omega",
-                                                                                                 newOmega]],
-                                                                                               state);
-                                                                           }();}
-                                                 _E.Case($moduleName,"between lines 184 and 206");
-                                               }();
-                                      });
-                elm.Physics = {_op: _op, sumMasses: sumMasses, massContrib: massContrib, partMasses: partMasses, beamMasses: beamMasses, attachMasses: attachMasses, structureMasses: structureMasses, totalMass: totalMass, centerOfMass: centerOfMass, partMoment: partMoment, beamMoment: beamMoment, momentMapVec: momentMapVec, translateMoment: translateMoment, attachMoment: attachMoment, structureMoments: structureMoments, momentContrib: momentContrib, rotInertiaContrib: rotInertiaContrib, rotInertia: rotInertia, partThrusts: partThrusts, beamThrusts: beamThrusts, attachThrusts: attachThrusts, structureThrusts: structureThrusts, netForce: netForce, netAcceleration: netAcceleration, torqueMag: torqueMag, netTorque: netTorque, netRotAcceleration: netRotAcceleration, netDelta: netDelta, applyBrakes: applyBrakes, updateMotion: updateMotion};
+                elm.Physics = {_op: _op, sumMasses: sumMasses, massContrib: massContrib, partMasses: partMasses, beamMasses: beamMasses, attachMasses: attachMasses, structureMasses: structureMasses, totalMass: totalMass, centerOfMass: centerOfMass, partMoment: partMoment, beamMoment: beamMoment, momentMapVec: momentMapVec, translateMoment: translateMoment, attachMoment: attachMoment, structureMoments: structureMoments, momentContrib: momentContrib, rotInertiaContrib: rotInertiaContrib, rotInertia: rotInertia, genCache: genCache, partThrusts: partThrusts, beamThrusts: beamThrusts, attachThrusts: attachThrusts, structureThrusts: structureThrusts, netForce: netForce, netAcceleration: netAcceleration, torqueMag: torqueMag, netTorque: netTorque, netRotAcceleration: netRotAcceleration, netDelta: netDelta, applyBrakes: applyBrakes, updateBrakes: updateBrakes, updateMotion: updateMotion};
                 return elm.Physics;
               };Elm.Utils = function (elm)
             {
@@ -1477,10 +1469,6 @@
                                 return {_: {}, disp: a, force: b};
                               });
               var Reverse = {ctor: "Reverse"};
-              var Position = F3(function (a,b,c)
-                                {
-                                  return {_: {}, theta: c, x: a, y: b};
-                                });
               var Point = function (a)
                           {
                             return {ctor: "Point", _0: a};
@@ -1536,9 +1524,13 @@
                           return {ctor: "FPS", _0: a};
                         };
               var Exit = {ctor: "Exit"};
+              var EntityCache = F4(function (a,b,c,d)
+                                   {
+                                     return {_: {}, comOffset: b, rotInertia: d, structure: a, totalMass: c};
+                                   });
               var Entity = F3(function (a,b,c)
                               {
-                                return {_: {}, controls: a, motion: b, structure: c};
+                                return {_: {}, cache: c, controls: a, motion: b};
                               });
               var Engine = function (a)
                            {
@@ -1564,7 +1556,7 @@
                               {
                                 return {_: {}, offset: a, theta: b};
                               });
-              elm.Types = {_op: _op, translateAttach: translateAttach, beam: beam, part: part, fresh: fresh, labelBeams: labelBeams, Disabled: Disabled, Forward: Forward, Reverse: Reverse, TurnLeft: TurnLeft, TurnRight: TurnRight, Brain: Brain, FuelTank: FuelTank, Engine: Engine, Point: Point, ParallelAxis: ParallelAxis, Brakes: Brakes, Click: Click, Modal: Modal, FPS: FPS, Pause: Pause, Cycle: Cycle, Exit: Exit, Number: Number, Position: Position, Attach: Attach, Beam: Beam, LabelBeamExt: LabelBeamExt, Thrust: Thrust, MotionState: MotionState, MotionDelta: MotionDelta, Entity: Entity, GameInput: GameInput, GameState: GameState, Mode: Mode, LabelDist: LabelDist, BuildMode: BuildMode};
+              elm.Types = {_op: _op, translateAttach: translateAttach, beam: beam, part: part, fresh: fresh, labelBeams: labelBeams, Disabled: Disabled, Forward: Forward, Reverse: Reverse, TurnLeft: TurnLeft, TurnRight: TurnRight, Brain: Brain, FuelTank: FuelTank, Engine: Engine, Point: Point, ParallelAxis: ParallelAxis, Brakes: Brakes, Click: Click, Modal: Modal, FPS: FPS, Pause: Pause, Cycle: Cycle, Exit: Exit, Number: Number, Attach: Attach, Beam: Beam, LabelBeamExt: LabelBeamExt, Thrust: Thrust, MotionState: MotionState, MotionDelta: MotionDelta, Entity: Entity, EntityCache: EntityCache, GameInput: GameInput, GameState: GameState, Mode: Mode, LabelDist: LabelDist, BuildMode: BuildMode};
               return elm.Types;
             };Elm.Public = Elm.Public || {};
 Elm.Public.TagTree = Elm.Public.TagTree || {};
