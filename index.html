@@ -50,52 +50,33 @@
              Public.Vec2 = Public.Vec2 || {};
              Public.Vec2.Vec2 = Elm.Public.Vec2.Vec2(elm);
              var Main = Elm.Main(elm);
+             var ShipWright = Elm.ShipWright(elm);
              var _op = {};
              var spine = A2(Types.beam,{_: {}, r: 200},_J.toList([]));
-             var station = {_: {}, cache: Physics.genCache(spine), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 0, x: 0, y: 200}, v: {_: {}, x: 0, y: 0}}};
-             var initialShips = _J.toList([{_: {}, cache: Physics.genCache(Main.simpleShip), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 0, x: 0, y: 0}, v: {_: {}, x: 0, y: 0}}},
-                                           {_: {}, cache: Physics.genCache(Main.simpleShip), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 1, x: 60, y: 50}, v: {_: {}, x: 0, y: 0}}},
-                                           {_: {}, cache: Physics.genCache(Main.simpleShip), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 4, x: 0 - 80, y: 40}, v: {_: {}, x: 0, y: 0}}},
-                                           {_: {}, cache: Physics.genCache(Main.simpleShip), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 3, x: 120, y: 0 - 20}, v: {_: {}, x: 0, y: 0}}}]);
-             var initialPlacement = Maybe.Nothing;
+             var station = {_: {}, cache: Physics.genEntityCache(spine), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 0, x: 0, y: 200}, v: {_: {}, x: 0, y: 0}}};
+             var initialShips = _J.toList([{_: {}, cache: Physics.genEntityCache(Main.simpleShip), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 0, x: 0, y: 0}, v: {_: {}, x: 0, y: 0}}},
+                                           {_: {}, cache: Physics.genEntityCache(Main.simpleShip), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 1, x: 60, y: 50}, v: {_: {}, x: 0, y: 0}}},
+                                           {_: {}, cache: Physics.genEntityCache(Main.simpleShip), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 4, x: 0 - 80, y: 40}, v: {_: {}, x: 0, y: 0}}},
+                                           {_: {}, cache: Physics.genEntityCache(Main.simpleShip), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 3, x: 120, y: 0 - 20}, v: {_: {}, x: 0, y: 0}}}]);
+             var initialPlacement = Maybe.Just({_: {}, id: 0, offset: 30, r: 20});
              var initialEntities = Dict.fromList({ctor: "::", _0: {ctor: "_Tuple2", _0: 4, _1: station}, _1: A2(List.zip,
                                                                                                                 _J.toList([0,
                                                                                                                            1,
                                                                                                                            2,
                                                                                                                            3]),
                                                                                                                 initialShips)});
-             var initialBuildMode = {_: {}, entity: Basics.floor(4), part: Types.Engine({_: {}, config: Types.Forward, r: 5}), placement: initialPlacement};
+             var initialBuildMode = {_: {}, entity: 4, part: Types.Engine({_: {}, config: Types.Forward, r: 10}), placement: initialPlacement};
              var initialMode = {_: {}, build: initialBuildMode, pause: false};
-             var initialState = {_: {}, entities: initialEntities, focus: 0, mode: initialMode};
+             var initialState = {_: {}, cache: A2(Utils.genGameStateCache,
+                                                  0,
+                                                  initialEntities), entities: initialEntities, focus: 0, mode: initialMode};
              var draw = F2(function (n,gs)
                            {
                              return function ()
                                     {
                                       var entities = Dict.values(gs.entities);
                                       var entityForms = A2(List.map,Draw.drawEntity(n),entities);
-                                      var camera = function ()
-                                                   {
-                                                     var _case0 = A2(Dict.lookup,
-                                                                     gs.focus,
-                                                                     gs.entities);
-                                                     switch (_case0.ctor)
-                                                     {case
-                                                      "Just" :
-                                                        return function ()
-                                                               {
-                                                                 var rootPos = Public.Vec2.Vec2.extractVec(_case0._0.motion.pos);
-                                                                 var comOffset = A2(Public.Vec2.Vec2.rotVec,
-                                                                                    _case0._0.motion.pos.theta,
-                                                                                    _case0._0.cache.comOffset);
-                                                                 return A2(Public.Vec2.Vec2.addVec,
-                                                                           comOffset,
-                                                                           rootPos);
-                                                               }();
-                                                      case
-                                                      "Nothing" :
-                                                        return Public.Vec2.Vec2.origin;}
-                                                     _E.Case($moduleName,"between lines 81 and 87");
-                                                   }();
+                                      var camera = gs.cache.camera;
                                       var cameraTransform = Public.Vec2.Vec2.vecTranslate(Public.Vec2.Vec2.negVec(camera));
                                       return _J.toList([Graphics.Collage.groupTransform(cameraTransform)(entityForms)]);
                                     }();
@@ -107,6 +88,9 @@
                               },
                               initialState,
                               GameInputs.gameInputs);
+             var withPhantom = A2(Signal._op["<~"],
+                                  ShipWright.addPhantom,
+                                  current);
              var main = Utils.combineSElems(Graphics.Element.outward)(_J.toList([A2(Signal._op["~"],
                                                                                     A2(Signal._op["<~"],
                                                                                        Utils.spaceBlack,
@@ -122,7 +106,7 @@
                                                                                           A2(Signal._op["<~"],
                                                                                              Basics.fst,
                                                                                              Time.timestamp(GameInputs.gameInputs))),
-                                                                                       current)),
+                                                                                       withPhantom)),
                                                                                  A2(Utils.combineSElems,
                                                                                     Graphics.Element.down,
                                                                                     _J.toList([A2(Signal._op["<~"],
@@ -155,7 +139,7 @@
                                                                                                     return Graphics.Element.color(Color.white)(Text.asText($));
                                                                                                   },
                                                                                                   GameInputs.modes)]))]));
-             elm.Demo = {_op: _op, spine: spine, station: station, initialShips: initialShips, initialEntities: initialEntities, initialState: initialState, initialMode: initialMode, initialPlacement: initialPlacement, initialBuildMode: initialBuildMode, current: current, draw: draw, main: main};
+             elm.Demo = {_op: _op, spine: spine, station: station, initialShips: initialShips, initialEntities: initialEntities, initialState: initialState, initialMode: initialMode, initialPlacement: initialPlacement, initialBuildMode: initialBuildMode, current: current, withPhantom: withPhantom, draw: draw, main: main};
              return elm.Demo;
            };Elm.Step = function (elm)
            {
@@ -187,6 +171,12 @@
              var Public = Public || {};
              Public.State = Public.State || {};
              Public.State.State = Elm.Public.State.State(elm);
+             var Public = Public || {};
+             Public.State = Public.State || {};
+             Public.State.State = Elm.Public.State.State(elm);
+             var Public = Public || {};
+             Public.Vec2 = Public.Vec2 || {};
+             Public.Vec2.Vec2 = Elm.Public.Vec2.Vec2(elm);
              var Types = Elm.Types(elm);
              var Utils = Elm.Utils(elm);
              var Physics = Elm.Physics(elm);
@@ -240,10 +230,80 @@
                                                                                                                    state));
                                                                         }();
                                                                });}
-                                                  _E.Case($moduleName,"between lines 54 and 60");
+                                                  _E.Case($moduleName,"between lines 70 and 76");
                                                 }();
                                        }();
                               };
+             var noStep = Public.State.State.returnS({ctor: "_Tuple0"});
+             var updatePhantom = function (pointer)
+                                 {
+                                   return function ()
+                                          {
+                                            var pure = Public.State.State.returnS;
+                                            _op[">>="] = Public.State.State.bindS;
+                                            return A2(_op[">>="],
+                                                      Public.State.State.get,
+                                                      function (state)
+                                                      {
+                                                        return function ()
+                                                               {
+                                                                 var relPointerV = Public.Vec2.Vec2.fromIntPair(pointer);
+                                                                 var myShip = A2(Dict.lookup,
+                                                                                 state.focus,
+                                                                                 state.entities);
+                                                                 var buildShip = A2(Dict.lookup,
+                                                                                    state.mode.build.entity,
+                                                                                    state.entities);
+                                                                 return function ()
+                                                                        {
+                                                                          var _case1 = {ctor: "_Tuple2", _0: myShip, _1: buildShip};
+                                                                          switch (_case1.ctor)
+                                                                          {case
+                                                                           "_Tuple2" :
+                                                                             switch (_case1._0.ctor)
+                                                                             {case
+                                                                              "Just" :
+                                                                                switch (_case1._1.ctor)
+                                                                                {case
+                                                                                 "Just" :
+                                                                                   return function ()
+                                                                                          {
+                                                                                            var mode = state.mode;
+                                                                                            var buildMode = mode.build;
+                                                                                            var absPointerV = A2(Public.Vec2.Vec2.addVec,
+                                                                                                                 state.cache.camera,
+                                                                                                                 relPointerV);
+                                                                                            var best = Maybe.Just(A2(ShipWright.bestPlacement,
+                                                                                                                     absPointerV,
+                                                                                                                     _case1._1._0));
+                                                                                            var newBuildMode = _N.replace([["placement",
+                                                                                                                            best]],
+                                                                                                                          buildMode);
+                                                                                            var newMode = _N.replace([["build",
+                                                                                                                       newBuildMode]],
+                                                                                                                     mode);
+                                                                                            var newState = _N.replace([["mode",
+                                                                                                                        newMode]],
+                                                                                                                      state);
+                                                                                            return Public.State.State.put(newState);
+                                                                                          }();}}}
+                                                                          return noStep;
+                                                                        }();
+                                                               }();
+                                                      });
+                                          }();
+                                 };
+             var gamePaused = function ()
+                              {
+                                var pure = Public.State.State.returnS;
+                                _op[">>="] = Public.State.State.bindS;
+                                return A2(_op[">>="],
+                                          Public.State.State.get,
+                                          function (state)
+                                          {
+                                            return pure(state.mode.pause);
+                                          });
+                              }();
              var focusControls = function (input)
                                  {
                                    return function ()
@@ -282,9 +342,9 @@
                                                                                     }();
                                                                            case
                                                                            "Nothing" :
-                                                                             return pure({ctor: "_Tuple0"});}
+                                                                             return noStep;}
                                                                           _E.Case($moduleName,
-                                                                                  "between lines 82 and 88");
+                                                                                  "between lines 128 and 134");
                                                                         }();
                                                                }();
                                                       });
@@ -296,8 +356,8 @@
                                            {
                                              var newMotion = function ()
                                                              {
-                                                               var _case3 = e.controls;
-                                                               switch (_case3.ctor)
+                                                               var _case8 = e.controls;
+                                                               switch (_case8.ctor)
                                                                {case
                                                                 "Left" :
                                                                   return A2(Physics.updateBrakes,
@@ -308,7 +368,7 @@
                                                                   return function ()
                                                                          {
                                                                            var delta = A2(Physics.netDelta,
-                                                                                          _case3._0,
+                                                                                          _case8._0,
                                                                                           e.cache);
                                                                            return A3(Physics.updateMotion,
                                                                                      e.cache,
@@ -316,7 +376,7 @@
                                                                                      e.motion);
                                                                          }();}
                                                                _E.Case($moduleName,
-                                                                       "between lines 92 and 97");
+                                                                       "between lines 138 and 143");
                                                              }();
                                              return _N.replace([["motion",newMotion]],e);
                                            }();
@@ -334,14 +394,41 @@
                                                       var newEntities = A2(Dict.map,
                                                                            entityPureStep,
                                                                            state.entities);
+                                                      var focus = state.focus;
+                                                      var newCache = A2(Utils.genGameStateCache,
+                                                                        focus,
+                                                                        newEntities);
                                                       var newState = _N.replace([["entities",
-                                                                                  newEntities]],
+                                                                                  newEntities],
+                                                                                 ["cache",
+                                                                                  newCache]],
                                                                                 state);
                                                       return Public.State.State.put(newState);
                                                     }();
                                            });
                                }();
-             var build = Public.State.State.returnS({ctor: "_Tuple0"});
+             var build = function ()
+                         {
+                           var pure = Public.State.State.returnS;
+                           _op[">>="] = Public.State.State.bindS;
+                           return A2(_op[">>="],
+                                     Public.State.State.get,
+                                     function (state)
+                                     {
+                                       return function ()
+                                              {
+                                                var _case11 = state.mode.build.placement;
+                                                switch (_case11.ctor)
+                                                {case
+                                                 "Just" :
+                                                   return noStep;
+                                                 case
+                                                 "Nothing" :
+                                                   return noStep;}
+                                                _E.Case($moduleName,"between lines 94 and 96");
+                                              }();
+                                     });
+                         }();
              var step = function (input)
                         {
                           return function ()
@@ -350,30 +437,38 @@
                                    _op[">>="] = Public.State.State.bindS;
                                    return function ()
                                           {
-                                            var _case6 = input.trigger;
-                                            switch (_case6.ctor)
+                                            var _case13 = input.trigger;
+                                            switch (_case13.ctor)
                                             {case
                                              "Click" :
                                                return build;
                                              case
                                              "FPS" :
                                                return A2(_op[">>="],
-                                                         focusControls(input),
-                                                         function (arg0)
+                                                         gamePaused,
+                                                         function (paused)
                                                          {
-                                                           return function ()
-                                                                  {
-                                                                    return physicsStep;
-                                                                  }();
+                                                           return paused ? noStep : A2(_op[">>="],
+                                                                                       focusControls(input),
+                                                                                       function (arg0)
+                                                                                       {
+                                                                                         return function ()
+                                                                                                {
+                                                                                                  return physicsStep;
+                                                                                                }();
+                                                                                       });
                                                          });
                                              case
                                              "Modal" :
-                                               return updateMode(_case6._0);}
-                                            _E.Case($moduleName,"between lines 39 and 44");
+                                               return updateMode(_case13._0);
+                                             case
+                                             "Pointer" :
+                                               return updatePhantom(_case13._0);}
+                                            _E.Case($moduleName,"between lines 53 and 63");
                                           }();
                                  }();
                         };
-             elm.Step = {_op: _op, step: step, build: build, updateMode: updateMode, rotateFocus: rotateFocus, focusControls: focusControls, entityPureStep: entityPureStep, physicsStep: physicsStep};
+             elm.Step = {_op: _op, gamePaused: gamePaused, noStep: noStep, step: step, updateMode: updateMode, rotateFocus: rotateFocus, build: build, updatePhantom: updatePhantom, focusControls: focusControls, entityPureStep: entityPureStep, physicsStep: physicsStep};
              return elm.Step;
            };Elm.ShipWright = function (elm)
                  {
@@ -410,53 +505,66 @@
                    Public.Vec2 = Public.Vec2 || {};
                    Public.Vec2.Vec2 = Elm.Public.Vec2.Vec2(elm);
                    var _op = {};
-                   var stopped = {_: {}, omega: 0, pos: {_: {}, theta: 0, x: 0, y: 0}, v: Public.Vec2.Vec2.origin};
-                   var pointDist = F2(function (arg1,bp)
+                   var pointDist = F2(function (pointerV,bp)
                                       {
                                         return function ()
                                                {
-                                                 switch (arg1.ctor)
-                                                 {case
-                                                  "_Tuple2" :
-                                                    return function ()
-                                                           {
-                                                             var yF = Basics.toFloat(arg1._1);
-                                                             var xF = Basics.toFloat(arg1._0);
-                                                             var dist = A3(Public.Vec2.Vec2.minimumDist,
-                                                                           bp.start,
-                                                                           bp.end,
-                                                                           {_: {}, x: xF, y: yF});
-                                                             return _N.insert("id",bp.id,dist);
-                                                           }();}
-                                                 _E.Case($moduleName,"between lines 78 and 81");
+                                                 var dist = A3(Public.Vec2.Vec2.minimumDist,
+                                                               bp.start,
+                                                               bp.end,
+                                                               pointerV);
+                                                 return _N.insert("id",bp.id,dist);
                                                }();
                                       });
-                   var initialShip = Types.beam({_: {}, r: 100})(_J.toList([{ctor: "_Tuple2", _0: {_: {}, offset: 70, theta: Basics.pi / 2}, _1: A2(Types.beam,
-                                                                                                                                                    {_: {}, r: 30},
-                                                                                                                                                    _J.toList([]))},
-                                                                            {ctor: "_Tuple2", _0: {_: {}, offset: 40, theta: (0 - Basics.pi) / 2}, _1: A2(Types.beam,
-                                                                                                                                                          {_: {}, r: 60},
-                                                                                                                                                          _J.toList([]))}]));
-                   var ship = A3(Signal.foldp,
-                                 Basics.flip(Utils.cnst),
-                                 initialShip,
-                                 Signal.constant({ctor: "_Tuple0"}));
-                   var display = A2(Draw.drawStructure,0,_J.toList([]));
+                   var placeStructure = F3(function (p,best,e)
+                                           {
+                                             return function ()
+                                                    {
+                                                      var s = e.cache.structure;
+                                                      return _N.cmp(best.id,0) < 0 ? s : function ()
+                                                                                         {
+                                                                                           var placePart = function (p)
+                                                                                                           {
+                                                                                                             return Types.part(p);
+                                                                                                           };
+                                                                                           var placeBeam = F2(function (b,
+                                                                                                                        subs)
+                                                                                                              {
+                                                                                                                return Types.beam(_N.remove("id",
+                                                                                                                                            b))(_N.eq(best.id,
+                                                                                                                                                      b.id) ? {ctor: "::", _0: {ctor: "_Tuple2", _0: {_: {}, offset: best.offset, theta: 0}, _1: Types.part(p)}, _1: subs} : subs);
+                                                                                                              });
+                                                                                           return A2(Public.TagTree.TagTree.foldTagTree$,
+                                                                                                     placePart,
+                                                                                                     placeBeam)(Types.labelBeams(s));
+                                                                                         }();
+                                                    }();
+                                           });
+                   var placePhantomPart = F3(function (p,best,e)
+                                             {
+                                               return function ()
+                                                      {
+                                                        var s = A3(placeStructure,p,best,e);
+                                                        var c = e.cache;
+                                                        return _N.replace([["cache",
+                                                                            _N.replace([["structure",
+                                                                                         s]],
+                                                                                       c)]],
+                                                                          e);
+                                                      }();
+                                             });
                    var dimensions = {ctor: "_Tuple2", _0: 800, _1: 600};
-                   var gamePointer = A2(Signal._op["<~"],
-                                        Utils.convertPos(dimensions),
-                                        Mouse.position);
                    var compareDists = F2(function (p1,p2)
                                          {
                                            return _N.cmp(p1.r,p2.r) < 0 ? p1 : p2;
                                          });
-                   var minPointDist = F2(function (pointer,bps)
+                   var minPointDist = F2(function (pointerV,bps)
                                          {
                                            return function ()
                                                   {
                                                     var minDist = 50;
                                                     var labeledDists = A2(List.map,
-                                                                          pointDist(pointer),
+                                                                          pointDist(pointerV),
                                                                           bps);
                                                     var fakePoint = {_: {}, id: 0 - 1, offset: 0, r: minDist};
                                                     return A3(List.foldl,
@@ -503,53 +611,54 @@
                                                  beamPoints,
                                                  attachPoints);
                                      }();
-                   var bestPlacement = function (pointer)
-                                       {
-                                         return function ($)
-                                                {
-                                                  return minPointDist(pointer)(buildPoints(Types.labelBeams($)));
-                                                };
-                                       };
-                   var placeStructure = F3(function (p,pointer,s)
-                                           {
-                                             return function ()
-                                                    {
-                                                      var best = A2(bestPlacement,pointer,s);
-                                                      return _N.cmp(best.id,0) < 0 ? s : function ()
-                                                                                         {
-                                                                                           var placePart = function (p)
-                                                                                                           {
-                                                                                                             return Types.part(p);
-                                                                                                           };
-                                                                                           var placeBeam = F2(function (b,
-                                                                                                                        subs)
-                                                                                                              {
-                                                                                                                return Types.beam(_N.remove("id",
-                                                                                                                                            b))(_N.eq(best.id,
-                                                                                                                                                      b.id) ? {ctor: "::", _0: {ctor: "_Tuple2", _0: {_: {}, offset: best.offset, theta: 0}, _1: Types.part(p)}, _1: subs} : subs);
-                                                                                                              });
-                                                                                           return A2(Public.TagTree.TagTree.foldTagTree$,
-                                                                                                     placePart,
-                                                                                                     placeBeam)(Types.labelBeams(s));
-                                                                                         }();
-                                                    }();
-                                           });
-                   var shipWith = A2(Signal._op["~"],
-                                     A2(Signal._op["<~"],
-                                        placeStructure(Types.Brain({_: {}, r: 10})),
-                                        gamePointer),
-                                     ship);
-                   var space = function (sfs)
-                               {
-                                 return A2(Signal._op["<~"],
-                                           Utils.spaceBlack(dimensions),
-                                           Signal.combine(sfs));
-                               }(_J.toList([A2(Signal._op["<~"],display,shipWith)]));
+                   var bestPlacement = F2(function (absPointerV,entity)
+                                          {
+                                            return function ()
+                                                   {
+                                                     var localPointerV = A2(Public.Vec2.Vec2.subVec,
+                                                                            entity.motion.pos,
+                                                                            absPointerV);
+                                                     return minPointDist(localPointerV)(buildPoints(Types.labelBeams(entity.cache.structure)));
+                                                   }();
+                                          });
+                   var addPhantom = function (state)
+                                    {
+                                      return function ()
+                                             {
+                                               var buildMode = state.mode.build;
+                                               var e = buildMode.entity;
+                                               var placement = buildMode.placement;
+                                               return function ()
+                                                      {
+                                                        switch (placement.ctor)
+                                                        {case
+                                                         "Just" :
+                                                           return function ()
+                                                                  {
+                                                                    var place = A2(placePhantomPart,
+                                                                                   buildMode.part,
+                                                                                   placement._0);
+                                                                    var es = A3(Utils.updateDict,
+                                                                                e,
+                                                                                place,
+                                                                                state.entities);
+                                                                    return _N.replace([["entities",
+                                                                                        es]],
+                                                                                      state);
+                                                                  }();
+                                                         case
+                                                         "Nothing" :
+                                                           return state;}
+                                                        _E.Case($moduleName,
+                                                                "between lines 121 and 126");
+                                                      }();
+                                             }();
+                                    };
                    var BuildPoint = F3(function (a,b,c)
                                        {
                                          return {_: {}, end: c, id: a, start: b};
                                        });
-                   elm.ShipWright = {_op: _op, dimensions: dimensions, gamePointer: gamePointer, initialShip: initialShip, stopped: stopped, ship: ship, shipWith: shipWith, display: display, space: space, buildPoints: buildPoints, pointDist: pointDist, compareDists: compareDists, minPointDist: minPointDist, bestPlacement: bestPlacement, placeStructure: placeStructure, BuildPoint: BuildPoint};
+                   elm.ShipWright = {_op: _op, dimensions: dimensions, buildPoints: buildPoints, pointDist: pointDist, compareDists: compareDists, minPointDist: minPointDist, bestPlacement: bestPlacement, placeStructure: placeStructure, placePhantomPart: placePhantomPart, addPhantom: addPhantom, BuildPoint: BuildPoint};
                    return elm.ShipWright;
                  };Elm.Main = function (elm)
            {
@@ -828,9 +937,11 @@
                                                               {ctor: "_Tuple2", _0: Char.toCode("c"), _1: Types.Cycle},
                                                               {ctor: "_Tuple2", _0: 27, _1: Types.Exit}]));
                    var ticks = A2(Signal._op["<~"],Types.FPS,Time.fps(25));
-                   var pointer = A2(Signal._op["~"],
-                                    A2(Signal._op["<~"],Utils.convertPos,Window.dimensions),
-                                    Mouse.position);
+                   var pointer = A2(Signal._op["<~"],
+                                    Types.Pointer,
+                                    A2(Signal._op["~"],
+                                       A2(Signal._op["<~"],Utils.convertPos,Window.dimensions),
+                                       Mouse.position));
                    var modeKeysDown = function ()
                                       {
                                         var watchKeys = Dict.toList(watchKeymap);
@@ -846,7 +957,7 @@
                                                                                                                    Basics.id,
                                                                                                                    true)(Keyboard.isDown(arg0._0)));}
                                                                      _E.Case($moduleName,
-                                                                             "on line 77, column 38 to 87");
+                                                                             "on line 73, column 38 to 87");
                                                                    }();
                                                           },
                                                           watchKeys);
@@ -870,23 +981,23 @@
                    var clicks = A2(Signal._op["<~"],
                                    Utils.cnst(Types.Click),
                                    Mouse.clicks);
-                   var triggers = Signal.merges(_J.toList([clicks,modes,ticks]));
+                   var triggers = Signal.merges(_J.toList([clicks,
+                                                           modes,
+                                                           ticks,
+                                                           pointer]));
                    var gameInputs = Signal.sampleOn(triggers)(A2(Signal._op["~"],
                                                                  A2(Signal._op["~"],
-                                                                    A2(Signal._op["~"],
-                                                                       A2(Signal._op["<~"],
-                                                                          F4(function (engines,
-                                                                                       pointer,
-                                                                                       window,
-                                                                                       trigger)
-                                                                             {
-                                                                               return {_: {}, engines: engines, pointer: pointer, trigger: trigger, window: window};
-                                                                             }),
-                                                                          engines),
-                                                                       pointer),
+                                                                    A2(Signal._op["<~"],
+                                                                       F3(function (engines,
+                                                                                    window,
+                                                                                    trigger)
+                                                                          {
+                                                                            return {_: {}, engines: engines, trigger: trigger, window: window};
+                                                                          }),
+                                                                       engines),
                                                                     Window.dimensions),
                                                                  triggers));
-                   elm.GameInputs = {_op: _op, gameInputs: gameInputs, engines: engines, pointer: pointer, triggers: triggers, clicks: clicks, watchKeymap: watchKeymap, modeKeysDown: modeKeysDown, modes: modes, ticks: ticks};
+                   elm.GameInputs = {_op: _op, gameInputs: gameInputs, engines: engines, triggers: triggers, clicks: clicks, watchKeymap: watchKeymap, modeKeysDown: modeKeysDown, modes: modes, ticks: ticks, pointer: pointer};
                    return elm.GameInputs;
                  };Elm.Physics = function (elm)
               {
@@ -1253,14 +1364,14 @@
                                  {
                                    return List.sum(List.map(momentContrib)(List.map(momentMapVec(Public.Vec2.Vec2.subVec(centerOfMass(structure))))(structureMoments(structure))));
                                  };
-                var genCache = function (s)
-                               {
-                                 return A4(Types.EntityCache,
-                                           s,
-                                           centerOfMass(s),
-                                           totalMass(s),
-                                           rotInertia(s));
-                               };
+                var genEntityCache = function (s)
+                                     {
+                                       return A4(Types.EntityCache,
+                                                 s,
+                                                 centerOfMass(s),
+                                                 totalMass(s),
+                                                 rotInertia(s));
+                                     };
                 var applyBrakes = function (state)
                                   {
                                     return function ()
@@ -1286,7 +1397,7 @@
                                                                                                             vy)}};
                                            }();
                                   };
-                elm.Physics = {_op: _op, sumMasses: sumMasses, massContrib: massContrib, partMasses: partMasses, beamMasses: beamMasses, attachMasses: attachMasses, structureMasses: structureMasses, totalMass: totalMass, centerOfMass: centerOfMass, partMoment: partMoment, beamMoment: beamMoment, momentMapVec: momentMapVec, translateMoment: translateMoment, attachMoment: attachMoment, structureMoments: structureMoments, momentContrib: momentContrib, rotInertiaContrib: rotInertiaContrib, rotInertia: rotInertia, genCache: genCache, partThrusts: partThrusts, beamThrusts: beamThrusts, attachThrusts: attachThrusts, structureThrusts: structureThrusts, netForce: netForce, netAcceleration: netAcceleration, torqueMag: torqueMag, netTorque: netTorque, netRotAcceleration: netRotAcceleration, netDelta: netDelta, applyBrakes: applyBrakes, updateBrakes: updateBrakes, updateMotion: updateMotion};
+                elm.Physics = {_op: _op, sumMasses: sumMasses, massContrib: massContrib, partMasses: partMasses, beamMasses: beamMasses, attachMasses: attachMasses, structureMasses: structureMasses, totalMass: totalMass, centerOfMass: centerOfMass, partMoment: partMoment, beamMoment: beamMoment, momentMapVec: momentMapVec, translateMoment: translateMoment, attachMoment: attachMoment, structureMoments: structureMoments, momentContrib: momentContrib, rotInertiaContrib: rotInertiaContrib, rotInertia: rotInertia, genEntityCache: genEntityCache, partThrusts: partThrusts, beamThrusts: beamThrusts, attachThrusts: attachThrusts, structureThrusts: structureThrusts, netForce: netForce, netAcceleration: netAcceleration, torqueMag: torqueMag, netTorque: netTorque, netRotAcceleration: netRotAcceleration, netDelta: netDelta, applyBrakes: applyBrakes, updateBrakes: updateBrakes, updateMotion: updateMotion};
                 return elm.Physics;
               };Elm.Utils = function (elm)
             {
@@ -1312,8 +1423,27 @@
               var Color = Elm.Color(elm);
               var Graphics = Graphics || {};
               Graphics.Collage = Elm.Graphics.Collage(elm);
+              var Dict = Elm.Dict(elm);
+              var Public = Public || {};
+              Public.Vec2 = Public.Vec2 || {};
+              Public.Vec2.Vec2 = Elm.Public.Vec2.Vec2(elm);
               var Types = Elm.Types(elm);
               var _op = {};
+              var updateDict = F3(function (k,f,d)
+                                  {
+                                    return function ()
+                                           {
+                                             var _case0 = A2(Dict.lookup,k,d);
+                                             switch (_case0.ctor)
+                                             {case
+                                              "Just" :
+                                                return A3(Dict.insert,k,f(_case0._0),d);
+                                              case
+                                              "Nothing" :
+                                                return d;}
+                                             _E.Case($moduleName,"between lines 52 and 54");
+                                           }();
+                                  });
               var spaceBlack = F2(function (arg1,stuff)
                                   {
                                     return function ()
@@ -1326,9 +1456,41 @@
                                                           arg1._1)({ctor: "::", _0: Graphics.Collage.filled(Color.black)(A2(Graphics.Collage.rect,
                                                                                                                             Basics.toFloat(arg1._0),
                                                                                                                             Basics.toFloat(arg1._1))), _1: stuff});}
-                                             _E.Case($moduleName,"between lines 36 and 38");
+                                             _E.Case($moduleName,"between lines 39 and 41");
                                            }();
                                   });
+              var genGameStateCache = F2(function (focus,entities)
+                                         {
+                                           return function ()
+                                                  {
+                                                    var camera = function ()
+                                                                 {
+                                                                   var _case5 = A2(Dict.lookup,
+                                                                                   focus,
+                                                                                   entities);
+                                                                   switch (_case5.ctor)
+                                                                   {case
+                                                                    "Just" :
+                                                                      return function ()
+                                                                             {
+                                                                               var pos = _case5._0.motion.pos;
+                                                                               var rootPos = Public.Vec2.Vec2.extractVec(pos);
+                                                                               var comOffset = A2(Public.Vec2.Vec2.rotVec,
+                                                                                                  pos.theta,
+                                                                                                  _case5._0.cache.comOffset);
+                                                                               return A2(Public.Vec2.Vec2.addVec,
+                                                                                         comOffset,
+                                                                                         rootPos);
+                                                                             }();
+                                                                    case
+                                                                    "Nothing" :
+                                                                      return Public.Vec2.Vec2.origin;}
+                                                                   _E.Case($moduleName,
+                                                                           "between lines 58 and 65");
+                                                                 }();
+                                                    return Types.GameStateCache(camera);
+                                                  }();
+                                         });
               var convertPos = F2(function (arg1,arg0)
                                   {
                                     return function ()
@@ -1347,9 +1509,9 @@
                                                                                                                  arg1._1,
                                                                                                                  2) - arg0._1};}
                                                          _E.Case($moduleName,
-                                                                 "on line 30, column 27 to 51");
+                                                                 "on line 33, column 27 to 51");
                                                        }();}
-                                             _E.Case($moduleName,"on line 30, column 27 to 51");
+                                             _E.Case($moduleName,"on line 33, column 27 to 51");
                                            }();
                                   });
               var controlEngines = function (input)
@@ -1373,7 +1535,7 @@
                             {
                               return x;
                             });
-              elm.Utils = {_op: _op, cnst: cnst, convertPos: convertPos, combineSElems: combineSElems, spaceBlack: spaceBlack, controlEngines: controlEngines};
+              elm.Utils = {_op: _op, cnst: cnst, convertPos: convertPos, combineSElems: combineSElems, spaceBlack: spaceBlack, controlEngines: controlEngines, updateDict: updateDict, genGameStateCache: genGameStateCache};
               return elm.Utils;
             };Elm.Types = function (elm)
             {
@@ -1469,6 +1631,10 @@
                                 return {_: {}, disp: a, force: b};
                               });
               var Reverse = {ctor: "Reverse"};
+              var Pointer = function (a)
+                            {
+                              return {ctor: "Pointer", _0: a};
+                            };
               var Point = function (a)
                           {
                             return {ctor: "Point", _0: a};
@@ -1506,13 +1672,17 @@
                                     {
                                       return _N.insert("id",a,b);
                                     });
-              var GameState = F3(function (a,b,c)
+              var GameStateCache = function (a)
+                                   {
+                                     return {_: {}, camera: a};
+                                   };
+              var GameState = F4(function (a,b,c,d)
                                  {
-                                   return {_: {}, entities: a, focus: c, mode: b};
+                                   return {_: {}, cache: d, entities: a, focus: c, mode: b};
                                  });
-              var GameInput = F4(function (a,b,c,d)
+              var GameInput = F3(function (a,b,c)
                                  {
-                                   return {_: {}, engines: a, pointer: b, trigger: d, window: c};
+                                   return {_: {}, engines: a, trigger: c, window: b};
                                  });
               var FuelTank = function (a)
                              {
@@ -1556,7 +1726,7 @@
                               {
                                 return {_: {}, offset: a, theta: b};
                               });
-              elm.Types = {_op: _op, translateAttach: translateAttach, beam: beam, part: part, fresh: fresh, labelBeams: labelBeams, Disabled: Disabled, Forward: Forward, Reverse: Reverse, TurnLeft: TurnLeft, TurnRight: TurnRight, Brain: Brain, FuelTank: FuelTank, Engine: Engine, Point: Point, ParallelAxis: ParallelAxis, Brakes: Brakes, Click: Click, Modal: Modal, FPS: FPS, Pause: Pause, Cycle: Cycle, Exit: Exit, Number: Number, Attach: Attach, Beam: Beam, LabelBeamExt: LabelBeamExt, Thrust: Thrust, MotionState: MotionState, MotionDelta: MotionDelta, Entity: Entity, EntityCache: EntityCache, GameInput: GameInput, GameState: GameState, Mode: Mode, LabelDist: LabelDist, BuildMode: BuildMode};
+              elm.Types = {_op: _op, translateAttach: translateAttach, beam: beam, part: part, fresh: fresh, labelBeams: labelBeams, Disabled: Disabled, Forward: Forward, Reverse: Reverse, TurnLeft: TurnLeft, TurnRight: TurnRight, Brain: Brain, FuelTank: FuelTank, Engine: Engine, Point: Point, ParallelAxis: ParallelAxis, Brakes: Brakes, Click: Click, Modal: Modal, FPS: FPS, Pointer: Pointer, Pause: Pause, Cycle: Cycle, Exit: Exit, Number: Number, Attach: Attach, Beam: Beam, LabelBeamExt: LabelBeamExt, Thrust: Thrust, MotionState: MotionState, MotionDelta: MotionDelta, Entity: Entity, EntityCache: EntityCache, GameInput: GameInput, GameState: GameState, GameStateCache: GameStateCache, Mode: Mode, LabelDist: LabelDist, BuildMode: BuildMode};
               return elm.Types;
             };Elm.Public = Elm.Public || {};
 Elm.Public.TagTree = Elm.Public.TagTree || {};
@@ -1807,6 +1977,15 @@ Elm.Public.State.State = function (elm)
                                                       return {ctor: "_Tuple2", _0: {ctor: "_Tuple0"}, _1: s$};
                                                     });
                                      };
+                           var updateS = function (f)
+                                         {
+                                           return A2(bindS,
+                                                     get,
+                                                     function (s)
+                                                     {
+                                                       return put(f(s));
+                                                     });
+                                         };
                            var returnS = function (x)
                                          {
                                            return State(function (s)
@@ -1854,7 +2033,7 @@ Elm.Public.State.State = function (elm)
                                                   return sequenceS(List.map(f)($));
                                                 };
                                        };
-                           elm.Public.State.State = {_op: _op, get: get, put: put, evalState: evalState, execState: execState, returnS: returnS, bindS: bindS, sequenceS: sequenceS, mapMS: mapMS, fmapS: fmapS, State: State};
+                           elm.Public.State.State = {_op: _op, get: get, put: put, evalState: evalState, execState: execState, returnS: returnS, bindS: bindS, sequenceS: sequenceS, mapMS: mapMS, fmapS: fmapS, updateS: updateS, State: State};
                            return elm.Public.State.State;
                          };Elm.Public = Elm.Public || {};
 Elm.Public.Vec2 = Elm.Public.Vec2 || {};
