@@ -89,10 +89,12 @@ draw n gs =
 
 main = combineSElems outward <|
   [ spaceBlack <~ (.window <~ gameInputs) ~ (draw <~ (fst <~ timestamp gameInputs) ~ withPhantom)
+  {-
   , combineSElems down
     [ (color white . asText) <~ gameInputs
     , (color white . asText . .focus) <~ current
     , (color white . asText . .mode) <~ current
     , (color white . asText) <~ modes
     ]
+  -}
   ]

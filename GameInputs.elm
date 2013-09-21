@@ -39,8 +39,11 @@ gameInputs : Signal GameInput
 -- TODO gameInputs = GameInput
 gameInputs = sampleOn triggers <| (\engines window trigger -> { engines=engines, window=window, trigger=trigger}) 
           <~ engines
-          ~ W.dimensions
+          ~ dimensions
           ~ triggers
+
+dimensions : Signal (Int, Int)
+dimensions = W.dimensions
 
 engines : Signal (Either Brakes [EngineConfig])
 engines =
@@ -80,5 +83,5 @@ ticks : Signal Trigger
 ticks = FPS <~ (T.fps 25)
 
 pointer : Signal Trigger
-pointer = Pointer <~ (convertPos <~ W.dimensions ~ M.position)
+pointer = Pointer <~ (convertPos <~ dimensions ~ M.position)
 
