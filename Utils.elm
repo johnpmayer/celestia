@@ -63,3 +63,4 @@ genGameStateCache focus entities =
           comOffset = rotVec pos.theta e.cache.comOffset
       in addVec comOffset rootPos
   in GameStateCache camera
+

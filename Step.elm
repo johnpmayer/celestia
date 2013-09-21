@@ -43,6 +43,9 @@ gamePaused =
     ST.get >>= (\state ->
     pure state.mode.pause)
 
+noStep : GameStep
+noStep = ST.returnS ()
+
 step : GameInput -> GameStep
 step input = 
   let (>>=) = ST.bindS
@@ -54,7 +57,7 @@ step input =
     FPS t ->
       gamePaused >>= (\paused ->
       if paused
-      then pure ()
+      then noStep
       else
         (focusControls input) >>= (\_ ->
         physicsStep))
@@ -79,12 +82,12 @@ rotateFocus =
   in
     ST.get >>= (\state ->
     let focus = state.focus
-        newFocus = (focus + 1) `mod` 4
+        newFocus = (focus + 1) `mod` 5
         newState = { state | focus <- newFocus }
     in ST.put newState)
 
 build : GameStep
-build = ST.returnS ()
+build = ST.updateS addPhantom
 
 updatePhantom : (Int,Int) -> GameStep
 updatePhantom pointer = 
@@ -105,7 +108,7 @@ updatePhantom pointer =
             newMode = { mode | build <- newBuildMode }
             newState = { state | mode <- newMode }
         in ST.put newState
-      _ -> pure ())
+      _ -> noStep)
 
 focusControls : GameInput -> GameStep
 focusControls input = 
@@ -117,7 +120,7 @@ focusControls input =
         entities = state.entities
         myShip = D.lookup focus entities
     in case myShip of
-      Nothing -> pure ()
+      Nothing -> noStep
       Just e ->
         let newMyShip = { e | controls <- input.engines }
             newEntities = D.insert focus newMyShip entities

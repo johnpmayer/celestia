@@ -37,7 +37,7 @@ import open Utils
 import open Public.Vec2.Vec2
 
 import Main (simpleShip)
-import ShipWright (placePhantomPart)
+import ShipWright (addPhantom)
 
 {- Setup initial game state and initialize the loop -}
 
@@ -75,18 +75,7 @@ current : Signal GameState
 current = foldp (execState . step) initialState gameInputs
 
 withPhantom : Signal GameState
-withPhantom = 
-  let addPhantom state = 
-    let buildMode = state.mode.build
-        e = buildMode.entity
-        placement = buildMode.placement
-    in case placement of
-      Nothing -> state
-      Just best -> 
-        let place = placePhantomPart buildMode.part best
-            es = updateDict e place state.entities
-        in { state | entities <- es }
-  in addPhantom <~ current
+withPhantom = addPhantom <~ current
 
 {- Render the display -}
 

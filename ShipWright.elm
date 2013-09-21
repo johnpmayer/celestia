@@ -112,3 +112,15 @@ placePhantomPart p best e =
   let c = e.cache
       s = placeStructure p best e
   in { e | cache <- { c | structure <- s } }
+
+addPhantom : GameState -> GameState
+addPhantom state = 
+    let buildMode = state.mode.build
+        e = buildMode.entity
+        placement = buildMode.placement
+    in case placement of
+      Nothing -> state
+      Just best -> 
+        let place = placePhantomPart buildMode.part best
+            es = updateDict e place state.entities
+        in { state | entities <- es }
