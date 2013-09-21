@@ -45,14 +45,14 @@ spine : Structure
 spine = beam {r = 200} [] 
 
 station : Entity
-station = { controls = Right [], motion = { pos = { x = 0, y = 200, theta = 0 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genCache spine }
+station = { controls = Right [], motion = { pos = { x = 0, y = 200, theta = 0 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genEntityCache spine }
 
 initialShips : [Entity]
 initialShips = 
-  [ { controls = Right [], motion = { pos = { x =   0, y =   0, theta = 0 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genCache simpleShip }
-  , { controls = Right [], motion = { pos = { x =  60, y =  50, theta = 1 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genCache simpleShip }
-  , { controls = Right [], motion = { pos = { x = -80, y =  40, theta = 4 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genCache simpleShip }
-  , { controls = Right [], motion = { pos = { x = 120, y = -20, theta = 3 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genCache simpleShip }
+  [ { controls = Right [], motion = { pos = { x =   0, y =   0, theta = 0 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genEntityCache simpleShip }
+  , { controls = Right [], motion = { pos = { x =  60, y =  50, theta = 1 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genEntityCache simpleShip }
+  , { controls = Right [], motion = { pos = { x = -80, y =  40, theta = 4 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genEntityCache simpleShip }
+  , { controls = Right [], motion = { pos = { x = 120, y = -20, theta = 3 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genEntityCache simpleShip }
   ]
 
 initialEntities : Dict Int Entity
@@ -60,7 +60,7 @@ initialEntities =
   D.fromList <| (4, station) :: (zip [0,1,2,3] initialShips)
 
 initialState : GameState
-initialState = { entities = initialEntities, mode = initialMode, focus = 0 }
+initialState = { entities = initialEntities, mode = initialMode, focus = 0, cache = genGameStateCache 0 initialEntities }
 
 initialMode : Mode
 initialMode = { pause = False, build = initialBuildMode }
@@ -73,9 +73,6 @@ initialBuildMode = { entity = 4, placement = initialPlacement, part = Engine { r
 
 current : Signal GameState
 current = foldp (execState . step) initialState gameInputs
-
-absPointer : Signal Vec2
-absPointer = ((\(x,y) -> {x=toFloat x,y=toFloat y}) . .pointer) <~ gameInputs
 
 withPhantom : Signal GameState
 withPhantom = 
@@ -96,12 +93,7 @@ withPhantom =
 draw : Float -> GameState -> [Form]
 draw n gs = 
   let entities = D.values <| gs.entities
-      camera = case D.lookup gs.focus gs.entities of
-        Nothing -> origin
-        Just e -> 
-          let rootPos = extractVec e.motion.pos
-              comOffset = rotVec e.motion.pos.theta e.cache.comOffset
-          in addVec comOffset rootPos 
+      camera = gs.cache.camera
       cameraTransform = vecTranslate <| negVec camera
       entityForms = map (drawEntity <| n) entities
   in [groupTransform cameraTransform <| entityForms]

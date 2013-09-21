@@ -114,8 +114,8 @@ rotInertia structure =
   structureMoments <|
   structure
 
-genCache : Structure -> EntityCache
-genCache s = EntityCache
+genEntityCache : Structure -> EntityCache
+genEntityCache s = EntityCache
   s
   (centerOfMass s)
   (totalMass s)

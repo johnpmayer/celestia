@@ -98,7 +98,7 @@ type EntityCache = { structure : Structure, comOffset : Vec2, totalMass : Float,
 
 {- GameInputs -}
 
-type GameInput = { engines : Either Brakes [EngineConfig], pointer : (Int,Int), window : (Int,Int), trigger : Trigger }
+type GameInput = { engines : Either Brakes [EngineConfig], window : (Int,Int), trigger : Trigger }
 
 data Brakes = Brakes
 
@@ -106,6 +106,7 @@ data Trigger
   = Click
   | Modal Modal
   | FPS Time
+  | Pointer (Int,Int)
 
 data Modal
   = Pause
@@ -113,7 +114,9 @@ data Modal
   | Exit
   | Number Int
 
-type GameState = { entities : Dict Int Entity, mode : Mode, focus : Int }
+type GameState = { entities : Dict Int Entity, mode : Mode, focus : Int, cache : GameStateCache }
+
+type GameStateCache = { camera : Vec2 }
 
 type Mode = { pause : Bool, build : BuildMode }
 

@@ -37,9 +37,8 @@ import open Utils
 
 gameInputs : Signal GameInput
 -- TODO gameInputs = GameInput
-gameInputs = sampleOn triggers <| (\engines pointer window trigger -> { engines=engines, pointer=pointer, window=window, trigger=trigger}) 
+gameInputs = sampleOn triggers <| (\engines window trigger -> { engines=engines, window=window, trigger=trigger}) 
           <~ engines
-          ~ pointer
           ~ W.dimensions
           ~ triggers
 
@@ -50,11 +49,8 @@ engines =
       override b ecs = if b then Left Brakes else Right ecs
   in override <~ brakes ~ controls
 
-pointer : Signal (Int,Int)
-pointer = convertPos <~ W.dimensions ~ M.position
-
 triggers : Signal Trigger
-triggers = merges [ clicks, modes, ticks ]
+triggers = merges [ clicks, modes, ticks, pointer ]
 
 clicks : Signal Trigger
 clicks = (cnst Click) <~ M.clicks
@@ -82,3 +78,7 @@ modes = Modal <~ modeKeysDown
 
 ticks : Signal Trigger
 ticks = FPS <~ (T.fps 25)
+
+pointer : Signal Trigger
+pointer = Pointer <~ (convertPos <~ W.dimensions ~ M.position)
+

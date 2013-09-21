@@ -28,6 +28,8 @@ import open Either
 import Public.State.State as ST
 import Public.State.State (State)
 
+import Public.Vec2.Vec2 as V
+
 import open Types
 import open Utils
 import open Physics
@@ -48,6 +50,7 @@ step input =
   in case input.trigger of
     Modal m -> updateMode m
     Click -> build
+    Pointer pointer -> updatePhantom pointer
     FPS t ->
       gamePaused >>= (\paused ->
       if paused
@@ -55,9 +58,6 @@ step input =
       else
         (focusControls input) >>= (\_ ->
         physicsStep))
-
-build : GameStep
-build = ST.returnS ()
 
 updateMode : Modal -> GameStep
 updateMode m =
@@ -82,6 +82,30 @@ rotateFocus =
         newFocus = (focus + 1) `mod` 4
         newState = { state | focus <- newFocus }
     in ST.put newState)
+
+build : GameStep
+build = ST.returnS ()
+
+updatePhantom : (Int,Int) -> GameStep
+updatePhantom pointer = 
+  let (>>=) = ST.bindS
+      pure = ST.returnS
+  in
+    ST.get >>= (\state ->
+    let relPointerV = V.fromIntPair pointer
+        myShip = D.lookup state.focus state.entities
+        buildShip = D.lookup state.mode.build.entity state.entities
+    in case (myShip, buildShip) of
+      (Just myShip, Just buildShip) ->
+        let absPointerV = V.addVec state.cache.camera relPointerV
+            best = Just <| bestPlacement absPointerV buildShip
+            mode = state.mode
+            buildMode = mode.build
+            newBuildMode = { buildMode | placement <- best }
+            newMode = { mode | build <- newBuildMode }
+            newState = { state | mode <- newMode }
+        in ST.put newState
+      _ -> pure ())
 
 focusControls : GameInput -> GameStep
 focusControls input = 
@@ -116,5 +140,7 @@ physicsStep =
   in
     ST.get >>= (\state ->
     let newEntities = D.map entityPureStep state.entities
-        newState = { state | entities <- newEntities }
+        focus = state.focus
+        newCache = genGameStateCache focus newEntities
+        newState = { state | entities <- newEntities, cache <- newCache }
     in ST.put newState)

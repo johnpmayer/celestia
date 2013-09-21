@@ -22,6 +22,7 @@
 module Utils where
 
 import open Dict
+import open Public.Vec2.Vec2
 
 import open Types
 
@@ -51,3 +52,14 @@ updateDict k f d =
   case lookup k d of
     Nothing -> d
     Just v -> insert k (f v) d
+
+genGameStateCache : Int -> Dict Int Entity -> GameStateCache
+genGameStateCache focus entities = 
+  let camera = case lookup focus entities of
+    Nothing -> origin
+    Just e ->
+      let pos = e.motion.pos
+          rootPos = extractVec pos
+          comOffset = rotVec pos.theta e.cache.comOffset
+      in addVec comOffset rootPos
+  in GameStateCache camera
