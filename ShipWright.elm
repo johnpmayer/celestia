@@ -31,6 +31,8 @@ import open Public.Vec2.Vec2
 
 dimensions = (800,600)
 
+{-
+
 gamePointer = (convertPos dimensions) <~ M.position
 
 initialShip = beam {r=100} <|
@@ -49,7 +51,6 @@ display = drawStructure 0 []
 space = (\sfs -> spaceBlack dimensions <~ combine sfs)
   [ display <~ shipWith ]
 
-{-
 main = combineSElems <|
   [ space
   , (asText . buildPoints . labelBeams) <~ ship
@@ -73,30 +74,29 @@ buildPoints =
       attachPoints attach = map (attachPoint attach)
   in foldTagTree partPoints beamPoints attachPoints
 
-pointDist : (Int,Int) -> BuildPoint -> LabelDist
-pointDist (x,y) bp = 
-  let xF = toFloat x
-      yF = toFloat y
-      dist = minimumDist bp.start bp.end {x=xF,y=yF}
+pointDist : Vec2 -> BuildPoint -> LabelDist
+pointDist pointerV bp = 
+  let dist = minimumDist bp.start bp.end pointerV
   in { dist | id = bp.id }
 
 compareDists : LabelDist -> LabelDist -> LabelDist
 compareDists p1 p2 = if p1.r < p2.r then p1 else p2
 
-minPointDist : (Int,Int) -> [BuildPoint] -> LabelDist
-minPointDist pointer bps = 
+minPointDist : Vec2 -> [BuildPoint] -> LabelDist
+minPointDist pointerV bps = 
   let minDist = 50
       fakePoint = { id=-1, r=minDist, offset=0 }
-      labeledDists = map (pointDist pointer) bps
+      labeledDists = map (pointDist pointerV) bps
   in foldl compareDists fakePoint labeledDists
 
-bestPlacement : (Int,Int) -> Structure -> LabelDist
-bestPlacement pointer = 
-  minPointDist pointer . buildPoints . labelBeams
+bestPlacement : Vec2 -> Entity -> LabelDist
+bestPlacement absPointerV entity =
+  let localPointerV = subVec entity.motion.pos absPointerV
+  in minPointDist localPointerV . buildPoints . labelBeams <| entity.cache.structure
 
-placeStructure : Part -> (Int,Int) -> Structure -> Structure
-placeStructure p pointer s =
-  let best = bestPlacement pointer s
+placeStructure : Part -> LabelDist -> Entity -> Structure
+placeStructure p best e =
+  let s = e.cache.structure
   in  if best.id < 0
       then s
       else
@@ -106,3 +106,9 @@ placeStructure p pointer s =
               then ({offset=best.offset,theta=0}, part p) :: subs
               else subs
         in foldTagTree' placePart placeBeam <| labelBeams s
+
+placePhantomPart : Part -> LabelDist -> Entity -> Entity
+placePhantomPart p best e =
+  let c = e.cache
+      s = placeStructure p best e
+  in { e | cache <- { c | structure <- s } }

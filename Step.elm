@@ -26,11 +26,20 @@ import Dict as D
 import open Either
 
 import Public.State.State as ST
+import Public.State.State (State)
 
 import open Types
 import open Utils
 import open Physics
 import open ShipWright
+
+gamePaused : State GameState Bool
+gamePaused =
+  let (>>=) = ST.bindS
+      pure = ST.returnS
+  in 
+    ST.get >>= (\state ->
+    pure state.mode.pause)
 
 step : GameInput -> GameStep
 step input = 
@@ -40,8 +49,12 @@ step input =
     Modal m -> updateMode m
     Click -> build
     FPS t ->
-      (focusControls input) >>= (\_ ->
-      physicsStep)
+      gamePaused >>= (\paused ->
+      if paused
+      then pure ()
+      else
+        (focusControls input) >>= (\_ ->
+        physicsStep))
 
 build : GameStep
 build = ST.returnS ()

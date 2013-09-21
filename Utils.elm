@@ -21,6 +21,8 @@
 
 module Utils where
 
+import open Dict
+
 import open Types
 
 cnst : a -> b -> a
@@ -44,4 +46,8 @@ controlEngines input =
   (if input.x > 0 then [ TurnRight ] else []) ++
   (if input.x < 0 then [ TurnLeft ] else [])
 
-
+updateDict : comparable -> (v -> v) -> Dict comparable v -> Dict comparable v
+updateDict k f d =
+  case lookup k d of
+    Nothing -> d
+    Just v -> insert k (f v) d

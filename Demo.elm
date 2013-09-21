@@ -37,6 +37,7 @@ import open Utils
 import open Public.Vec2.Vec2
 
 import Main (simpleShip)
+import ShipWright (placePhantomPart)
 
 {- Setup initial game state and initialize the loop -}
 
@@ -65,13 +66,30 @@ initialMode : Mode
 initialMode = { pause = False, build = initialBuildMode }
 
 initialPlacement : Maybe LabelDist
-initialPlacement = Nothing
+initialPlacement = Just { id=0, r=20, offset=30 }
 
 initialBuildMode : BuildMode
-initialBuildMode = { entity = floor 4, placement = initialPlacement, part = Engine { r = 5, config = Forward } }
+initialBuildMode = { entity = 4, placement = initialPlacement, part = Engine { r = 10, config = Forward } }
 
 current : Signal GameState
 current = foldp (execState . step) initialState gameInputs
+
+absPointer : Signal Vec2
+absPointer = ((\(x,y) -> {x=toFloat x,y=toFloat y}) . .pointer) <~ gameInputs
+
+withPhantom : Signal GameState
+withPhantom = 
+  let addPhantom state = 
+    let buildMode = state.mode.build
+        e = buildMode.entity
+        placement = buildMode.placement
+    in case placement of
+      Nothing -> state
+      Just best -> 
+        let place = placePhantomPart buildMode.part best
+            es = updateDict e place state.entities
+        in { state | entities <- es }
+  in addPhantom <~ current
 
 {- Render the display -}
 
@@ -89,7 +107,7 @@ draw n gs =
   in [groupTransform cameraTransform <| entityForms]
 
 main = combineSElems outward <|
-  [ spaceBlack <~ (.window <~ gameInputs) ~ (draw <~ (fst <~ timestamp gameInputs) ~ current)
+  [ spaceBlack <~ (.window <~ gameInputs) ~ (draw <~ (fst <~ timestamp gameInputs) ~ withPhantom)
   , combineSElems down
     [ (color white . asText) <~ gameInputs
     , (color white . asText . .focus) <~ current
