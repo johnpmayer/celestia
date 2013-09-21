@@ -50,6 +50,7 @@
              Public.Vec2 = Public.Vec2 || {};
              Public.Vec2.Vec2 = Elm.Public.Vec2.Vec2(elm);
              var Main = Elm.Main(elm);
+             var ShipWright = Elm.ShipWright(elm);
              var _op = {};
              var spine = A2(Types.beam,{_: {}, r: 200},_J.toList([]));
              var station = {_: {}, cache: Physics.genCache(spine), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 0, x: 0, y: 200}, v: {_: {}, x: 0, y: 0}}};
@@ -57,14 +58,14 @@
                                            {_: {}, cache: Physics.genCache(Main.simpleShip), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 1, x: 60, y: 50}, v: {_: {}, x: 0, y: 0}}},
                                            {_: {}, cache: Physics.genCache(Main.simpleShip), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 4, x: 0 - 80, y: 40}, v: {_: {}, x: 0, y: 0}}},
                                            {_: {}, cache: Physics.genCache(Main.simpleShip), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 3, x: 120, y: 0 - 20}, v: {_: {}, x: 0, y: 0}}}]);
-             var initialPlacement = Maybe.Nothing;
+             var initialPlacement = Maybe.Just({_: {}, id: 0, offset: 30, r: 20});
              var initialEntities = Dict.fromList({ctor: "::", _0: {ctor: "_Tuple2", _0: 4, _1: station}, _1: A2(List.zip,
                                                                                                                 _J.toList([0,
                                                                                                                            1,
                                                                                                                            2,
                                                                                                                            3]),
                                                                                                                 initialShips)});
-             var initialBuildMode = {_: {}, entity: Basics.floor(4), part: Types.Engine({_: {}, config: Types.Forward, r: 5}), placement: initialPlacement};
+             var initialBuildMode = {_: {}, entity: 4, part: Types.Engine({_: {}, config: Types.Forward, r: 10}), placement: initialPlacement};
              var initialMode = {_: {}, build: initialBuildMode, pause: false};
              var initialState = {_: {}, entities: initialEntities, focus: 0, mode: initialMode};
              var draw = F2(function (n,gs)
@@ -94,7 +95,8 @@
                                                       case
                                                       "Nothing" :
                                                         return Public.Vec2.Vec2.origin;}
-                                                     _E.Case($moduleName,"between lines 81 and 87");
+                                                     _E.Case($moduleName,
+                                                             "between lines 99 and 105");
                                                    }();
                                       var cameraTransform = Public.Vec2.Vec2.vecTranslate(Public.Vec2.Vec2.negVec(camera));
                                       return _J.toList([Graphics.Collage.groupTransform(cameraTransform)(entityForms)]);
@@ -107,6 +109,43 @@
                               },
                               initialState,
                               GameInputs.gameInputs);
+             var withPhantom = function ()
+                               {
+                                 var addPhantom = function (state)
+                                                  {
+                                                    return function ()
+                                                           {
+                                                             var buildMode = state.mode.build;
+                                                             var e = buildMode.entity;
+                                                             var placement = buildMode.placement;
+                                                             return function ()
+                                                                    {
+                                                                      switch (placement.ctor)
+                                                                      {case
+                                                                       "Just" :
+                                                                         return function ()
+                                                                                {
+                                                                                  var place = A2(ShipWright.placePhantomPart,
+                                                                                                 buildMode.part,
+                                                                                                 placement._0);
+                                                                                  var es = A3(Utils.updateDict,
+                                                                                              e,
+                                                                                              place,
+                                                                                              state.entities);
+                                                                                  return _N.replace([["entities",
+                                                                                                      es]],
+                                                                                                    state);
+                                                                                }();
+                                                                       case
+                                                                       "Nothing" :
+                                                                         return state;}
+                                                                      _E.Case($moduleName,
+                                                                              "between lines 86 and 92");
+                                                                    }();
+                                                           }();
+                                                  };
+                                 return A2(Signal._op["<~"],addPhantom,current);
+                               }();
              var main = Utils.combineSElems(Graphics.Element.outward)(_J.toList([A2(Signal._op["~"],
                                                                                     A2(Signal._op["<~"],
                                                                                        Utils.spaceBlack,
@@ -122,7 +161,7 @@
                                                                                           A2(Signal._op["<~"],
                                                                                              Basics.fst,
                                                                                              Time.timestamp(GameInputs.gameInputs))),
-                                                                                       current)),
+                                                                                       withPhantom)),
                                                                                  A2(Utils.combineSElems,
                                                                                     Graphics.Element.down,
                                                                                     _J.toList([A2(Signal._op["<~"],
@@ -155,7 +194,27 @@
                                                                                                     return Graphics.Element.color(Color.white)(Text.asText($));
                                                                                                   },
                                                                                                   GameInputs.modes)]))]));
-             elm.Demo = {_op: _op, spine: spine, station: station, initialShips: initialShips, initialEntities: initialEntities, initialState: initialState, initialMode: initialMode, initialPlacement: initialPlacement, initialBuildMode: initialBuildMode, current: current, draw: draw, main: main};
+             var absPointer = A2(Signal._op["<~"],
+                                 function ($)
+                                 {
+                                   return function (arg0)
+                                          {
+                                            return function ()
+                                                   {
+                                                     switch (arg0.ctor)
+                                                     {case
+                                                      "_Tuple2" :
+                                                        return {_: {}, x: Basics.toFloat(arg0._0), y: Basics.toFloat(arg0._1)};}
+                                                     _E.Case($moduleName,
+                                                             "on line 78, column 27 to 50");
+                                                   }();
+                                          }(function (_)
+                                            {
+                                              return _.pointer;
+                                            }($));
+                                 },
+                                 GameInputs.gameInputs);
+             elm.Demo = {_op: _op, spine: spine, station: station, initialShips: initialShips, initialEntities: initialEntities, initialState: initialState, initialMode: initialMode, initialPlacement: initialPlacement, initialBuildMode: initialBuildMode, current: current, absPointer: absPointer, withPhantom: withPhantom, draw: draw, main: main};
              return elm.Demo;
            };Elm.Step = function (elm)
            {
@@ -184,6 +243,9 @@
              var Char = Elm.Char(elm);
              var Dict = Elm.Dict(elm);
              var Either = Elm.Either(elm);
+             var Public = Public || {};
+             Public.State = Public.State || {};
+             Public.State.State = Elm.Public.State.State(elm);
              var Public = Public || {};
              Public.State = Public.State || {};
              Public.State.State = Elm.Public.State.State(elm);
@@ -240,10 +302,21 @@
                                                                                                                    state));
                                                                         }();
                                                                });}
-                                                  _E.Case($moduleName,"between lines 54 and 60");
+                                                  _E.Case($moduleName,"between lines 67 and 73");
                                                 }();
                                        }();
                               };
+             var gamePaused = function ()
+                              {
+                                var pure = Public.State.State.returnS;
+                                _op[">>="] = Public.State.State.bindS;
+                                return A2(_op[">>="],
+                                          Public.State.State.get,
+                                          function (state)
+                                          {
+                                            return pure(state.mode.pause);
+                                          });
+                              }();
              var focusControls = function (input)
                                  {
                                    return function ()
@@ -284,7 +357,7 @@
                                                                            "Nothing" :
                                                                              return pure({ctor: "_Tuple0"});}
                                                                           _E.Case($moduleName,
-                                                                                  "between lines 82 and 88");
+                                                                                  "between lines 95 and 101");
                                                                         }();
                                                                }();
                                                       });
@@ -316,7 +389,7 @@
                                                                                      e.motion);
                                                                          }();}
                                                                _E.Case($moduleName,
-                                                                       "between lines 92 and 97");
+                                                                       "between lines 105 and 110");
                                                              }();
                                              return _N.replace([["motion",newMotion]],e);
                                            }();
@@ -358,22 +431,27 @@
                                              case
                                              "FPS" :
                                                return A2(_op[">>="],
-                                                         focusControls(input),
-                                                         function (arg0)
+                                                         gamePaused,
+                                                         function (paused)
                                                          {
-                                                           return function ()
-                                                                  {
-                                                                    return physicsStep;
-                                                                  }();
+                                                           return paused ? pure({ctor: "_Tuple0"}) : A2(_op[">>="],
+                                                                                                        focusControls(input),
+                                                                                                        function (arg0)
+                                                                                                        {
+                                                                                                          return function ()
+                                                                                                                 {
+                                                                                                                   return physicsStep;
+                                                                                                                 }();
+                                                                                                        });
                                                          });
                                              case
                                              "Modal" :
                                                return updateMode(_case6._0);}
-                                            _E.Case($moduleName,"between lines 39 and 44");
+                                            _E.Case($moduleName,"between lines 48 and 57");
                                           }();
                                  }();
                         };
-             elm.Step = {_op: _op, step: step, build: build, updateMode: updateMode, rotateFocus: rotateFocus, focusControls: focusControls, entityPureStep: entityPureStep, physicsStep: physicsStep};
+             elm.Step = {_op: _op, gamePaused: gamePaused, step: step, build: build, updateMode: updateMode, rotateFocus: rotateFocus, focusControls: focusControls, entityPureStep: entityPureStep, physicsStep: physicsStep};
              return elm.Step;
            };Elm.ShipWright = function (elm)
                  {
@@ -410,53 +488,66 @@
                    Public.Vec2 = Public.Vec2 || {};
                    Public.Vec2.Vec2 = Elm.Public.Vec2.Vec2(elm);
                    var _op = {};
-                   var stopped = {_: {}, omega: 0, pos: {_: {}, theta: 0, x: 0, y: 0}, v: Public.Vec2.Vec2.origin};
-                   var pointDist = F2(function (arg1,bp)
+                   var pointDist = F2(function (pointerV,bp)
                                       {
                                         return function ()
                                                {
-                                                 switch (arg1.ctor)
-                                                 {case
-                                                  "_Tuple2" :
-                                                    return function ()
-                                                           {
-                                                             var yF = Basics.toFloat(arg1._1);
-                                                             var xF = Basics.toFloat(arg1._0);
-                                                             var dist = A3(Public.Vec2.Vec2.minimumDist,
-                                                                           bp.start,
-                                                                           bp.end,
-                                                                           {_: {}, x: xF, y: yF});
-                                                             return _N.insert("id",bp.id,dist);
-                                                           }();}
-                                                 _E.Case($moduleName,"between lines 78 and 81");
+                                                 var dist = A3(Public.Vec2.Vec2.minimumDist,
+                                                               bp.start,
+                                                               bp.end,
+                                                               pointerV);
+                                                 return _N.insert("id",bp.id,dist);
                                                }();
                                       });
-                   var initialShip = Types.beam({_: {}, r: 100})(_J.toList([{ctor: "_Tuple2", _0: {_: {}, offset: 70, theta: Basics.pi / 2}, _1: A2(Types.beam,
-                                                                                                                                                    {_: {}, r: 30},
-                                                                                                                                                    _J.toList([]))},
-                                                                            {ctor: "_Tuple2", _0: {_: {}, offset: 40, theta: (0 - Basics.pi) / 2}, _1: A2(Types.beam,
-                                                                                                                                                          {_: {}, r: 60},
-                                                                                                                                                          _J.toList([]))}]));
-                   var ship = A3(Signal.foldp,
-                                 Basics.flip(Utils.cnst),
-                                 initialShip,
-                                 Signal.constant({ctor: "_Tuple0"}));
-                   var display = A2(Draw.drawStructure,0,_J.toList([]));
+                   var placeStructure = F3(function (p,best,e)
+                                           {
+                                             return function ()
+                                                    {
+                                                      var s = e.cache.structure;
+                                                      return _N.cmp(best.id,0) < 0 ? s : function ()
+                                                                                         {
+                                                                                           var placePart = function (p)
+                                                                                                           {
+                                                                                                             return Types.part(p);
+                                                                                                           };
+                                                                                           var placeBeam = F2(function (b,
+                                                                                                                        subs)
+                                                                                                              {
+                                                                                                                return Types.beam(_N.remove("id",
+                                                                                                                                            b))(_N.eq(best.id,
+                                                                                                                                                      b.id) ? {ctor: "::", _0: {ctor: "_Tuple2", _0: {_: {}, offset: best.offset, theta: 0}, _1: Types.part(p)}, _1: subs} : subs);
+                                                                                                              });
+                                                                                           return A2(Public.TagTree.TagTree.foldTagTree$,
+                                                                                                     placePart,
+                                                                                                     placeBeam)(Types.labelBeams(s));
+                                                                                         }();
+                                                    }();
+                                           });
+                   var placePhantomPart = F3(function (p,best,e)
+                                             {
+                                               return function ()
+                                                      {
+                                                        var s = A3(placeStructure,p,best,e);
+                                                        var c = e.cache;
+                                                        return _N.replace([["cache",
+                                                                            _N.replace([["structure",
+                                                                                         s]],
+                                                                                       c)]],
+                                                                          e);
+                                                      }();
+                                             });
                    var dimensions = {ctor: "_Tuple2", _0: 800, _1: 600};
-                   var gamePointer = A2(Signal._op["<~"],
-                                        Utils.convertPos(dimensions),
-                                        Mouse.position);
                    var compareDists = F2(function (p1,p2)
                                          {
                                            return _N.cmp(p1.r,p2.r) < 0 ? p1 : p2;
                                          });
-                   var minPointDist = F2(function (pointer,bps)
+                   var minPointDist = F2(function (pointerV,bps)
                                          {
                                            return function ()
                                                   {
                                                     var minDist = 50;
                                                     var labeledDists = A2(List.map,
-                                                                          pointDist(pointer),
+                                                                          pointDist(pointerV),
                                                                           bps);
                                                     var fakePoint = {_: {}, id: 0 - 1, offset: 0, r: minDist};
                                                     return A3(List.foldl,
@@ -503,53 +594,21 @@
                                                  beamPoints,
                                                  attachPoints);
                                      }();
-                   var bestPlacement = function (pointer)
-                                       {
-                                         return function ($)
-                                                {
-                                                  return minPointDist(pointer)(buildPoints(Types.labelBeams($)));
-                                                };
-                                       };
-                   var placeStructure = F3(function (p,pointer,s)
-                                           {
-                                             return function ()
-                                                    {
-                                                      var best = A2(bestPlacement,pointer,s);
-                                                      return _N.cmp(best.id,0) < 0 ? s : function ()
-                                                                                         {
-                                                                                           var placePart = function (p)
-                                                                                                           {
-                                                                                                             return Types.part(p);
-                                                                                                           };
-                                                                                           var placeBeam = F2(function (b,
-                                                                                                                        subs)
-                                                                                                              {
-                                                                                                                return Types.beam(_N.remove("id",
-                                                                                                                                            b))(_N.eq(best.id,
-                                                                                                                                                      b.id) ? {ctor: "::", _0: {ctor: "_Tuple2", _0: {_: {}, offset: best.offset, theta: 0}, _1: Types.part(p)}, _1: subs} : subs);
-                                                                                                              });
-                                                                                           return A2(Public.TagTree.TagTree.foldTagTree$,
-                                                                                                     placePart,
-                                                                                                     placeBeam)(Types.labelBeams(s));
-                                                                                         }();
-                                                    }();
-                                           });
-                   var shipWith = A2(Signal._op["~"],
-                                     A2(Signal._op["<~"],
-                                        placeStructure(Types.Brain({_: {}, r: 10})),
-                                        gamePointer),
-                                     ship);
-                   var space = function (sfs)
-                               {
-                                 return A2(Signal._op["<~"],
-                                           Utils.spaceBlack(dimensions),
-                                           Signal.combine(sfs));
-                               }(_J.toList([A2(Signal._op["<~"],display,shipWith)]));
+                   var bestPlacement = F2(function (absPointerV,entity)
+                                          {
+                                            return function ()
+                                                   {
+                                                     var localPointerV = A2(Public.Vec2.Vec2.subVec,
+                                                                            entity.motion.pos,
+                                                                            absPointerV);
+                                                     return minPointDist(localPointerV)(buildPoints(Types.labelBeams(entity.cache.structure)));
+                                                   }();
+                                          });
                    var BuildPoint = F3(function (a,b,c)
                                        {
                                          return {_: {}, end: c, id: a, start: b};
                                        });
-                   elm.ShipWright = {_op: _op, dimensions: dimensions, gamePointer: gamePointer, initialShip: initialShip, stopped: stopped, ship: ship, shipWith: shipWith, display: display, space: space, buildPoints: buildPoints, pointDist: pointDist, compareDists: compareDists, minPointDist: minPointDist, bestPlacement: bestPlacement, placeStructure: placeStructure, BuildPoint: BuildPoint};
+                   elm.ShipWright = {_op: _op, dimensions: dimensions, buildPoints: buildPoints, pointDist: pointDist, compareDists: compareDists, minPointDist: minPointDist, bestPlacement: bestPlacement, placeStructure: placeStructure, placePhantomPart: placePhantomPart, BuildPoint: BuildPoint};
                    return elm.ShipWright;
                  };Elm.Main = function (elm)
            {
@@ -1312,8 +1371,24 @@
               var Color = Elm.Color(elm);
               var Graphics = Graphics || {};
               Graphics.Collage = Elm.Graphics.Collage(elm);
+              var Dict = Elm.Dict(elm);
               var Types = Elm.Types(elm);
               var _op = {};
+              var updateDict = F3(function (k,f,d)
+                                  {
+                                    return function ()
+                                           {
+                                             var _case0 = A2(Dict.lookup,k,d);
+                                             switch (_case0.ctor)
+                                             {case
+                                              "Just" :
+                                                return A3(Dict.insert,k,f(_case0._0),d);
+                                              case
+                                              "Nothing" :
+                                                return d;}
+                                             _E.Case($moduleName,"between lines 51 and 53");
+                                           }();
+                                  });
               var spaceBlack = F2(function (arg1,stuff)
                                   {
                                     return function ()
@@ -1326,7 +1401,7 @@
                                                           arg1._1)({ctor: "::", _0: Graphics.Collage.filled(Color.black)(A2(Graphics.Collage.rect,
                                                                                                                             Basics.toFloat(arg1._0),
                                                                                                                             Basics.toFloat(arg1._1))), _1: stuff});}
-                                             _E.Case($moduleName,"between lines 36 and 38");
+                                             _E.Case($moduleName,"between lines 38 and 40");
                                            }();
                                   });
               var convertPos = F2(function (arg1,arg0)
@@ -1347,9 +1422,9 @@
                                                                                                                  arg1._1,
                                                                                                                  2) - arg0._1};}
                                                          _E.Case($moduleName,
-                                                                 "on line 30, column 27 to 51");
+                                                                 "on line 32, column 27 to 51");
                                                        }();}
-                                             _E.Case($moduleName,"on line 30, column 27 to 51");
+                                             _E.Case($moduleName,"on line 32, column 27 to 51");
                                            }();
                                   });
               var controlEngines = function (input)
@@ -1373,7 +1448,7 @@
                             {
                               return x;
                             });
-              elm.Utils = {_op: _op, cnst: cnst, convertPos: convertPos, combineSElems: combineSElems, spaceBlack: spaceBlack, controlEngines: controlEngines};
+              elm.Utils = {_op: _op, cnst: cnst, convertPos: convertPos, combineSElems: combineSElems, spaceBlack: spaceBlack, controlEngines: controlEngines, updateDict: updateDict};
               return elm.Utils;
             };Elm.Types = function (elm)
             {
