@@ -64,3 +64,5 @@ genGameStateCache focus entities =
       in addVec comOffset rootPos
   in GameStateCache camera
 
+prepend : String -> String -> String
+prepend p s = p ++ s

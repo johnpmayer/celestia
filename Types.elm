@@ -122,7 +122,13 @@ type Mode = { pause : Bool, build : BuildMode }
 
 type LabelDist = { id:Int, r:Float, offset:Float }
 
-type BuildMode = { entity : Int, placement : Maybe LabelDist, part : Part }
+type BuildCache = { localDisp : Vec2 }
+
+data BuildStage
+  = Place
+  | Rotate BuildCache
+
+type BuildMode = { entity : Int, stage : BuildStage, absRotate : Maybe Float, placement : Maybe LabelDist, part : Part }
 
 type GameStep = State GameState ()
 

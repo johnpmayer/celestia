@@ -30,8 +30,8 @@ import open Physics
 
 import Draw (drawEntity)
 import Public.State.State (execState)
-import Step (GameState, Mode, None, step)
-import GameInputs (gameInputs, modes)
+import Step (step)
+import GameInputs (gameInputs)
 import open Types
 import open Utils
 import open Public.Vec2.Vec2
@@ -65,11 +65,8 @@ initialState = { entities = initialEntities, mode = initialMode, focus = 0, cach
 initialMode : Mode
 initialMode = { pause = False, build = initialBuildMode }
 
-initialPlacement : Maybe LabelDist
-initialPlacement = Just { id=0, r=20, offset=30 }
-
 initialBuildMode : BuildMode
-initialBuildMode = { entity = 4, placement = initialPlacement, part = Engine { r = 10, config = Forward } }
+initialBuildMode = { entity = 4, stage = Place, absRotate = Nothing, placement = Nothing, part = Engine { r = 10, config = Forward } }
 
 current : Signal GameState
 current = foldp (execState . step) initialState gameInputs
@@ -89,12 +86,8 @@ draw n gs =
 
 main = combineSElems outward <|
   [ spaceBlack <~ (.window <~ gameInputs) ~ (draw <~ (fst <~ timestamp gameInputs) ~ withPhantom)
-  {-
   , combineSElems down
-    [ (color white . asText) <~ gameInputs
-    , (color white . asText . .focus) <~ current
-    , (color white . asText . .mode) <~ current
-    , (color white . asText) <~ modes
+    [ (color white . asText . prepend "Focus " . show . .focus) <~ current
+    , (color white . asText . prepend "Build " . show . .build . .mode) <~ current
     ]
-  -}
   ]

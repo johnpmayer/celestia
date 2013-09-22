@@ -23,6 +23,8 @@ module ShipWright where
 
 import Mouse as M
 
+import Dict as D
+
 import open Draw
 import open Public.TagTree.TagTree
 import open Types
@@ -42,7 +44,7 @@ initialShip = beam {r=100} <|
 
 stopped = { v = origin, pos = {x=0,y=0,theta=0}, omega = 0} 
 
-ship = foldp (flip cnst) initialShip (constant ())
+ship = foldp (flip cnst  initialShip (constant ())
 
 shipWith = (placeStructure (Brain {r=10})) <~ gamePointer ~ ship
 
@@ -90,9 +92,25 @@ minPointDist pointerV bps =
   in foldl compareDists fakePoint labeledDists
 
 bestPlacement : Vec2 -> Entity -> LabelDist
-bestPlacement absPointerV entity =
-  let localPointerV = subVec entity.motion.pos absPointerV
-  in minPointDist localPointerV . buildPoints . labelBeams <| entity.cache.structure
+bestPlacement localPointerV entity =
+  minPointDist localPointerV . buildPoints . labelBeams <| entity.cache.structure
+
+walkLocalDisp : LabelDist -> Entity -> Maybe Vec2
+walkLocalDisp placement e = 
+  let labelStruct = labelBeams e.cache.structure
+      dispPart = cnst Nothing
+      dispLabelBeam b subs =
+        if placement.id == b.id
+        then Just { x = placement.offset, y = 0 }
+        else case justs subs of
+          [] -> Nothing
+          [v] -> Just v
+          (v::vs) -> Just v
+      dispAttach a sub = case sub of
+        Nothing -> Nothing
+        Just v -> Just <| translateAttach a v
+  in foldTagTree dispPart dispLabelBeam dispAttach labelStruct
+
 
 placeStructure : Part -> LabelDist -> Entity -> Structure
 placeStructure p best e =
@@ -113,14 +131,24 @@ placePhantomPart p best e =
       s = placeStructure p best e
   in { e | cache <- { c | structure <- s } }
 
+fixPhantom : GameState -> Maybe Vec2
+fixPhantom state = 
+  let buildMode = state.mode.build
+      e = D.lookup buildMode.entity state.entities
+      placement = buildMode.placement
+  in case (e, placement) of
+    (Just e, Just best) -> walkLocalDisp best e
+    _ -> Nothing
+
 addPhantom : GameState -> GameState
 addPhantom state = 
-    let buildMode = state.mode.build
-        e = buildMode.entity
-        placement = buildMode.placement
-    in case placement of
-      Nothing -> state
-      Just best -> 
-        let place = placePhantomPart buildMode.part best
-            es = updateDict e place state.entities
-        in { state | entities <- es }
+  let buildMode = state.mode.build
+      e = buildMode.entity
+      placement = buildMode.placement
+  in case placement of
+    Nothing -> state
+    Just best -> 
+      let place = placePhantomPart buildMode.part best
+          es = updateDict e place state.entities
+      in { state | entities <- es }
+

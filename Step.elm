@@ -74,6 +74,7 @@ updateMode m =
         let mode = state.mode
             pause = not state.mode.pause
         in ST.put { state | mode <- { mode | pause <- pause } })
+      _ -> noStep
 
 rotateFocus : GameStep
 rotateFocus =
@@ -86,8 +87,31 @@ rotateFocus =
         newState = { state | focus <- newFocus }
     in ST.put newState)
 
+setStage : BuildStage -> GameStep
+setStage newStage = ST.updateS <| (\state ->
+  let mode = state.mode
+      buildMode = mode.build
+      newBuildMode = { buildMode | stage <- newStage }
+      newMode = { mode | build <- newBuildMode }
+  in { state | mode <- newMode })
+
 build : GameStep
-build = ST.updateS addPhantom
+build = 
+  let (>>=) = ST.bindS
+      pure = ST.returnS
+  in
+    ST.get >>= (\state ->
+    let buildMode = state.mode.build
+        stage = buildMode.stage
+    in case stage of
+          Place -> 
+            case fixPhantom state of
+              Nothing -> noStep
+              Just localDisp ->
+                setStage <| Rotate <| BuildCache localDisp
+          Rotate cache -> 
+            ST.updateS addPhantom >>= (\_ ->
+            setStage Place))
 
 updatePhantom : (Int,Int) -> GameStep
 updatePhantom pointer = 
@@ -101,13 +125,23 @@ updatePhantom pointer =
     in case (myShip, buildShip) of
       (Just myShip, Just buildShip) ->
         let absPointerV = V.addVec state.cache.camera relPointerV
-            best = Just <| bestPlacement absPointerV buildShip
+            localPointerV = V.subVec buildShip.motion.pos absPointerV
             mode = state.mode
             buildMode = mode.build
-            newBuildMode = { buildMode | placement <- best }
-            newMode = { mode | build <- newBuildMode }
-            newState = { state | mode <- newMode }
-        in ST.put newState
+        in case buildMode.stage of
+          Place ->
+            let best = Just <| bestPlacement localPointerV buildShip
+                newBuildMode = { buildMode | placement <- best }
+                newMode = { mode | build <- newBuildMode }
+                newState = { state | mode <- newMode }
+            in ST.put newState
+          Rotate { localDisp } -> 
+            let dispPointer = V.subVec localDisp localPointerV
+                absRotate = atan2 dispPointer.y dispPointer.x
+                newBuildMode = { buildMode | absRotate <- Just absRotate }
+                newMode = { mode | build <- newBuildMode }
+                newState = { state | mode <- newMode }
+            in ST.put newState
       _ -> noStep)
 
 focusControls : GameInput -> GameStep
