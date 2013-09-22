@@ -112,8 +112,8 @@ walkLocalDisp placement e =
   in foldTagTree dispPart dispLabelBeam dispAttach labelStruct
 
 
-placeStructure : Part -> LabelDist -> Entity -> Structure
-placeStructure p best e =
+placeStructure : Part -> Float -> LabelDist -> Entity -> Structure
+placeStructure p theta best e =
   let s = e.cache.structure
   in  if best.id < 0
       then s
@@ -121,14 +121,14 @@ placeStructure p best e =
         let placePart p = part p
             placeBeam b subs = beam {b - id} <|
               if best.id == b.id
-              then ({offset=best.offset,theta=0}, part p) :: subs
+              then ({offset=best.offset,theta=theta}, part p) :: subs
               else subs
         in foldTagTree' placePart placeBeam <| labelBeams s
 
-placePhantomPart : Part -> LabelDist -> Entity -> Entity
-placePhantomPart p best e =
+placePhantomPart : Part -> Float -> LabelDist -> Entity -> Entity
+placePhantomPart p theta best e =
   let c = e.cache
-      s = placeStructure p best e
+      s = placeStructure p theta best e
   in { e | cache <- { c | structure <- s } }
 
 fixPhantom : GameState -> Maybe Vec2
@@ -145,10 +145,15 @@ addPhantom state =
   let buildMode = state.mode.build
       e = buildMode.entity
       placement = buildMode.placement
-  in case placement of
-    Nothing -> state
-    Just best -> 
-      let place = placePhantomPart buildMode.part best
+      absRotate = buildMode.absRotate
+  in case (placement, absRotate) of
+    (Just best, Just absRotate) ->
+      let place = placePhantomPart buildMode.part absRotate best
           es = updateDict e place state.entities
       in { state | entities <- es }
+    (Just best, Nothing) -> 
+      let place = placePhantomPart buildMode.part 0 best
+          es = updateDict e place state.entities
+      in { state | entities <- es }
+    _ -> state
 
