@@ -125,7 +125,8 @@ updatePhantom pointer =
     in case (myShip, buildShip) of
       (Just myShip, Just buildShip) ->
         let absPointerV = V.addVec state.cache.camera relPointerV
-            localPointerV = V.subVec buildShip.motion.pos absPointerV
+            buildPos = buildShip.motion.pos
+            localPointerV = V.rotVec (-buildPos.theta) <| V.subVec buildPos absPointerV
             mode = state.mode
             buildMode = mode.build
         in case buildMode.stage of
