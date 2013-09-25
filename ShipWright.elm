@@ -141,18 +141,20 @@ fixPhantom state =
     _ -> Nothing
 
 addPhantom : GameState -> GameState
-addPhantom state = 
+addPhantom state =
   let buildMode = state.mode.build
       e = buildMode.entity
       placement = buildMode.placement
       absRotate = buildMode.absRotate
-  in case (placement, absRotate) of
-    (Just best, Just absRotate) ->
-      let place = placePhantomPart buildMode.part absRotate best
+      part = buildMode.part
+  in case (part, placement, absRotate) of
+    (Nothing, _, _) -> state
+    (Just part, Just best, Just absRotate) ->
+      let place = placePhantomPart part absRotate best
           es = updateDict e place state.entities
       in { state | entities <- es }
-    (Just best, Nothing) -> 
-      let place = placePhantomPart buildMode.part 0 best
+    (Just part, Just best, Nothing) -> 
+      let place = placePhantomPart part 0 best
           es = updateDict e place state.entities
       in { state | entities <- es }
     _ -> state

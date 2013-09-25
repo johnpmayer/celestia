@@ -66,7 +66,7 @@ initialMode : Mode
 initialMode = { pause = False, build = initialBuildMode }
 
 initialBuildMode : BuildMode
-initialBuildMode = { entity = 4, stage = Place, absRotate = Nothing, placement = Nothing, part = Engine { r = 10, config = Forward } }
+initialBuildMode = { entity = 4, stage = Place, absRotate = Nothing, placement = Nothing, part = Nothing }
 
 current : Signal GameState
 current = foldp (execState . step) initialState gameInputs

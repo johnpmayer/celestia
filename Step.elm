@@ -103,7 +103,9 @@ build =
     ST.get >>= (\state ->
     let buildMode = state.mode.build
         stage = buildMode.stage
-    in case stage of
+    in case buildMode.part of
+      Nothing -> noStep
+      Just _ -> case stage of
           Place -> 
             case fixPhantom state of
               Nothing -> noStep
@@ -119,31 +121,34 @@ updatePhantom pointer =
       pure = ST.returnS
   in
     ST.get >>= (\state ->
-    let relPointerV = V.fromIntPair pointer
-        myShip = D.lookup state.focus state.entities
-        buildShip = D.lookup state.mode.build.entity state.entities
-    in case (myShip, buildShip) of
-      (Just myShip, Just buildShip) ->
-        let absPointerV = V.addVec state.cache.camera relPointerV
-            buildPos = buildShip.motion.pos
-            localPointerV = V.rotVec (-buildPos.theta) <| V.subVec buildPos absPointerV
-            mode = state.mode
-            buildMode = mode.build
-        in case buildMode.stage of
-          Place ->
-            let best = Just <| bestPlacement localPointerV buildShip
-                newBuildMode = { buildMode | placement <- best }
-                newMode = { mode | build <- newBuildMode }
-                newState = { state | mode <- newMode }
-            in ST.put newState
-          Rotate { localDisp } -> 
-            let dispPointer = V.subVec localDisp localPointerV
-                absRotate = atan2 dispPointer.y dispPointer.x
-                newBuildMode = { buildMode | absRotate <- Just absRotate }
-                newMode = { mode | build <- newBuildMode }
-                newState = { state | mode <- newMode }
-            in ST.put newState
-      _ -> noStep)
+    case state.mode.build.part of
+      Nothing -> noStep
+      Just _ ->
+        let relPointerV = V.fromIntPair pointer
+            myShip = D.lookup state.focus state.entities
+            buildShip = D.lookup state.mode.build.entity state.entities
+        in case (myShip, buildShip) of
+          (Just myShip, Just buildShip) ->
+            let absPointerV = V.addVec state.cache.camera relPointerV
+                buildPos = buildShip.motion.pos
+                localPointerV = V.rotVec (-buildPos.theta) <| V.subVec buildPos absPointerV
+                mode = state.mode
+                buildMode = mode.build
+            in case buildMode.stage of
+              Place ->
+                let best = Just <| bestPlacement localPointerV buildShip
+                    newBuildMode = { buildMode | placement <- best }
+                    newMode = { mode | build <- newBuildMode }
+                    newState = { state | mode <- newMode }
+                in ST.put newState
+              Rotate { localDisp } -> 
+                let dispPointer = V.subVec localDisp localPointerV
+                    absRotate = atan2 dispPointer.y dispPointer.x
+                    newBuildMode = { buildMode | absRotate <- Just absRotate }
+                    newMode = { mode | build <- newBuildMode }
+                    newState = { state | mode <- newMode }
+                in ST.put newState
+          _ -> noStep)
 
 focusControls : GameInput -> GameStep
 focusControls input = 
