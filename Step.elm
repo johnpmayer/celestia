@@ -74,7 +74,38 @@ updateMode m =
         let mode = state.mode
             pause = not state.mode.pause
         in ST.put { state | mode <- { mode | pause <- pause } })
-      _ -> noStep
+      Exit -> quitBuild
+      Number n -> updateModeTree n
+
+updateModeTree : Int -> GameStep
+updateModeTree n =
+  let (>>=) = ST.bindS
+      pure = ST.returnS
+  in
+    ST.get >>= (\state ->
+    let mode = state.mode
+        buildMode = mode.build
+        part = case n of
+          1 -> Just <| Brain { r=10 }
+          2 -> Just <| FuelTank { l=20, w=10 }
+          3 -> Just <| Engine { r=10, config=Forward }
+          _ -> Nothing
+        newBuildMode = { buildMode | part <- part }
+        newMode = { mode | build <- newBuildMode }
+        newState = { state | mode <- newMode }
+    in ST.put newState)
+
+quitBuild : GameStep
+quitBuild = 
+  let (>>=) = ST.bindS
+      pure = ST.returnS
+  in
+    ST.get >>= (\state ->
+    let mode = state.mode
+        buildMode = mode.build
+        newBuildMode = BuildMode buildMode.entity Place Nothing Nothing Nothing
+        newMode = { mode | build <- newBuildMode }
+    in ST.put { state | mode <- newMode })
 
 rotateFocus : GameStep
 rotateFocus =
