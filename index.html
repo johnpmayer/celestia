@@ -58,14 +58,13 @@
                                            {_: {}, cache: Physics.genEntityCache(Main.simpleShip), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 1, x: 60, y: 50}, v: {_: {}, x: 0, y: 0}}},
                                            {_: {}, cache: Physics.genEntityCache(Main.simpleShip), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 4, x: 0 - 80, y: 40}, v: {_: {}, x: 0, y: 0}}},
                                            {_: {}, cache: Physics.genEntityCache(Main.simpleShip), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 3, x: 120, y: 0 - 20}, v: {_: {}, x: 0, y: 0}}}]);
-             var initialPlacement = Maybe.Just({_: {}, id: 0, offset: 30, r: 20});
              var initialEntities = Dict.fromList({ctor: "::", _0: {ctor: "_Tuple2", _0: 4, _1: station}, _1: A2(List.zip,
                                                                                                                 _J.toList([0,
                                                                                                                            1,
                                                                                                                            2,
                                                                                                                            3]),
                                                                                                                 initialShips)});
-             var initialBuildMode = {_: {}, entity: 4, part: Types.Engine({_: {}, config: Types.Forward, r: 10}), placement: initialPlacement};
+             var initialBuildMode = {_: {}, entity: 4, orientation: Maybe.Nothing, part: Types.Engine({_: {}, config: Types.Forward, r: 10}), placement: Maybe.Nothing, stage: Types.Place};
              var initialMode = {_: {}, build: initialBuildMode, pause: false};
              var initialState = {_: {}, cache: A2(Utils.genGameStateCache,
                                                   0,
@@ -112,34 +111,25 @@
                                                                                     _J.toList([A2(Signal._op["<~"],
                                                                                                   function ($)
                                                                                                   {
-                                                                                                    return Graphics.Element.color(Color.white)(Text.asText($));
-                                                                                                  },
-                                                                                                  GameInputs.gameInputs),
-                                                                                               A2(Signal._op["<~"],
-                                                                                                  function ($)
-                                                                                                  {
-                                                                                                    return Graphics.Element.color(Color.white)(Text.asText(function (_)
-                                                                                                                                                           {
-                                                                                                                                                             return _.focus;
-                                                                                                                                                           }($)));
+                                                                                                    return Graphics.Element.color(Color.white)(Text.asText(Utils.prepend(_str("Focus "))(Prelude.show(function (_)
+                                                                                                                                                                                                      {
+                                                                                                                                                                                                        return _.focus;
+                                                                                                                                                                                                      }($)))));
                                                                                                   },
                                                                                                   current),
                                                                                                A2(Signal._op["<~"],
                                                                                                   function ($)
                                                                                                   {
-                                                                                                    return Graphics.Element.color(Color.white)(Text.asText(function (_)
-                                                                                                                                                           {
-                                                                                                                                                             return _.mode;
-                                                                                                                                                           }($)));
+                                                                                                    return Graphics.Element.color(Color.white)(Text.asText(Utils.prepend(_str("Build "))(Prelude.show(function (_)
+                                                                                                                                                                                                      {
+                                                                                                                                                                                                        return _.build;
+                                                                                                                                                                                                      }(function (_)
+                                                                                                                                                                                                        {
+                                                                                                                                                                                                          return _.mode;
+                                                                                                                                                                                                        }($))))));
                                                                                                   },
-                                                                                                  current),
-                                                                                               A2(Signal._op["<~"],
-                                                                                                  function ($)
-                                                                                                  {
-                                                                                                    return Graphics.Element.color(Color.white)(Text.asText($));
-                                                                                                  },
-                                                                                                  GameInputs.modes)]))]));
-             elm.Demo = {_op: _op, spine: spine, station: station, initialShips: initialShips, initialEntities: initialEntities, initialState: initialState, initialMode: initialMode, initialPlacement: initialPlacement, initialBuildMode: initialBuildMode, current: current, withPhantom: withPhantom, draw: draw, main: main};
+                                                                                                  current)]))]));
+             elm.Demo = {_op: _op, spine: spine, station: station, initialShips: initialShips, initialEntities: initialEntities, initialState: initialState, initialMode: initialMode, initialBuildMode: initialBuildMode, current: current, withPhantom: withPhantom, draw: draw, main: main};
              return elm.Demo;
            };Elm.Step = function (elm)
            {
@@ -182,6 +172,26 @@
              var Physics = Elm.Physics(elm);
              var ShipWright = Elm.ShipWright(elm);
              var _op = {};
+             var setStage = function (newStage)
+                            {
+                              return Public.State.State.updateS(function (state)
+                                                                {
+                                                                  return function ()
+                                                                         {
+                                                                           var mode = state.mode;
+                                                                           var buildMode = mode.build;
+                                                                           var newBuildMode = _N.replace([["stage",
+                                                                                                           newStage]],
+                                                                                                         buildMode);
+                                                                           var newMode = _N.replace([["build",
+                                                                                                      newBuildMode]],
+                                                                                                    mode);
+                                                                           return _N.replace([["mode",
+                                                                                               newMode]],
+                                                                                             state);
+                                                                         }();
+                                                                });
+                            };
              var rotateFocus = function ()
                                {
                                  var pure = Public.State.State.returnS;
@@ -193,7 +203,7 @@
                                              return function ()
                                                     {
                                                       var focus = state.focus;
-                                                      var newFocus = A2(Basics.mod,focus + 1,4);
+                                                      var newFocus = A2(Basics.mod,focus + 1,5);
                                                       var newState = _N.replace([["focus",
                                                                                   newFocus]],
                                                                                 state);
@@ -201,6 +211,7 @@
                                                     }();
                                            });
                                }();
+             var noStep = Public.State.State.returnS({ctor: "_Tuple0"});
              var updateMode = function (m)
                               {
                                 return function ()
@@ -230,11 +241,10 @@
                                                                                                                    state));
                                                                         }();
                                                                });}
-                                                  _E.Case($moduleName,"between lines 70 and 76");
+                                                  return noStep;
                                                 }();
                                        }();
                               };
-             var noStep = Public.State.State.returnS({ctor: "_Tuple0"});
              var updatePhantom = function (pointer)
                                  {
                                    return function ()
@@ -344,7 +354,7 @@
                                                                            "Nothing" :
                                                                              return noStep;}
                                                                           _E.Case($moduleName,
-                                                                                  "between lines 128 and 134");
+                                                                                  "between lines 146 and 152");
                                                                         }();
                                                                }();
                                                       });
@@ -376,7 +386,7 @@
                                                                                      e.motion);
                                                                          }();}
                                                                _E.Case($moduleName,
-                                                                       "between lines 138 and 143");
+                                                                       "between lines 156 and 161");
                                                              }();
                                              return _N.replace([["motion",newMotion]],e);
                                            }();
@@ -417,15 +427,33 @@
                                      {
                                        return function ()
                                               {
-                                                var _case11 = state.mode.build.placement;
-                                                switch (_case11.ctor)
-                                                {case
-                                                 "Just" :
-                                                   return noStep;
-                                                 case
-                                                 "Nothing" :
-                                                   return noStep;}
-                                                _E.Case($moduleName,"between lines 94 and 96");
+                                                var buildMode = state.mode.build;
+                                                var stage = buildMode.stage;
+                                                return function ()
+                                                       {
+                                                         switch (stage.ctor)
+                                                         {case
+                                                          "Place" :
+                                                            return function ()
+                                                                   {
+                                                                     var placement = buildMode;
+                                                                     var localDisp = Public.Vec2.Vec2.origin;
+                                                                     return setStage(Types.Rotate(Types.BuildCache(localDisp)));
+                                                                   }();
+                                                          case
+                                                          "Rotate" :
+                                                            return A2(_op[">>="],
+                                                                      Public.State.State.updateS(ShipWright.addPhantom),
+                                                                      function (arg0)
+                                                                      {
+                                                                        return function ()
+                                                                               {
+                                                                                 return setStage(Types.Place);
+                                                                               }();
+                                                                      });}
+                                                         _E.Case($moduleName,
+                                                                 "between lines 106 and 113");
+                                                       }();
                                               }();
                                      });
                          }();
@@ -437,8 +465,8 @@
                                    _op[">>="] = Public.State.State.bindS;
                                    return function ()
                                           {
-                                            var _case13 = input.trigger;
-                                            switch (_case13.ctor)
+                                            var _case14 = input.trigger;
+                                            switch (_case14.ctor)
                                             {case
                                              "Click" :
                                                return build;
@@ -460,15 +488,15 @@
                                                          });
                                              case
                                              "Modal" :
-                                               return updateMode(_case13._0);
+                                               return updateMode(_case14._0);
                                              case
                                              "Pointer" :
-                                               return updatePhantom(_case13._0);}
+                                               return updatePhantom(_case14._0);}
                                             _E.Case($moduleName,"between lines 53 and 63");
                                           }();
                                  }();
                         };
-             elm.Step = {_op: _op, gamePaused: gamePaused, noStep: noStep, step: step, updateMode: updateMode, rotateFocus: rotateFocus, build: build, updatePhantom: updatePhantom, focusControls: focusControls, entityPureStep: entityPureStep, physicsStep: physicsStep};
+             elm.Step = {_op: _op, gamePaused: gamePaused, noStep: noStep, step: step, updateMode: updateMode, rotateFocus: rotateFocus, setStage: setStage, build: build, updatePhantom: updatePhantom, focusControls: focusControls, entityPureStep: entityPureStep, physicsStep: physicsStep};
              return elm.Step;
            };Elm.ShipWright = function (elm)
                  {
@@ -505,6 +533,57 @@
                    Public.Vec2 = Public.Vec2 || {};
                    Public.Vec2.Vec2 = Elm.Public.Vec2.Vec2(elm);
                    var _op = {};
+                   var walkLocalDisp = F2(function (placement,e)
+                                          {
+                                            return function ()
+                                                   {
+                                                     var labelStruct = Types.labelBeams(e.cache.structure);
+                                                     var dispPart = Utils.cnst(Maybe.Nothing);
+                                                     var dispLabelBeam = F2(function (b,subs)
+                                                                            {
+                                                                              return _N.eq(placement.id,
+                                                                                           b.id) ? Maybe.Just({_: {}, x: placement.offset, y: 0}) : function ()
+                                                                                                                                                    {
+                                                                                                                                                      var _case0 = Maybe.justs(subs);
+                                                                                                                                                      switch (_case0.ctor)
+                                                                                                                                                      {case
+                                                                                                                                                       "::" :
+                                                                                                                                                         switch (_case0._1.ctor)
+                                                                                                                                                         {case
+                                                                                                                                                          "[]" :
+                                                                                                                                                            return Maybe.Just(_case0._0);}
+                                                                                                                                                         return Maybe.Just(_case0._0);
+                                                                                                                                                       case
+                                                                                                                                                       "[]" :
+                                                                                                                                                         return Maybe.Nothing;}
+                                                                                                                                                      _E.Case($moduleName,
+                                                                                                                                                              "between lines 104 and 108");
+                                                                                                                                                    }();
+                                                                            });
+                                                     var dispAttach = F2(function (a,sub)
+                                                                         {
+                                                                           return function ()
+                                                                                  {
+                                                                                    switch (sub.ctor)
+                                                                                    {case
+                                                                                     "Just" :
+                                                                                       return Maybe.Just(A2(Types.translateAttach,
+                                                                                                            a,
+                                                                                                            sub._0));
+                                                                                     case
+                                                                                     "Nothing" :
+                                                                                       return Maybe.Nothing;}
+                                                                                    _E.Case($moduleName,
+                                                                                            "between lines 108 and 111");
+                                                                                  }();
+                                                                         });
+                                                     return A4(Public.TagTree.TagTree.foldTagTree,
+                                                               dispPart,
+                                                               dispLabelBeam,
+                                                               dispAttach,
+                                                               labelStruct);
+                                                   }();
+                                          });
                    var pointDist = F2(function (pointerV,bp)
                                       {
                                         return function ()
@@ -650,7 +729,7 @@
                                                          "Nothing" :
                                                            return state;}
                                                         _E.Case($moduleName,
-                                                                "between lines 121 and 126");
+                                                                "between lines 138 and 143");
                                                       }();
                                              }();
                                     };
@@ -658,7 +737,7 @@
                                        {
                                          return {_: {}, end: c, id: a, start: b};
                                        });
-                   elm.ShipWright = {_op: _op, dimensions: dimensions, buildPoints: buildPoints, pointDist: pointDist, compareDists: compareDists, minPointDist: minPointDist, bestPlacement: bestPlacement, placeStructure: placeStructure, placePhantomPart: placePhantomPart, addPhantom: addPhantom, BuildPoint: BuildPoint};
+                   elm.ShipWright = {_op: _op, dimensions: dimensions, buildPoints: buildPoints, pointDist: pointDist, compareDists: compareDists, minPointDist: minPointDist, bestPlacement: bestPlacement, walkLocalDisp: walkLocalDisp, placeStructure: placeStructure, placePhantomPart: placePhantomPart, addPhantom: addPhantom, BuildPoint: BuildPoint};
                    return elm.ShipWright;
                  };Elm.Main = function (elm)
            {
@@ -937,11 +1016,6 @@
                                                               {ctor: "_Tuple2", _0: Char.toCode("c"), _1: Types.Cycle},
                                                               {ctor: "_Tuple2", _0: 27, _1: Types.Exit}]));
                    var ticks = A2(Signal._op["<~"],Types.FPS,Time.fps(25));
-                   var pointer = A2(Signal._op["<~"],
-                                    Types.Pointer,
-                                    A2(Signal._op["~"],
-                                       A2(Signal._op["<~"],Utils.convertPos,Window.dimensions),
-                                       Mouse.position));
                    var modeKeysDown = function ()
                                       {
                                         var watchKeys = Dict.toList(watchKeymap);
@@ -957,7 +1031,7 @@
                                                                                                                    Basics.id,
                                                                                                                    true)(Keyboard.isDown(arg0._0)));}
                                                                      _E.Case($moduleName,
-                                                                             "on line 73, column 38 to 87");
+                                                                             "on line 76, column 38 to 87");
                                                                    }();
                                                           },
                                                           watchKeys);
@@ -978,6 +1052,12 @@
                                              A2(Signal._op["<~"],override,brakes),
                                              controls);
                                  }();
+                   var dimensions = Window.dimensions;
+                   var pointer = A2(Signal._op["<~"],
+                                    Types.Pointer,
+                                    A2(Signal._op["~"],
+                                       A2(Signal._op["<~"],Utils.convertPos,dimensions),
+                                       Mouse.position));
                    var clicks = A2(Signal._op["<~"],
                                    Utils.cnst(Types.Click),
                                    Mouse.clicks);
@@ -995,9 +1075,9 @@
                                                                             return {_: {}, engines: engines, trigger: trigger, window: window};
                                                                           }),
                                                                        engines),
-                                                                    Window.dimensions),
+                                                                    dimensions),
                                                                  triggers));
-                   elm.GameInputs = {_op: _op, gameInputs: gameInputs, engines: engines, triggers: triggers, clicks: clicks, watchKeymap: watchKeymap, modeKeysDown: modeKeysDown, modes: modes, ticks: ticks, pointer: pointer};
+                   elm.GameInputs = {_op: _op, gameInputs: gameInputs, dimensions: dimensions, engines: engines, triggers: triggers, clicks: clicks, watchKeymap: watchKeymap, modeKeysDown: modeKeysDown, modes: modes, ticks: ticks, pointer: pointer};
                    return elm.GameInputs;
                  };Elm.Physics = function (elm)
               {
@@ -1459,6 +1539,10 @@
                                              _E.Case($moduleName,"between lines 39 and 41");
                                            }();
                                   });
+              var prepend = F2(function (p,s)
+                               {
+                                 return _L.append(p,s);
+                               });
               var genGameStateCache = F2(function (focus,entities)
                                          {
                                            return function ()
@@ -1535,7 +1619,7 @@
                             {
                               return x;
                             });
-              elm.Utils = {_op: _op, cnst: cnst, convertPos: convertPos, combineSElems: combineSElems, spaceBlack: spaceBlack, controlEngines: controlEngines, updateDict: updateDict, genGameStateCache: genGameStateCache};
+              elm.Utils = {_op: _op, cnst: cnst, convertPos: convertPos, combineSElems: combineSElems, spaceBlack: spaceBlack, controlEngines: controlEngines, updateDict: updateDict, genGameStateCache: genGameStateCache, prepend: prepend};
               return elm.Utils;
             };Elm.Types = function (elm)
             {
@@ -1630,6 +1714,10 @@
                               {
                                 return {_: {}, disp: a, force: b};
                               });
+              var Rotate = function (a)
+                           {
+                             return {ctor: "Rotate", _0: a};
+                           };
               var Reverse = {ctor: "Reverse"};
               var Pointer = function (a)
                             {
@@ -1639,6 +1727,7 @@
                           {
                             return {ctor: "Point", _0: a};
                           };
+              var Place = {ctor: "Place"};
               var Pause = {ctor: "Pause"};
               var ParallelAxis = function (a)
                                  {
@@ -1709,10 +1798,14 @@
               var Disabled = {ctor: "Disabled"};
               var Cycle = {ctor: "Cycle"};
               var Click = {ctor: "Click"};
-              var BuildMode = F3(function (a,b,c)
+              var BuildMode = F5(function (a,b,c,d,e)
                                  {
-                                   return {_: {}, entity: a, part: c, placement: b};
+                                   return {_: {}, entity: a, orientation: c, part: e, placement: d, stage: b};
                                  });
+              var BuildCache = function (a)
+                               {
+                                 return {_: {}, localDisp: a};
+                               };
               var Brakes = {ctor: "Brakes"};
               var Brain = function (a)
                           {
@@ -1726,7 +1819,7 @@
                               {
                                 return {_: {}, offset: a, theta: b};
                               });
-              elm.Types = {_op: _op, translateAttach: translateAttach, beam: beam, part: part, fresh: fresh, labelBeams: labelBeams, Disabled: Disabled, Forward: Forward, Reverse: Reverse, TurnLeft: TurnLeft, TurnRight: TurnRight, Brain: Brain, FuelTank: FuelTank, Engine: Engine, Point: Point, ParallelAxis: ParallelAxis, Brakes: Brakes, Click: Click, Modal: Modal, FPS: FPS, Pointer: Pointer, Pause: Pause, Cycle: Cycle, Exit: Exit, Number: Number, Attach: Attach, Beam: Beam, LabelBeamExt: LabelBeamExt, Thrust: Thrust, MotionState: MotionState, MotionDelta: MotionDelta, Entity: Entity, EntityCache: EntityCache, GameInput: GameInput, GameState: GameState, GameStateCache: GameStateCache, Mode: Mode, LabelDist: LabelDist, BuildMode: BuildMode};
+              elm.Types = {_op: _op, translateAttach: translateAttach, beam: beam, part: part, fresh: fresh, labelBeams: labelBeams, Disabled: Disabled, Forward: Forward, Reverse: Reverse, TurnLeft: TurnLeft, TurnRight: TurnRight, Brain: Brain, FuelTank: FuelTank, Engine: Engine, Point: Point, ParallelAxis: ParallelAxis, Brakes: Brakes, Click: Click, Modal: Modal, FPS: FPS, Pointer: Pointer, Pause: Pause, Cycle: Cycle, Exit: Exit, Number: Number, Place: Place, Rotate: Rotate, Attach: Attach, Beam: Beam, LabelBeamExt: LabelBeamExt, Thrust: Thrust, MotionState: MotionState, MotionDelta: MotionDelta, Entity: Entity, EntityCache: EntityCache, GameInput: GameInput, GameState: GameState, GameStateCache: GameStateCache, Mode: Mode, LabelDist: LabelDist, BuildCache: BuildCache, BuildMode: BuildMode};
               return elm.Types;
             };Elm.Public = Elm.Public || {};
 Elm.Public.TagTree = Elm.Public.TagTree || {};
