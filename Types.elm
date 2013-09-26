@@ -119,7 +119,7 @@ type Mode = { pause : Bool, build : BuildMode }
 
 type LabelDist = { id:Int, r:Float, offset:Float }
 
-type BuildCache = { localDisp : Vec2 }
+type BuildCache = { localDisp : Vec2, relOrientation : Float }
 
 data BuildStage
   = Place

@@ -96,20 +96,23 @@ bestPlacement : Vec2 -> Entity -> LabelDist
 bestPlacement localPointerV entity =
   minPointDist localPointerV . buildPoints . labelBeams <| entity.cache.structure
 
-walkLocalDisp : LabelDist -> Entity -> Maybe Vec2
+walkLocalDisp : LabelDist -> Entity -> Maybe BuildCache
 walkLocalDisp placement e = 
   let labelStruct = labelBeams e.cache.structure
       dispPart = cnst Nothing
       dispLabelBeam b subs =
         if placement.id == b.id
-        then Just { x = placement.offset, y = 0 }
+        then Just 
+          { localDisp = { x = placement.offset, y = 0 }
+          , relOrientation = 0 }
         else case justs subs of
           [] -> Nothing
           [v] -> Just v
           (v::vs) -> Just v
       dispAttach a sub = case sub of
         Nothing -> Nothing
-        Just v -> Just <| translateAttach a v
+        Just {localDisp,relOrientation} -> 
+          Just <| BuildCache (translateAttach a localDisp) (relOrientation + a.theta)
   in foldTagTree dispPart dispLabelBeam dispAttach labelStruct
 
 
@@ -133,7 +136,7 @@ placePhantomPart p theta best e =
       newCache = genEntityCache s
   in { e | cache <- newCache }
 
-fixPhantom : GameState -> Maybe Vec2
+fixPhantom : GameState -> Maybe BuildCache
 fixPhantom state = 
   let buildMode = state.mode.build
       e = D.lookup buildMode.entity state.entities

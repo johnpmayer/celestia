@@ -140,8 +140,8 @@ build =
           Place -> 
             case fixPhantom state of
               Nothing -> noStep
-              Just localDisp ->
-                setStage <| Rotate <| BuildCache localDisp
+              Just cache ->
+                setStage <| Rotate cache
           Rotate cache -> 
             ST.updateS addPhantom >>= (\_ ->
             setStage Place))
@@ -172,10 +172,11 @@ updatePhantom pointer =
                     newMode = { mode | build <- newBuildMode }
                     newState = { state | mode <- newMode }
                 in ST.put newState
-              Rotate { localDisp } -> 
+              Rotate { localDisp, relOrientation } -> 
                 let dispPointer = V.subVec localDisp localPointerV
                     absRotate = atan2 dispPointer.y dispPointer.x
-                    newBuildMode = { buildMode | absRotate <- Just absRotate }
+                    localRotate = absRotate - relOrientation 
+                    newBuildMode = { buildMode | absRotate <- Just localRotate }
                     newMode = { mode | build <- newBuildMode }
                     newState = { state | mode <- newMode }
                 in ST.put newState
