@@ -26,6 +26,7 @@ import Mouse as M
 import Dict as D
 
 import open Draw
+import open Physics
 import open Public.TagTree.TagTree
 import open Types
 import open Utils
@@ -129,7 +130,8 @@ placePhantomPart : Part -> Float -> LabelDist -> Entity -> Entity
 placePhantomPart p theta best e =
   let c = e.cache
       s = placeStructure p theta best e
-  in { e | cache <- { c | structure <- s } }
+      newCache = genEntityCache s
+  in { e | cache <- newCache }
 
 fixPhantom : GameState -> Maybe Vec2
 fixPhantom state = 

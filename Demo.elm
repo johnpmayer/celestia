@@ -42,7 +42,7 @@ import ShipWright (addPhantom)
 {- Setup initial game state and initialize the loop -}
 
 spine : Structure
-spine = beam {r = 200} [] 
+spine = beam {r = 200} [ ( { offset=150, theta=(pi/2) }, beam { r=40 } [] ) ] 
 
 station : Entity
 station = { controls = Right [], motion = { pos = { x = 0, y = 200, theta = 0 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genEntityCache spine }
