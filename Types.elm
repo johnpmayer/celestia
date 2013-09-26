@@ -32,10 +32,7 @@ import open Public.Vec2.Vec2
 type Attach = { offset : Float, theta : Float }
 
 translateAttach : Attach -> Vec2Ext a -> Vec2Ext a
-translateAttach attach vext = 
-  let dX = attach.offset * cos attach.theta
-      dY = attach.offset * sin attach.theta
-  in addVec { x = dX, y = dY } vext
+translateAttach {offset,theta} = addVec {x=offset,y=0} . rotVec theta
 
 type Beam = { r : Float }
 

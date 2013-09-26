@@ -204,10 +204,9 @@ updateBrakes cache state =
 
 updateMotion : EntityCache -> MotionDelta -> MotionState -> MotionState
 updateMotion cache delta state = 
-  let newOmega = delta.alpha + state.omega
-      midOmega = (state.omega + newOmega) / 2
+  let newOmega = state.omega + delta.alpha
       oldTheta = state.pos.theta
-      newTheta = oldTheta + midOmega
+      newTheta = oldTheta + state.omega
       absA = rotVec oldTheta delta.a
       newV = addVec absA state.v
       midV = midVec state.v newV

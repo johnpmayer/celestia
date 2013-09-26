@@ -89,5 +89,6 @@ main = combineSElems outward <|
   , combineSElems down
     [ (color white . asText . prepend "Focus " . show . .focus) <~ current
     , (color white . asText . prepend "Build " . show . .build . .mode) <~ current
+    , (color white . asText . prepend "Ship4 " . show . D.lookup 4 . .entities) <~ current
     ]
   ]
