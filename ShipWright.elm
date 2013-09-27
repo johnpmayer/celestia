@@ -32,39 +32,6 @@ import open Types
 import open Utils
 import open Public.Vec2.Vec2
 
-dimensions = (800,600)
-
-{-
-
-gamePointer = (convertPos dimensions) <~ M.position
-
-initialShip = beam {r=100} <|
-  [ ({offset=70,theta=(pi/2)}, beam {r=30} [])
-  , ({offset=40,theta=(-pi/2)}, beam {r=60} [])
-  ]
-
-stopped = { v = origin, pos = {x=0,y=0,theta=0}, omega = 0} 
-
-ship = foldp (flip cnst  initialShip (constant ())
-
-shipWith = (placeStructure (Brain {r=10})) <~ gamePointer ~ ship
-
-display = drawStructure 0 []
-
-space = (\sfs -> spaceBlack dimensions <~ combine sfs)
-  [ display <~ shipWith ]
-
-main = combineSElems <|
-  [ space
-  , (asText . buildPoints . labelBeams) <~ ship
-  , asText <~ (bestPlacement <~ gamePointer ~ ship)
-  ]
--}
-
-{- Hard Stuff -}
-
-type BuildPoint = {id : Int, start : Vec2, end : Vec2}
-
 buildPoints : LabelStructure -> [BuildPoint]
 buildPoints = 
   let partPoints = cnst []
@@ -119,12 +86,13 @@ walkLocalDisp placement e =
 placeStructure : Structure -> Float -> LabelDist -> Entity -> Structure
 placeStructure placeS theta best e =
   let s = e.cache.structure
+      roundTheta = rndModulo (pi/12) theta
   in  if best.id < 0
       then s
       else
         let placeBeam b subs = beam {b - id} <|
               if best.id == b.id
-              then ({offset=best.offset,theta=theta}, placeS) :: subs
+              then ({offset=best.offset,theta=roundTheta}, placeS) :: subs
               else subs
         in foldTagTree' part placeBeam <| labelBeams s
 

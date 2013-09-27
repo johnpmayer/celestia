@@ -66,3 +66,6 @@ genGameStateCache focus entities =
 
 prepend : String -> String -> String
 prepend p s = p ++ s
+
+rndModulo : Float -> Float -> Float
+rndModulo f n = f * (toFloat (round (n / f)))
