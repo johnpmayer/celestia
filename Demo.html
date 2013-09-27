@@ -715,7 +715,7 @@
                                                                                                                                                                                               "[]" :
                                                                                                                                                                                                 return Maybe.Nothing;}
                                                                                                                                                                                              _E.Case($moduleName,
-                                                                                                                                                                                                     "between lines 108 and 112");
+                                                                                                                                                                                                     "between lines 75 and 79");
                                                                                                                                                                                            }();
                                                                             });
                                                      var dispAttach = F2(function (a,sub)
@@ -734,7 +734,7 @@
                                                                                      "Nothing" :
                                                                                        return Maybe.Nothing;}
                                                                                     _E.Case($moduleName,
-                                                                                            "between lines 112 and 116");
+                                                                                            "between lines 79 and 83");
                                                                                   }();
                                                                          });
                                                      return A4(Public.TagTree.TagTree.foldTagTree,
@@ -760,6 +760,9 @@
                                              return function ()
                                                     {
                                                       var s = e.cache.structure;
+                                                      var roundTheta = A2(Utils.rndModulo,
+                                                                          Basics.pi / 12,
+                                                                          theta);
                                                       return _N.cmp(best.id,0) < 0 ? s : function ()
                                                                                          {
                                                                                            var placeBeam = F2(function (b,
@@ -767,7 +770,7 @@
                                                                                                               {
                                                                                                                 return Types.beam(_N.remove("id",
                                                                                                                                             b))(_N.eq(best.id,
-                                                                                                                                                      b.id) ? {ctor: "::", _0: {ctor: "_Tuple2", _0: {_: {}, offset: best.offset, theta: theta}, _1: placeS}, _1: subs} : subs);
+                                                                                                                                                      b.id) ? {ctor: "::", _0: {ctor: "_Tuple2", _0: {_: {}, offset: best.offset, theta: roundTheta}, _1: placeS}, _1: subs} : subs);
                                                                                                               });
                                                                                            return A2(Public.TagTree.TagTree.foldTagTree$,
                                                                                                      Types.part,
@@ -813,7 +816,6 @@
                                                       }();
                                              }();
                                     };
-                   var dimensions = {ctor: "_Tuple2", _0: 800, _1: 600};
                    var compareDists = F2(function (p1,p2)
                                          {
                                            return _N.cmp(p1.r,p2.r) < 0 ? p1 : p2;
@@ -936,11 +938,7 @@
                                                       }();
                                              }();
                                     };
-                   var BuildPoint = F3(function (a,b,c)
-                                       {
-                                         return {_: {}, end: c, id: a, start: b};
-                                       });
-                   elm.ShipWright = {_op: _op, dimensions: dimensions, buildPoints: buildPoints, pointDist: pointDist, compareDists: compareDists, minPointDist: minPointDist, bestPlacement: bestPlacement, walkLocalDisp: walkLocalDisp, placeStructure: placeStructure, placePhantomPart: placePhantomPart, fixPhantom: fixPhantom, addPhantom: addPhantom, BuildPoint: BuildPoint};
+                   elm.ShipWright = {_op: _op, buildPoints: buildPoints, pointDist: pointDist, compareDists: compareDists, minPointDist: minPointDist, bestPlacement: bestPlacement, walkLocalDisp: walkLocalDisp, placeStructure: placeStructure, placePhantomPart: placePhantomPart, fixPhantom: fixPhantom, addPhantom: addPhantom};
                    return elm.ShipWright;
                  };Elm.Main = function (elm)
            {
@@ -1741,6 +1739,10 @@
                                              _E.Case($moduleName,"between lines 39 and 41");
                                            }();
                                   });
+              var rndModulo = F2(function (f,n)
+                                 {
+                                   return f * Basics.toFloat(Basics.round(n / f));
+                                 });
               var prepend = F2(function (p,s)
                                {
                                  return _L.append(p,s);
@@ -1821,7 +1823,7 @@
                             {
                               return x;
                             });
-              elm.Utils = {_op: _op, cnst: cnst, convertPos: convertPos, combineSElems: combineSElems, spaceBlack: spaceBlack, controlEngines: controlEngines, updateDict: updateDict, genGameStateCache: genGameStateCache, prepend: prepend};
+              elm.Utils = {_op: _op, cnst: cnst, convertPos: convertPos, combineSElems: combineSElems, spaceBlack: spaceBlack, controlEngines: controlEngines, updateDict: updateDict, genGameStateCache: genGameStateCache, prepend: prepend, rndModulo: rndModulo};
               return elm.Utils;
             };Elm.Types = function (elm)
             {
@@ -1999,6 +2001,10 @@
               var Disabled = {ctor: "Disabled"};
               var Cycle = {ctor: "Cycle"};
               var Click = {ctor: "Click"};
+              var BuildPoint = F3(function (a,b,c)
+                                  {
+                                    return {_: {}, end: c, id: a, start: b};
+                                  });
               var BuildMode = F5(function (a,b,c,d,e)
                                  {
                                    return {_: {}, absRotate: c, entity: a, part: e, placement: d, stage: b};
@@ -2020,7 +2026,7 @@
                               {
                                 return {_: {}, offset: a, theta: b};
                               });
-              elm.Types = {_op: _op, translateAttach: translateAttach, beam: beam, part: part, fresh: fresh, labelBeams: labelBeams, Disabled: Disabled, Forward: Forward, Reverse: Reverse, TurnLeft: TurnLeft, TurnRight: TurnRight, Brain: Brain, FuelTank: FuelTank, Engine: Engine, Point: Point, ParallelAxis: ParallelAxis, Brakes: Brakes, Click: Click, Modal: Modal, FPS: FPS, Pointer: Pointer, Pause: Pause, Cycle: Cycle, Exit: Exit, Number: Number, Place: Place, Rotate: Rotate, Attach: Attach, Beam: Beam, LabelBeamExt: LabelBeamExt, Thrust: Thrust, MotionState: MotionState, MotionDelta: MotionDelta, Entity: Entity, EntityCache: EntityCache, GameInput: GameInput, GameState: GameState, GameStateCache: GameStateCache, Mode: Mode, LabelDist: LabelDist, BuildCache: BuildCache, BuildMode: BuildMode};
+              elm.Types = {_op: _op, translateAttach: translateAttach, beam: beam, part: part, fresh: fresh, labelBeams: labelBeams, Disabled: Disabled, Forward: Forward, Reverse: Reverse, TurnLeft: TurnLeft, TurnRight: TurnRight, Brain: Brain, FuelTank: FuelTank, Engine: Engine, Point: Point, ParallelAxis: ParallelAxis, Brakes: Brakes, Click: Click, Modal: Modal, FPS: FPS, Pointer: Pointer, Pause: Pause, Cycle: Cycle, Exit: Exit, Number: Number, Place: Place, Rotate: Rotate, Attach: Attach, Beam: Beam, LabelBeamExt: LabelBeamExt, Thrust: Thrust, MotionState: MotionState, MotionDelta: MotionDelta, Entity: Entity, EntityCache: EntityCache, GameInput: GameInput, GameState: GameState, GameStateCache: GameStateCache, Mode: Mode, LabelDist: LabelDist, BuildPoint: BuildPoint, BuildCache: BuildCache, BuildMode: BuildMode};
               return elm.Types;
             };Elm.Public = Elm.Public || {};
 Elm.Public.TagTree = Elm.Public.TagTree || {};

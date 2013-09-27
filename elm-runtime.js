@@ -482,6 +482,9 @@ Elm.Native.Utils = function(elm) {
     function min(a,b) { return a < b ? a : b }
 
     function mod(a,b) {
+        if (b === 0) {
+            throw new Error("Cannot perform mod 0. Division by zero error.");
+        }
         var r = a % b;
         var m = a === 0 ? 0 : (b > 0 ? (a >= 0 ? r : r+b) : -mod(-a,-b));
 
@@ -496,11 +499,11 @@ Elm.Native.Utils = function(elm) {
         t.style.styleFloat = "left";
         t.style.cssFloat   = "left";
 
-        elm.node.appendChild(t);
+        document.body.appendChild(t);
         var style = window.getComputedStyle(t, null);
         var w = Math.ceil(style.getPropertyValue("width").slice(0,-2) - 0);
         var h = Math.ceil(style.getPropertyValue("height").slice(0,-2) - 0);
-        elm.node.removeChild(t);
+        document.body.removeChild(t);
         return Tuple2(w,h);
     }
 
@@ -1459,6 +1462,47 @@ Elm.Native.Json = function(elm) {
       fromJSObject : toValue
   };
 
+};
+Elm.Native.CLI = function(elm) {
+  'use strict';
+  elm.Native = elm.Native || {};
+  if (elm.Native.CLI) return elm.Native.CLI;
+
+  var rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  var Signal = Elm.Signal(elm);
+
+  var stdin = Signal.constant('');
+
+  /* Signal JSString */
+  rl.on('line', function(line) {
+    elm.notify(stdin.id, line);
+  });
+
+  /* Signal JSString -> Signal JSString */
+  var stdouteffect = function(input) {
+    var first = true;
+
+    var print = function(line) {
+      if (first) {
+        first = false;
+        return line;
+      }
+      rl.write(line + '\n');
+      return line;
+    }
+
+    var node = Signal.lift(print)(input);
+    return node;
+  }
+
+  return elm.Native.CLI = {
+    stdin : stdin,
+    stdouteffect : stdouteffect
+  };
 };
 
 Elm.Native.Random = function(elm) {
@@ -2654,7 +2698,7 @@ Elm.Color = function (elm)
               var rgba = Color;
               var white = A4(Color,255,255,255,1);
               var yellow = A4(Color,237,212,0,1);
-              elm.Color = {_op: _op, rgba: rgba, rgb: rgb, lightYellow: lightYellow, yellow: yellow, darkYellow: darkYellow, lightOrange: lightOrange, orange: orange, darkOrange: darkOrange, lightBrown: lightBrown, brown: brown, darkBrown: darkBrown, lightGreen: lightGreen, green: green, darkGreen: darkGreen, lightBlue: lightBlue, blue: blue, darkBlue: darkBlue, lightPurple: lightPurple, purple: purple, darkPurple: darkPurple, lightRed: lightRed, red: red, darkRed: darkRed, black: black, white: white, lightGrey: lightGrey, grey: grey, darkGrey: darkGrey, lightGray: lightGray, gray: gray, darkGray: darkGray, lightCharcoal: lightCharcoal, charcoal: charcoal, darkCharcoal: darkCharcoal, grayscale: grayscale, greyscale: greyscale, complement: complement, hsva: hsva, hsv: hsv, linear: linear, radial: radial, Color: Color, Linear: Linear, Radial: Radial};
+              elm.Color = {_op: _op, rgba: rgba, rgb: rgb, lightRed: lightRed, red: red, darkRed: darkRed, lightOrange: lightOrange, orange: orange, darkOrange: darkOrange, lightYellow: lightYellow, yellow: yellow, darkYellow: darkYellow, lightGreen: lightGreen, green: green, darkGreen: darkGreen, lightBlue: lightBlue, blue: blue, darkBlue: darkBlue, lightPurple: lightPurple, purple: purple, darkPurple: darkPurple, lightBrown: lightBrown, brown: brown, darkBrown: darkBrown, black: black, white: white, lightGrey: lightGrey, grey: grey, darkGrey: darkGrey, lightGray: lightGray, gray: gray, darkGray: darkGray, lightCharcoal: lightCharcoal, charcoal: charcoal, darkCharcoal: darkCharcoal, grayscale: grayscale, greyscale: greyscale, complement: complement, hsva: hsva, hsv: hsv, linear: linear, radial: radial, Color: Color, Linear: Linear, Radial: Radial};
               return elm.Color;
             };Elm.Basics = function (elm)
              {
@@ -2746,22 +2790,18 @@ Elm.Color = function (elm)
                                         switch (arg0.ctor)
                                         {case
                                          "_Tuple2" :
-                                           return {ctor: "_Tuple2", _0: Native.Basics.sqrt(A2(_op["+"],
-                                                                                              A2(_op["^"],
-                                                                                                 arg0._0,
-                                                                                                 2),
-                                                                                              A2(_op["^"],
-                                                                                                 arg0._1,
-                                                                                                 2))), _1: A2(Native.Basics.atan2,
-                                                                                                              arg0._1,
-                                                                                                              arg0._0)};}
-                                        _E.Case($moduleName,"on line 29, column 18 to 73");
+                                           return {ctor: "_Tuple2", _0: Native.Basics.sqrt(Math.pow(arg0._0,
+                                                                                                    2) + Math.pow(arg0._1,
+                                                                                                                  2)), _1: A2(Native.Basics.atan2,
+                                                                                                                              arg0._1,
+                                                                                                                              arg0._0)};}
+                                        _E.Case($moduleName,"on line 78, column 18 to 73");
                                       }();
                              };
                _op["*"] = Native.Basics.mul;
                var degrees = function (d)
                              {
-                               return A2(_op["/"],A2(_op["*"],d,Native.Basics.pi),180);
+                               return d * Native.Basics.pi / 180;
                              };
                var fromPolar = function (arg0)
                                {
@@ -2770,20 +2810,16 @@ Elm.Color = function (elm)
                                           switch (arg0.ctor)
                                           {case
                                            "_Tuple2" :
-                                             return {ctor: "_Tuple2", _0: A2(_op["*"],
-                                                                             arg0._0,
-                                                                             Native.Basics.cos(arg0._1)), _1: A2(_op["*"],
-                                                                                                                 arg0._0,
-                                                                                                                 Native.Basics.sin(arg0._1))};}
-                                          _E.Case($moduleName,"on line 24, column 20 to 68");
+                                             return {ctor: "_Tuple2", _0: arg0._0 * Native.Basics.cos(arg0._1), _1: arg0._0 * Native.Basics.sin(arg0._1)};}
+                                          _E.Case($moduleName,"on line 72, column 20 to 68");
                                         }();
                                };
                var turns = function (r)
                            {
-                             return A2(_op["*"],A2(_op["*"],2,Native.Basics.pi),r);
+                             return 2 * Native.Basics.pi * r;
                            };
                _op["&&"] = Native.Basics.and;
-               elm.Basics = {_op: _op, radians: radians, degrees: degrees, turns: turns, fromPolar: fromPolar, toPolar: toPolar, div: div, rem: rem, mod: mod, cos: cos, sin: sin, tan: tan, acos: acos, asin: asin, atan: atan, atan2: atan2, sqrt: sqrt, abs: abs, logBase: logBase, min: min, max: max, clamp: clamp, pi: pi, e: e, compare: compare, xor: xor, not: not, otherwise: otherwise, round: round, truncate: truncate, floor: floor, ceiling: ceiling, toFloat: toFloat, id: id, fst: fst, snd: snd, flip: flip, curry: curry, uncurry: uncurry, LT: LT, EQ: EQ, GT: GT};
+               elm.Basics = {_op: _op, radians: radians, degrees: degrees, turns: turns, fromPolar: fromPolar, toPolar: toPolar, div: div, rem: rem, mod: mod, cos: cos, sin: sin, tan: tan, acos: acos, asin: asin, atan: atan, atan2: atan2, sqrt: sqrt, abs: abs, logBase: logBase, clamp: clamp, pi: pi, e: e, compare: compare, min: min, max: max, xor: xor, not: not, otherwise: otherwise, round: round, truncate: truncate, floor: floor, ceiling: ceiling, toFloat: toFloat, id: id, fst: fst, snd: snd, flip: flip, curry: curry, uncurry: uncurry, LT: LT, EQ: EQ, GT: GT};
                return elm.Basics;
              };Elm.Set = function (elm)
           {
@@ -2905,7 +2941,483 @@ Elm.Color = function (elm)
                          };
              elm.Json = {_op: _op, toString: toString, toJSString: toJSString, fromString: fromString, fromJSString: fromJSString, fromJSObject: fromJSObject, toJSObject: toJSObject, String: String, Number: Number, Boolean: Boolean, Null: Null, Array: Array, Object: Object};
              return elm.Json;
-           };Elm.Touch = function (elm)
+           };Elm.AutomatonV2 = function (elm)
+                  {
+                    if (elm.AutomatonV2)
+                    return elm.AutomatonV2;
+                    var N = Elm.Native,
+                        _N = N.Utils(elm),
+                        _L = N.List(elm),
+                        _E = N.Error(elm),
+                        _J = N.JavaScript(elm),
+                        _str = _J.toString,
+                        $moduleName = "AutomatonV2";
+                    var Basics = Elm.Basics(elm);
+                    var Signal = Elm.Signal(elm);
+                    var List = Elm.List(elm);
+                    var Maybe = Elm.Maybe(elm);
+                    var _op = {};
+                    var enqueue = F2(function (x,arg0)
+                                     {
+                                       return function ()
+                                              {
+                                                switch (arg0.ctor)
+                                                {case
+                                                 "_Tuple2" :
+                                                   return {ctor: "_Tuple2", _0: {ctor: "::", _0: x, _1: arg0._0}, _1: arg0._1};}
+                                                _E.Case($moduleName,"on line 120, column 22 to 31");
+                                              }();
+                                     });
+                    var empty = {ctor: "_Tuple2", _0: _J.toList([]), _1: _J.toList([])};
+                    var dequeue = function (q)
+                                  {
+                                    return function ()
+                                           {
+                                             switch (q.ctor)
+                                             {case
+                                              "_Tuple2" :
+                                                switch (q._0.ctor)
+                                                {case
+                                                 "[]" :
+                                                   switch (q._1.ctor)
+                                                   {case
+                                                    "[]" :
+                                                      return Maybe.Nothing;}}
+                                                switch (q._1.ctor)
+                                                {case
+                                                 "::" :
+                                                   return Maybe.Just({ctor: "_Tuple2", _0: q._1._0, _1: {ctor: "_Tuple2", _0: q._0, _1: q._1._1}});
+                                                 case
+                                                 "[]" :
+                                                   return dequeue({ctor: "_Tuple2", _0: _J.toList([]), _1: List.reverse(q._0)});}}
+                                             _E.Case($moduleName,"between lines 121 and 124");
+                                           }();
+                                  };
+                    var Stateful = F2(function (a,b)
+                                      {
+                                        return {ctor: "Stateful", _0: a, _1: b};
+                                      });
+                    var Pure = function (a)
+                               {
+                                 return {ctor: "Pure", _0: a};
+                               };
+                    var andThen = F2(function (first,second)
+                                     {
+                                       return function ()
+                                              {
+                                                switch (first.ctor)
+                                                {case
+                                                 "Pure" :
+                                                   return function ()
+                                                          {
+                                                            switch (second.ctor)
+                                                            {case
+                                                             "Pure" :
+                                                               return Pure(function ($)
+                                                                           {
+                                                                             return second._0(first._0($));
+                                                                           });
+                                                             case
+                                                             "Stateful" :
+                                                               return A2(Stateful,
+                                                                         second._0,
+                                                                         function (i)
+                                                                         {
+                                                                           return second._1(first._0(i));
+                                                                         });}
+                                                            _E.Case($moduleName,
+                                                                    "between lines 25 and 28");
+                                                          }();
+                                                 case
+                                                 "Stateful" :
+                                                   return function ()
+                                                          {
+                                                            switch (second.ctor)
+                                                            {case
+                                                             "Pure" :
+                                                               return A2(Stateful,
+                                                                         first._0,
+                                                                         F2(function (i,st)
+                                                                            {
+                                                                              return function ()
+                                                                                     {
+                                                                                       var $ = A2(first._1,
+                                                                                                  i,
+                                                                                                  st),
+                                                                                           inter = $._0,
+                                                                                           st$ = $._1;
+                                                                                       return {ctor: "_Tuple2", _0: second._0(inter), _1: st$};
+                                                                                     }();
+                                                                            }));
+                                                             case
+                                                             "Stateful" :
+                                                               return A2(Stateful,
+                                                                         {ctor: "_Tuple2", _0: first._0, _1: second._0},
+                                                                         F2(function (i,arg0)
+                                                                            {
+                                                                              return function ()
+                                                                                     {
+                                                                                       switch (arg0.ctor)
+                                                                                       {case
+                                                                                        "_Tuple2" :
+                                                                                          return function ()
+                                                                                                 {
+                                                                                                   var $ = A2(first._1,
+                                                                                                              i,
+                                                                                                              arg0._0),
+                                                                                                       inter = $._0,
+                                                                                                       fst$ = $._1;
+                                                                                                   var $ = A2(second._1,
+                                                                                                              inter,
+                                                                                                              arg0._1),
+                                                                                                       o = $._0,
+                                                                                                       sst$ = $._1;
+                                                                                                   return {ctor: "_Tuple2", _0: o, _1: {ctor: "_Tuple2", _0: fst$, _1: sst$}};
+                                                                                                 }();}
+                                                                                       _E.Case($moduleName,
+                                                                                               "between lines 33 and 35");
+                                                                                     }();
+                                                                            }));}
+                                                            _E.Case($moduleName,
+                                                                    "between lines 28 and 35");
+                                                          }();}
+                                                _E.Case($moduleName,"between lines 24 and 35");
+                                              }();
+                                     });
+                    var extendDown = function (auto)
+                                     {
+                                       return function ()
+                                              {
+                                                switch (auto.ctor)
+                                                {case
+                                                 "Pure" :
+                                                   return Pure(function (arg0)
+                                                               {
+                                                                 return function ()
+                                                                        {
+                                                                          switch (arg0.ctor)
+                                                                          {case
+                                                                           "_Tuple2" :
+                                                                             return {ctor: "_Tuple2", _0: auto._0(arg0._0), _1: arg0._1};}
+                                                                          _E.Case($moduleName,
+                                                                                  "on line 40, column 45 to 57");
+                                                                        }();
+                                                               });
+                                                 case
+                                                 "Stateful" :
+                                                   return A2(Stateful,
+                                                             auto._0,
+                                                             F2(function (arg1,s)
+                                                                {
+                                                                  return function ()
+                                                                         {
+                                                                           switch (arg1.ctor)
+                                                                           {case
+                                                                            "_Tuple2" :
+                                                                              return {ctor: "_Tuple2", _0: A2(auto._1,
+                                                                                                              arg1._0,
+                                                                                                              s), _1: arg1._1};}
+                                                                           _E.Case($moduleName,
+                                                                                   "on line 41, column 56 to 70");
+                                                                         }();
+                                                                }));}
+                                                _E.Case($moduleName,"between lines 39 and 41");
+                                              }();
+                                     };
+                    var loop = F2(function (base,auto)
+                                  {
+                                    return function ()
+                                           {
+                                             switch (auto.ctor)
+                                             {case
+                                              "Pure" :
+                                                return A2(Stateful,base,Basics.curry(auto._0));
+                                              case
+                                              "Stateful" :
+                                                return function ()
+                                                       {
+                                                         var newFun = F2(function (i,arg0)
+                                                                         {
+                                                                           return function ()
+                                                                                  {
+                                                                                    switch (arg0.ctor)
+                                                                                    {case
+                                                                                     "_Tuple2" :
+                                                                                       return function ()
+                                                                                              {
+                                                                                                var $ = A2(auto._1,
+                                                                                                           {ctor: "_Tuple2", _0: i, _1: arg0._0},
+                                                                                                           arg0._1);
+                                                                                                var o = function ()
+                                                                                                        {
+                                                                                                          switch ($.ctor)
+                                                                                                          {case
+                                                                                                           "_Tuple2" :
+                                                                                                             switch ($._0.ctor)
+                                                                                                             {case
+                                                                                                              "_Tuple2" :
+                                                                                                                return $._0._0;}}
+                                                                                                          _E.Case($moduleName,
+                                                                                                                  "on line 49, column 28 to 41");
+                                                                                                        }();
+                                                                                                var s$ = function ()
+                                                                                                         {
+                                                                                                           switch ($.ctor)
+                                                                                                           {case
+                                                                                                            "_Tuple2" :
+                                                                                                              switch ($._0.ctor)
+                                                                                                              {case
+                                                                                                               "_Tuple2" :
+                                                                                                                 return $._0._1;}}
+                                                                                                           _E.Case($moduleName,
+                                                                                                                   "on line 49, column 28 to 41");
+                                                                                                         }();
+                                                                                                var s2$ = function ()
+                                                                                                          {
+                                                                                                            switch ($.ctor)
+                                                                                                            {case
+                                                                                                             "_Tuple2" :
+                                                                                                               switch ($._0.ctor)
+                                                                                                               {case
+                                                                                                                "_Tuple2" :
+                                                                                                                  return $._1;}}
+                                                                                                            _E.Case($moduleName,
+                                                                                                                    "on line 49, column 28 to 41");
+                                                                                                          }();
+                                                                                                return {ctor: "_Tuple2", _0: o, _1: {ctor: "_Tuple2", _0: s$, _1: s2$}};
+                                                                                              }();}
+                                                                                    _E.Case($moduleName,
+                                                                                            "between lines 49 and 50");
+                                                                                  }();
+                                                                         });
+                                                         return A2(Stateful,
+                                                                   {ctor: "_Tuple2", _0: base, _1: auto._0},
+                                                                   newFun);
+                                                       }();}
+                                             _E.Case($moduleName,"between lines 45 and 51");
+                                           }();
+                                  });
+                    var pure = Pure;
+                    var extendUp = function (auto)
+                                   {
+                                     return function ()
+                                            {
+                                              var swap = function (arg0)
+                                                         {
+                                                           return function ()
+                                                                  {
+                                                                    switch (arg0.ctor)
+                                                                    {case
+                                                                     "_Tuple2" :
+                                                                       return {ctor: "_Tuple2", _0: arg0._1, _1: arg0._0};}
+                                                                    _E.Case($moduleName,
+                                                                            "on line 88, column 22 to 26");
+                                                                  }();
+                                                         };
+                                              return A2(andThen,
+                                                        A2(andThen,pure(swap),extendDown(auto)),
+                                                        pure(swap));
+                                            }();
+                                   };
+                    var pair = F2(function (f,g)
+                                  {
+                                    return A2(andThen,extendDown(f),extendUp(g));
+                                  });
+                    var branch = F2(function (f,g)
+                                    {
+                                      return function ()
+                                             {
+                                               var $double = pure(function (i)
+                                                                  {
+                                                                    return {ctor: "_Tuple2", _0: i, _1: i};
+                                                                  });
+                                               return A2(andThen,$double,A2(pair,f,g));
+                                             }();
+                                    });
+                    var combi = F2(function (a1,a2)
+                                   {
+                                     return A2(andThen,
+                                               A2(branch,a1,a2),
+                                               pure(Basics.uncurry(F2(function (x,y)
+                                                                      {
+                                                                        return {ctor: "::", _0: x, _1: y};
+                                                                      }))));
+                                   });
+                    var combine = function (autos)
+                                  {
+                                    return function ()
+                                           {
+                                             var l = List.length(autos);
+                                             return _N.eq(l,0) ? pure(function (arg0)
+                                                                      {
+                                                                        return function ()
+                                                                               {
+                                                                                 return _J.toList([]);
+                                                                               }();
+                                                                      }) : A3(List.foldr,
+                                                                              combi,
+                                                                              A2(andThen,
+                                                                                 List.last(autos),
+                                                                                 pure(function (a)
+                                                                                      {
+                                                                                        return _J.toList([a]);
+                                                                                      })),
+                                                                              A2(List.take,
+                                                                                 l - 1,
+                                                                                 autos));
+                                           }();
+                                  };
+                    var hiddenState = F2(function (base,fun)
+                                         {
+                                           return A2(loop,
+                                                     base,
+                                                     pure(function (arg0)
+                                                          {
+                                                            return function ()
+                                                                   {
+                                                                     switch (arg0.ctor)
+                                                                     {case
+                                                                      "_Tuple2" :
+                                                                        return function ()
+                                                                               {
+                                                                                 var $ = A2(fun,
+                                                                                            arg0._0,
+                                                                                            arg0._1),
+                                                                                     o = $._0,
+                                                                                     s$ = $._1;
+                                                                                 return {ctor: "_Tuple2", _0: s$, _1: o};
+                                                                               }();}
+                                                                     _E.Case($moduleName,
+                                                                             "between lines 82 and 83");
+                                                                   }();
+                                                          }));
+                                         });
+                    var average = function (k)
+                                  {
+                                    return function ()
+                                           {
+                                             var stepFull = F2(function (n,arg0)
+                                                               {
+                                                                 return function ()
+                                                                        {
+                                                                          switch (arg0.ctor)
+                                                                          {case
+                                                                           "_Tuple3" :
+                                                                             return function ()
+                                                                                    {
+                                                                                      var _case66 = dequeue(arg0._0);
+                                                                                      switch (_case66.ctor)
+                                                                                      {case
+                                                                                       "Just" :
+                                                                                         switch (_case66._0.ctor)
+                                                                                         {case
+                                                                                          "_Tuple2" :
+                                                                                            return function ()
+                                                                                                   {
+                                                                                                     var sum$ = arg0._2 + n - _case66._0._0;
+                                                                                                     return {ctor: "_Tuple2", _0: {ctor: "_Tuple3", _0: A2(enqueue,
+                                                                                                                                                           n,
+                                                                                                                                                           _case66._0._1), _1: arg0._1, _2: sum$}, _1: sum$ / Basics.toFloat(arg0._1)};
+                                                                                                   }();}
+                                                                                       case
+                                                                                       "Nothing" :
+                                                                                         return {ctor: "_Tuple2", _0: {ctor: "_Tuple3", _0: arg0._0, _1: arg0._1, _2: arg0._2}, _1: 0};}
+                                                                                      _E.Case($moduleName,
+                                                                                              "between lines 133 and 137");
+                                                                                    }();}
+                                                                          _E.Case($moduleName,
+                                                                                  "between lines 133 and 137");
+                                                                        }();
+                                                               });
+                                             var step = F2(function (n,arg0)
+                                                           {
+                                                             return function ()
+                                                                    {
+                                                                      switch (arg0.ctor)
+                                                                      {case
+                                                                       "_Tuple3" :
+                                                                         return _N.eq(arg0._1,
+                                                                                      k) ? A2(stepFull,
+                                                                                              n,
+                                                                                              {ctor: "_Tuple3", _0: arg0._0, _1: arg0._1, _2: arg0._2}) : {ctor: "_Tuple2", _0: {ctor: "_Tuple3", _0: A2(enqueue,
+                                                                                                                                                                                                         n,
+                                                                                                                                                                                                         arg0._0), _1: arg0._1 + 1, _2: arg0._2 + n}, _1: (arg0._2 + n) / (Basics.toFloat(arg0._1) + 1)};}
+                                                                      _E.Case($moduleName,
+                                                                              "between lines 130 and 131");
+                                                                    }();
+                                                           });
+                                             return A2(hiddenState,
+                                                       {ctor: "_Tuple3", _0: empty, _1: 0, _2: 0},
+                                                       step);
+                                           }();
+                                  };
+                    var state = F2(function (base,fun)
+                                   {
+                                     return A2(loop,
+                                               base,
+                                               pure(function (arg0)
+                                                    {
+                                                      return function ()
+                                                             {
+                                                               switch (arg0.ctor)
+                                                               {case
+                                                                "_Tuple2" :
+                                                                  return function ()
+                                                                         {
+                                                                           var s$ = A2(fun,
+                                                                                       arg0._0,
+                                                                                       arg0._1);
+                                                                           return {ctor: "_Tuple2", _0: s$, _1: s$};
+                                                                         }();}
+                                                               _E.Case($moduleName,
+                                                                       "between lines 75 and 76");
+                                                             }();
+                                                    }));
+                                   });
+                    var count = A2(state,
+                                   0,
+                                   F2(function (arg1,c)
+                                      {
+                                        return function ()
+                                               {
+                                                 return c + 1;
+                                               }();
+                                      }));
+                    var run = F3(function (auto,baseOut,input)
+                                 {
+                                   return function ()
+                                          {
+                                            switch (auto.ctor)
+                                            {case
+                                             "Pure" :
+                                               return A2(Signal.lift,auto._0,input);
+                                             case
+                                             "Stateful" :
+                                               return A2(Signal.lift,
+                                                         Basics.fst,
+                                                         A3(Signal.foldp,
+                                                            F2(function (i,arg0)
+                                                               {
+                                                                 return function ()
+                                                                        {
+                                                                          switch (arg0.ctor)
+                                                                          {case
+                                                                           "_Tuple2" :
+                                                                             return A2(auto._1,
+                                                                                       i,
+                                                                                       arg0._1);}
+                                                                          _E.Case($moduleName,
+                                                                                  "on line 58, column 47 to 54");
+                                                                        }();
+                                                               }),
+                                                            {ctor: "_Tuple2", _0: baseOut, _1: auto._0},
+                                                            input));}
+                                            _E.Case($moduleName,"between lines 55 and 59");
+                                          }();
+                                 });
+                    elm.AutomatonV2 = {_op: _op, pure: pure, andThen: andThen, extendDown: extendDown, loop: loop, run: run, state: state, hiddenState: hiddenState, extendUp: extendUp, pair: pair, branch: branch, combi: combi, combine: combine, count: count, empty: empty, enqueue: enqueue, dequeue: dequeue, average: average, Pure: Pure, Stateful: Stateful};
+                    return elm.AutomatonV2;
+                  };Elm.Touch = function (elm)
             {
               if (elm.Touch)
               return elm.Touch;
@@ -2953,94 +3465,6 @@ Elm.Color = function (elm)
                              {
                                return {ctor: "RBNode", _0: a, _1: b, _2: c, _3: d, _4: e};
                              });
-             var isRed = function (t)
-                         {
-                           return function ()
-                                  {
-                                    switch (t.ctor)
-                                    {case
-                                     "RBNode" :
-                                       switch (t._0.ctor)
-                                       {case
-                                        "Red" :
-                                          return true;}}
-                                    return false;
-                                  }();
-                         };
-             var isRedLeft = function (t)
-                             {
-                               return function ()
-                                      {
-                                        switch (t.ctor)
-                                        {case
-                                         "RBNode" :
-                                           switch (t._3.ctor)
-                                           {case
-                                            "RBNode" :
-                                              switch (t._3._0.ctor)
-                                              {case
-                                               "Red" :
-                                                 return true;}}}
-                                        return false;
-                                      }();
-                             };
-             var isRedLeftLeft = function (t)
-                                 {
-                                   return function ()
-                                          {
-                                            switch (t.ctor)
-                                            {case
-                                             "RBNode" :
-                                               switch (t._3.ctor)
-                                               {case
-                                                "RBNode" :
-                                                  switch (t._3._3.ctor)
-                                                  {case
-                                                   "RBNode" :
-                                                     switch (t._3._3._0.ctor)
-                                                     {case
-                                                      "Red" :
-                                                        return true;}}}}
-                                            return false;
-                                          }();
-                                 };
-             var isRedRight = function (t)
-                              {
-                                return function ()
-                                       {
-                                         switch (t.ctor)
-                                         {case
-                                          "RBNode" :
-                                            switch (t._4.ctor)
-                                            {case
-                                             "RBNode" :
-                                               switch (t._4._0.ctor)
-                                               {case
-                                                "Red" :
-                                                  return true;}}}
-                                         return false;
-                                       }();
-                              };
-             var isRedRightLeft = function (t)
-                                  {
-                                    return function ()
-                                           {
-                                             switch (t.ctor)
-                                             {case
-                                              "RBNode" :
-                                                switch (t._4.ctor)
-                                                {case
-                                                 "RBNode" :
-                                                   switch (t._4._3.ctor)
-                                                   {case
-                                                    "RBNode" :
-                                                      switch (t._4._3._0.ctor)
-                                                      {case
-                                                       "Red" :
-                                                         return true;}}}}
-                                             return false;
-                                           }();
-                                  };
              var rotateLeft = function (t)
                               {
                                 return function ()
@@ -3119,8 +3543,45 @@ Elm.Color = function (elm)
                                                   return t;
                                                 }();
                                        };
-             var RBEmpty = {ctor: "RBEmpty"};
-             var empty = RBEmpty;
+             var RBEmpty = function (a)
+                           {
+                             return {ctor: "RBEmpty", _0: a};
+                           };
+             var max = function (t)
+                       {
+                         return function ()
+                                {
+                                  switch (t.ctor)
+                                  {case
+                                   "RBEmpty" :
+                                     return Native.Error.raise(_str("(max Empty) is not defined"));
+                                   case
+                                   "RBNode" :
+                                     switch (t._4.ctor)
+                                     {case
+                                      "RBEmpty" :
+                                        return {ctor: "_Tuple2", _0: t._1, _1: t._2};}
+                                     return max(t._4);}
+                                  _E.Case($moduleName,"between lines 63 and 68");
+                                }();
+                       };
+             var redden = function (t)
+                          {
+                            return function ()
+                                   {
+                                     switch (t.ctor)
+                                     {case
+                                      "RBEmpty" :
+                                        return Native.Error.raise(_str("can\'t make a Leaf red"));
+                                      case
+                                      "RBNode" :
+                                        return A5(RBNode,Red,t._1,t._2,t._3,t._4);}
+                                     _E.Case($moduleName,"between lines 285 and 290");
+                                   }();
+                          };
+             var NBlack = {ctor: "NBlack"};
+             var LBlack = {ctor: "LBlack"};
+             var empty = RBEmpty(LBlack);
              var findWithDefault = F3(function (base,k,t)
                                       {
                                         return function ()
@@ -3128,15 +3589,18 @@ Elm.Color = function (elm)
                                                  switch (t.ctor)
                                                  {case
                                                   "RBEmpty" :
-                                                    return base;
+                                                    switch (t._0.ctor)
+                                                    {case
+                                                     "LBlack" :
+                                                       return base;}
                                                   case
                                                   "RBNode" :
                                                     return function ()
                                                            {
-                                                             var _case115 = A2(Native.Utils.compare,
-                                                                               k,
-                                                                               t._1);
-                                                             switch (_case115.ctor)
+                                                             var _case71 = A2(Native.Utils.compare,
+                                                                              k,
+                                                                              t._1);
+                                                             switch (_case71.ctor)
                                                              {case
                                                               "EQ" :
                                                                 return t._2;
@@ -3153,9 +3617,9 @@ Elm.Color = function (elm)
                                                                           k,
                                                                           t._3);}
                                                              _E.Case($moduleName,
-                                                                     "between lines 137 and 153");
+                                                                     "between lines 86 and 91");
                                                            }();}
-                                                 _E.Case($moduleName,"between lines 134 and 153");
+                                                 _E.Case($moduleName,"between lines 83 and 91");
                                                }();
                                       });
              var foldl = F3(function (f,acc,t)
@@ -3165,14 +3629,17 @@ Elm.Color = function (elm)
                                        switch (t.ctor)
                                        {case
                                         "RBEmpty" :
-                                          return acc;
+                                          switch (t._0.ctor)
+                                          {case
+                                           "LBlack" :
+                                             return acc;}
                                         case
                                         "RBNode" :
                                           return A3(foldl,
                                                     f,
                                                     A3(f,t._1,t._2,A3(foldl,f,acc,t._3)),
                                                     t._4);}
-                                       _E.Case($moduleName,"between lines 360 and 362");
+                                       _E.Case($moduleName,"between lines 305 and 310");
                                      }();
                             });
              var foldr = F3(function (f,acc,t)
@@ -3182,14 +3649,17 @@ Elm.Color = function (elm)
                                        switch (t.ctor)
                                        {case
                                         "RBEmpty" :
-                                          return acc;
+                                          switch (t._0.ctor)
+                                          {case
+                                           "LBlack" :
+                                             return acc;}
                                         case
                                         "RBNode" :
                                           return A3(foldr,
                                                     f,
                                                     A3(f,t._1,t._2,A3(foldr,f,acc,t._4)),
                                                     t._3);}
-                                       _E.Case($moduleName,"between lines 368 and 370");
+                                       _E.Case($moduleName,"between lines 313 and 318");
                                      }();
                             });
              var keys = function (t)
@@ -3229,13 +3699,16 @@ Elm.Color = function (elm)
                                         switch (t.ctor)
                                         {case
                                          "RBEmpty" :
-                                           return Maybe.Nothing;
+                                           switch (t._0.ctor)
+                                           {case
+                                            "LBlack" :
+                                              return Maybe.Nothing;}
                                          case
                                          "RBNode" :
                                            return function ()
                                                   {
-                                                    var _case134 = A2(Native.Utils.compare,k,t._1);
-                                                    switch (_case134.ctor)
+                                                    var _case93 = A2(Native.Utils.compare,k,t._1);
+                                                    switch (_case93.ctor)
                                                     {case
                                                      "EQ" :
                                                        return Maybe.Just(t._2);
@@ -3245,10 +3718,9 @@ Elm.Color = function (elm)
                                                      case
                                                      "LT" :
                                                        return A2(lookup,k,t._3);}
-                                                    _E.Case($moduleName,
-                                                            "between lines 125 and 128");
+                                                    _E.Case($moduleName,"between lines 74 and 80");
                                                   }();}
-                                        _E.Case($moduleName,"between lines 122 and 128");
+                                        _E.Case($moduleName,"between lines 71 and 80");
                                       }();
                              });
              var member = F2(function (k,t)
@@ -3262,7 +3734,10 @@ Elm.Color = function (elm)
                                      switch (t.ctor)
                                      {case
                                       "RBEmpty" :
-                                        return RBEmpty;
+                                        switch (t._0.ctor)
+                                        {case
+                                         "LBlack" :
+                                           return RBEmpty(LBlack);}
                                       case
                                       "RBNode" :
                                         return A5(RBNode,
@@ -3271,7 +3746,7 @@ Elm.Color = function (elm)
                                                   f(t._2),
                                                   A2(map,f,t._3),
                                                   A2(map,f,t._4));}
-                                     _E.Case($moduleName,"between lines 352 and 354");
+                                     _E.Case($moduleName,"between lines 297 and 302");
                                    }();
                           });
              var min = function (t)
@@ -3281,30 +3756,60 @@ Elm.Color = function (elm)
                                   switch (t.ctor)
                                   {case
                                    "RBEmpty" :
-                                     return Native.Error.raise(_str("(min Empty) is not defined"));
+                                     switch (t._0.ctor)
+                                     {case
+                                      "LBlack" :
+                                        return Native.Error.raise(_str("(min Empty) is not defined"));}
                                    case
                                    "RBNode" :
                                      switch (t._3.ctor)
                                      {case
                                       "RBEmpty" :
-                                        return {ctor: "_Tuple2", _0: t._1, _1: t._2};}
+                                        switch (t._3._0.ctor)
+                                        {case
+                                         "LBlack" :
+                                           return {ctor: "_Tuple2", _0: t._1, _1: t._2};}}
                                      return min(t._3);}
-                                  _E.Case($moduleName,"between lines 105 and 117");
+                                  _E.Case($moduleName,"between lines 56 and 59");
                                 }();
                        };
+             var LBBlack = {ctor: "LBBlack"};
              var Black = {ctor: "Black"};
+             var blacken = function (t)
+                           {
+                             return function ()
+                                    {
+                                      switch (t.ctor)
+                                      {case
+                                       "RBEmpty" :
+                                         return RBEmpty(LBlack);
+                                       case
+                                       "RBNode" :
+                                         return A5(RBNode,Black,t._1,t._2,t._3,t._4);}
+                                      _E.Case($moduleName,"between lines 279 and 281");
+                                    }();
+                           };
              var ensureBlackRoot = function (t)
                                    {
                                      return function ()
                                             {
                                               switch (t.ctor)
                                               {case
+                                               "RBEmpty" :
+                                                 switch (t._0.ctor)
+                                                 {case
+                                                  "LBlack" :
+                                                    return t;}
+                                               case
                                                "RBNode" :
                                                  switch (t._0.ctor)
                                                  {case
+                                                  "Black" :
+                                                    return t;
+                                                  case
                                                   "Red" :
                                                     return A5(RBNode,Black,t._1,t._2,t._3,t._4);}}
-                                              return t;
+                                              _E.Case($moduleName,"between lines 143 and 149");
                                             }();
                                    };
              var otherColor = function (c)
@@ -3318,7 +3823,7 @@ Elm.Color = function (elm)
                                           case
                                           "Red" :
                                             return Black;}
-                                         _E.Case($moduleName,"on line 186, column 16 to 57");
+                                         _E.Case($moduleName,"on line 122, column 16 to 57");
                                        }();
                               };
              var color_flip = function (t)
@@ -3391,22 +3896,25 @@ Elm.Color = function (elm)
                                                              switch (t.ctor)
                                                              {case
                                                               "RBEmpty" :
-                                                                return A5(RBNode,
-                                                                          Red,
-                                                                          k,
-                                                                          v,
-                                                                          RBEmpty,
-                                                                          RBEmpty);
+                                                                switch (t._0.ctor)
+                                                                {case
+                                                                 "LBlack" :
+                                                                   return A5(RBNode,
+                                                                             Red,
+                                                                             k,
+                                                                             v,
+                                                                             RBEmpty(LBlack),
+                                                                             RBEmpty(LBlack));}
                                                               case
                                                               "RBNode" :
                                                                 return function ()
                                                                        {
                                                                          var h = function ()
                                                                                  {
-                                                                                   var _case192 = A2(Native.Utils.compare,
+                                                                                   var _case163 = A2(Native.Utils.compare,
                                                                                                      k,
                                                                                                      t._1);
-                                                                                   switch (_case192.ctor)
+                                                                                   switch (_case163.ctor)
                                                                                    {case
                                                                                     "EQ" :
                                                                                       return A5(RBNode,
@@ -3432,12 +3940,12 @@ Elm.Color = function (elm)
                                                                                                 ins(t._3),
                                                                                                 t._4);}
                                                                                    _E.Case($moduleName,
-                                                                                           "between lines 219 and 223");
+                                                                                           "between lines 156 and 160");
                                                                                  }();
                                                                          return fixUp(h);
                                                                        }();}
                                                              _E.Case($moduleName,
-                                                                     "between lines 216 and 224");
+                                                                     "between lines 153 and 161");
                                                            }();
                                                   };
                                         return ensureBlackRoot(ins(t));
@@ -3455,7 +3963,7 @@ Elm.Color = function (elm)
                                                        "_Tuple2" :
                                                          return A3(insert,arg1._0,arg1._1,d);}
                                                       _E.Case($moduleName,
-                                                              "on line 403, column 43 to 55");
+                                                              "on line 348, column 43 to 55");
                                                     }();
                                            }),
                                         empty,
@@ -3470,240 +3978,429 @@ Elm.Color = function (elm)
                                                               return A2(member,k,t2) ? A3(insert,
                                                                                           k,
                                                                                           v,
-                                                                                          t) : Basics.otherwise ? t : _E.If($moduleName,
-                                                                                                                            "on line 381, column 22 to 63");
+                                                                                          t) : t;
                                                             });
                                            return A3(foldl,combine,empty,t1);
                                          }();
                                 });
              var singleton = F2(function (k,v)
                                 {
-                                  return A3(insert,k,v,RBEmpty);
+                                  return A3(insert,k,v,RBEmpty(LBlack));
                                 });
              var union = F2(function (t1,t2)
                             {
                               return A3(foldl,insert,t2,t1);
                             });
-             var moveRedLeft = function (t)
-                               {
-                                 return function ()
-                                        {
-                                          var t$ = color_flip(t);
+             var BBlack = {ctor: "BBlack"};
+             var blackish = function (arg0)
+                            {
+                              return function ()
+                                     {
+                                       switch (arg0.ctor)
+                                       {case
+                                        "RBNode" :
+                                          return _N.eq(arg0._0,Black) || _N.eq(arg0._0,BBlack);}
+                                       _E.Case($moduleName,"on line 243, column 31 to 56");
+                                     }();
+                            };
+             var isBBlack = function (t)
+                            {
+                              return function ()
+                                     {
+                                       switch (t.ctor)
+                                       {case
+                                        "RBEmpty" :
+                                          switch (t._0.ctor)
+                                          {case
+                                           "LBBlack" :
+                                             return true;}
+                                        case
+                                        "RBNode" :
                                           return function ()
                                                  {
-                                                   switch (t$.ctor)
+                                                   switch (t._0.ctor)
                                                    {case
-                                                    "RBNode" :
-                                                      return function ()
-                                                             {
-                                                               switch (t$._4.ctor)
-                                                               {case
-                                                                "RBNode" :
-                                                                  switch (t$._4._3.ctor)
-                                                                  {case
-                                                                   "RBNode" :
-                                                                     switch (t$._4._3._0.ctor)
-                                                                     {case
-                                                                      "Red" :
-                                                                        return color_flip(rotateLeft(A5(RBNode,
-                                                                                                        t$._0,
-                                                                                                        t$._1,
-                                                                                                        t$._2,
-                                                                                                        t$._3,
-                                                                                                        rotateRight(t$._4))));}}}
-                                                               return t$;
-                                                             }();}
-                                                   return t$;
-                                                 }();
-                                        }();
-                               };
-             var moveRedLeftIfNeeded = function (t)
-                                       {
-                                         return isRedLeft(t) || isRedLeftLeft(t) ? t : Basics.otherwise ? moveRedLeft(t) : _E.If($moduleName,
-                                                                                                                                 "on line 286, column 3 to 62");
-                                       };
-             var deleteMin = function (t)
+                                                    "BBlack" :
+                                                      return true;}
+                                                   return false;
+                                                 }();}
+                                       return false;
+                                     }();
+                            };
+             var lessBlack = function (c)
                              {
                                return function ()
                                       {
-                                        var del = function (t)
-                                                  {
-                                                    return function ()
-                                                           {
-                                                             switch (t.ctor)
-                                                             {case
-                                                              "RBNode" :
-                                                                switch (t._3.ctor)
-                                                                {case
-                                                                 "RBEmpty" :
-                                                                   return RBEmpty;}}
-                                                             return function ()
-                                                                    {
-                                                                      var _case219 = moveRedLeftIfNeeded(t);
-                                                                      switch (_case219.ctor)
-                                                                      {case
-                                                                       "RBEmpty" :
-                                                                         return RBEmpty;
-                                                                       case
-                                                                       "RBNode" :
-                                                                         return fixUp(A5(RBNode,
-                                                                                         _case219._0,
-                                                                                         _case219._1,
-                                                                                         _case219._2,
-                                                                                         del(_case219._3),
-                                                                                         _case219._4));}
-                                                                      _E.Case($moduleName,
-                                                                              "between lines 297 and 300");
-                                                                    }();
-                                                           }();
-                                                  };
-                                        return ensureBlackRoot(del(t));
+                                        switch (c.ctor)
+                                        {case
+                                         "BBlack" :
+                                           return Black;
+                                         case
+                                         "Black" :
+                                           return Red;
+                                         case
+                                         "NBlack" :
+                                           return NBlack;
+                                         case
+                                         "Red" :
+                                           return NBlack;}
+                                        _E.Case($moduleName,"between lines 185 and 189");
                                       }();
                              };
-             var moveRedRight = function (t)
+             var balance_node = function (t)
                                 {
                                   return function ()
                                          {
-                                           var t$ = color_flip(t);
-                                           return isRedLeftLeft(t$) ? color_flip(rotateRight(t$)) : Basics.otherwise ? t$ : _E.If($moduleName,
-                                                                                                                                  "on line 282, column 3 to 63");
+                                           var assemble = function (col)
+                                                          {
+                                                            return function (xk)
+                                                                   {
+                                                                     return function (xv)
+                                                                            {
+                                                                              return function (yk)
+                                                                                     {
+                                                                                       return function (yv)
+                                                                                              {
+                                                                                                return function (zk)
+                                                                                                       {
+                                                                                                         return function (zv)
+                                                                                                                {
+                                                                                                                  return function (a)
+                                                                                                                         {
+                                                                                                                           return function (b)
+                                                                                                                                  {
+                                                                                                                                    return function (c)
+                                                                                                                                           {
+                                                                                                                                             return function (d)
+                                                                                                                                                    {
+                                                                                                                                                      return A5(RBNode,
+                                                                                                                                                                lessBlack(col),
+                                                                                                                                                                yk,
+                                                                                                                                                                yv,
+                                                                                                                                                                A5(RBNode,
+                                                                                                                                                                   Black,
+                                                                                                                                                                   xk,
+                                                                                                                                                                   xv,
+                                                                                                                                                                   a,
+                                                                                                                                                                   b),
+                                                                                                                                                                A5(RBNode,
+                                                                                                                                                                   Black,
+                                                                                                                                                                   zk,
+                                                                                                                                                                   zv,
+                                                                                                                                                                   c,
+                                                                                                                                                                   d));
+                                                                                                                                                    };
+                                                                                                                                           };
+                                                                                                                                  };
+                                                                                                                         };
+                                                                                                                };
+                                                                                                       };
+                                                                                              };
+                                                                                     };
+                                                                            };
+                                                                   };
+                                                          };
+                                           return blackish(t) ? function ()
+                                                                {
+                                                                  switch (t.ctor)
+                                                                  {case
+                                                                   "RBNode" :
+                                                                     switch (t._3.ctor)
+                                                                     {case
+                                                                      "RBNode" :
+                                                                        switch (t._3._0.ctor)
+                                                                        {case
+                                                                         "Red" :
+                                                                           switch (t._3._3.ctor)
+                                                                           {case
+                                                                            "RBNode" :
+                                                                              switch (t._3._3._0.ctor)
+                                                                              {case
+                                                                               "Red" :
+                                                                                 return assemble(t._0)(t._3._3._1)(t._3._3._2)(t._3._1)(t._3._2)(t._1)(t._2)(t._3._3._3)(t._3._3._4)(t._3._4)(t._4);}}
+                                                                           switch (t._3._4.ctor)
+                                                                           {case
+                                                                            "RBNode" :
+                                                                              switch (t._3._4._0.ctor)
+                                                                              {case
+                                                                               "Red" :
+                                                                                 return assemble(t._0)(t._3._1)(t._3._2)(t._3._4._1)(t._3._4._2)(t._1)(t._2)(t._3._3)(t._3._4._3)(t._3._4._4)(t._4);}}}}
+                                                                     switch (t._4.ctor)
+                                                                     {case
+                                                                      "RBNode" :
+                                                                        switch (t._4._0.ctor)
+                                                                        {case
+                                                                         "Red" :
+                                                                           switch (t._4._3.ctor)
+                                                                           {case
+                                                                            "RBNode" :
+                                                                              switch (t._4._3._0.ctor)
+                                                                              {case
+                                                                               "Red" :
+                                                                                 return assemble(t._0)(t._1)(t._2)(t._4._3._1)(t._4._3._2)(t._4._1)(t._4._2)(t._3)(t._4._3._3)(t._4._3._4)(t._4._4);}}
+                                                                           switch (t._4._4.ctor)
+                                                                           {case
+                                                                            "RBNode" :
+                                                                              switch (t._4._4._0.ctor)
+                                                                              {case
+                                                                               "Red" :
+                                                                                 return assemble(t._0)(t._1)(t._2)(t._4._1)(t._4._2)(t._4._4._1)(t._4._4._2)(t._3)(t._4._3)(t._4._4._3)(t._4._4._4);}}}}
+                                                                     switch (t._0.ctor)
+                                                                     {case
+                                                                      "BBlack" :
+                                                                        switch (t._4.ctor)
+                                                                        {case
+                                                                         "RBNode" :
+                                                                           switch (t._4._0.ctor)
+                                                                           {case
+                                                                            "NBlack" :
+                                                                              switch (t._4._3.ctor)
+                                                                              {case
+                                                                               "RBNode" :
+                                                                                 switch (t._4._3._0.ctor)
+                                                                                 {case
+                                                                                  "Black" :
+                                                                                    return function ()
+                                                                                           {
+                                                                                             switch (t._4._4.ctor)
+                                                                                             {case
+                                                                                              "RBNode" :
+                                                                                                switch (t._4._4._0.ctor)
+                                                                                                {case
+                                                                                                 "Black" :
+                                                                                                   return A5(RBNode,
+                                                                                                             Black,
+                                                                                                             t._4._3._1,
+                                                                                                             t._4._3._2,
+                                                                                                             A5(RBNode,
+                                                                                                                Black,
+                                                                                                                t._1,
+                                                                                                                t._2,
+                                                                                                                t._3,
+                                                                                                                t._4._3._3),
+                                                                                                             A5(balance,
+                                                                                                                Black,
+                                                                                                                t._4._1,
+                                                                                                                t._4._2,
+                                                                                                                t._4._3._4,
+                                                                                                                redden(t._4._4)));}}
+                                                                                             return t;
+                                                                                           }();}}}}
+                                                                        switch (t._3.ctor)
+                                                                        {case
+                                                                         "RBNode" :
+                                                                           switch (t._3._0.ctor)
+                                                                           {case
+                                                                            "NBlack" :
+                                                                              switch (t._3._4.ctor)
+                                                                              {case
+                                                                               "RBNode" :
+                                                                                 switch (t._3._4._0.ctor)
+                                                                                 {case
+                                                                                  "Black" :
+                                                                                    return function ()
+                                                                                           {
+                                                                                             switch (t._3._3.ctor)
+                                                                                             {case
+                                                                                              "RBNode" :
+                                                                                                switch (t._3._3._0.ctor)
+                                                                                                {case
+                                                                                                 "Black" :
+                                                                                                   return A5(RBNode,
+                                                                                                             Black,
+                                                                                                             t._3._4._1,
+                                                                                                             t._3._4._2,
+                                                                                                             A5(balance,
+                                                                                                                Black,
+                                                                                                                t._3._1,
+                                                                                                                t._3._2,
+                                                                                                                redden(t._3._3),
+                                                                                                                t._3._4._3),
+                                                                                                             A5(RBNode,
+                                                                                                                Black,
+                                                                                                                t._1,
+                                                                                                                t._2,
+                                                                                                                t._3._4._4,
+                                                                                                                t._4));}}
+                                                                                             return t;
+                                                                                           }();}}}}}}
+                                                                  return t;
+                                                                }() : t;
                                          }();
                                 };
-             var moveRedRightIfNeeded = function (t)
-                                        {
-                                          return isRedRight(t) || isRedRightLeft(t) ? t : Basics.otherwise ? moveRedRight(t) : _E.If($moduleName,
-                                                                                                                                     "on line 290, column 3 to 65");
-                                        };
-             var remove = F2(function (k,t)
+             var balance = F5(function (c,k,v,l,r)
+                              {
+                                return balance_node(A5(RBNode,c,k,v,l,r));
+                              });
+             var lessBlackTree = function (t)
+                                 {
+                                   return function ()
+                                          {
+                                            switch (t.ctor)
+                                            {case
+                                             "RBEmpty" :
+                                               return RBEmpty(LBlack);
+                                             case
+                                             "RBNode" :
+                                               return A5(RBNode,
+                                                         lessBlack(t._0),
+                                                         t._1,
+                                                         t._2,
+                                                         t._3,
+                                                         t._4);}
+                                            _E.Case($moduleName,"between lines 197 and 199");
+                                          }();
+                                 };
+             var moreBlack = function (c)
                              {
                                return function ()
                                       {
-                                        var eq_and_noRightNode = function (t)
-                                                                 {
-                                                                   return function ()
-                                                                          {
-                                                                            switch (t.ctor)
-                                                                            {case
-                                                                             "RBNode" :
-                                                                               switch (t._4.ctor)
-                                                                               {case
-                                                                                "RBEmpty" :
-                                                                                  return _N.eq(k,
-                                                                                               t._1);}}
-                                                                            return false;
-                                                                          }();
-                                                                 };
-                                        var eq = function (t)
-                                                 {
-                                                   return function ()
-                                                          {
-                                                            switch (t.ctor)
-                                                            {case
-                                                             "RBNode" :
-                                                               return _N.eq(k,t._1);}
-                                                            return false;
-                                                          }();
-                                                 };
-                                        var delEQ = function (t)
-                                                    {
-                                                      return function ()
-                                                             {
-                                                               switch (t.ctor)
-                                                               {case
-                                                                "RBEmpty" :
-                                                                  return Native.Error.raise(_str("delEQ called on a Empty"));
-                                                                case
-                                                                "RBNode" :
-                                                                  return function ()
-                                                                         {
-                                                                           var $ = min(t._4),
-                                                                               k$ = $._0,
-                                                                               v$ = $._1;
-                                                                           return fixUp(A5(RBNode,
-                                                                                           t._0,
-                                                                                           k$,
-                                                                                           v$,
-                                                                                           t._3,
-                                                                                           deleteMin(t._4)));
-                                                                         }();}
-                                                               _E.Case($moduleName,
-                                                                       "between lines 325 and 329");
-                                                             }();
-                                                    };
-                                        var del = function (t)
-                                                  {
-                                                    return function ()
-                                                           {
-                                                             switch (t.ctor)
-                                                             {case
-                                                              "RBEmpty" :
-                                                                return RBEmpty;
-                                                              case
-                                                              "RBNode" :
-                                                                return _N.cmp(k,
-                                                                              t._1) < 0 ? delLT(t) : Basics.otherwise ? function ()
-                                                                                                                        {
-                                                                                                                          var u = isRedLeft(t) ? rotateRight(t) : Basics.otherwise ? t : _E.If($moduleName,
-                                                                                                                                                                                               "on line 336, column 33 to 73");
-                                                                                                                          return eq_and_noRightNode(u) ? RBEmpty : Basics.otherwise ? function ()
-                                                                                                                                                                                      {
-                                                                                                                                                                                        var t$ = moveRedRightIfNeeded(t);
-                                                                                                                                                                                        return eq(t$) ? delEQ(t$) : Basics.otherwise ? delGT(t$) : _E.If($moduleName,
-                                                                                                                                                                                                                                                         "on line 339, column 29 to 65");
-                                                                                                                                                                                      }() : _E.If($moduleName,
-                                                                                                                                                                                                  "between lines 337 and 339");
-                                                                                                                        }() : _E.If($moduleName,
-                                                                                                                                    "between lines 335 and 339");}
-                                                             _E.Case($moduleName,
-                                                                     "between lines 332 and 340");
-                                                           }();
-                                                  };
-                                        var delGT = function (t)
-                                                    {
-                                                      return function ()
-                                                             {
-                                                               switch (t.ctor)
-                                                               {case
-                                                                "RBEmpty" :
-                                                                  return Native.Error.raise(_str("delGT called on a Empty"));
-                                                                case
-                                                                "RBNode" :
-                                                                  return fixUp(A5(RBNode,
-                                                                                  t._0,
-                                                                                  t._1,
-                                                                                  t._2,
-                                                                                  t._3,
-                                                                                  del(t._4)));}
-                                                               _E.Case($moduleName,
-                                                                       "between lines 329 and 332");
-                                                             }();
-                                                    };
-                                        var delLT = function (t)
-                                                    {
-                                                      return function ()
-                                                             {
-                                                               var _case255 = moveRedLeftIfNeeded(t);
-                                                               switch (_case255.ctor)
-                                                               {case
-                                                                "RBEmpty" :
-                                                                  return Native.Error.raise(_str("delLT on Empty"));
-                                                                case
-                                                                "RBNode" :
-                                                                  return fixUp(A5(RBNode,
-                                                                                  _case255._0,
-                                                                                  _case255._1,
-                                                                                  _case255._2,
-                                                                                  del(_case255._3),
-                                                                                  _case255._4));}
-                                                               _E.Case($moduleName,
-                                                                       "between lines 322 and 325");
-                                                             }();
-                                                    };
-                                        return A2(member,
-                                                  k,
-                                                  t) ? ensureBlackRoot(del(t)) : Basics.otherwise ? t : _E.If($moduleName,
-                                                                                                              "on line 340, column 7 to 56");
+                                        switch (c.ctor)
+                                        {case
+                                         "BBlack" :
+                                           return BBlack;
+                                         case
+                                         "Black" :
+                                           return BBlack;
+                                         case
+                                         "NBlack" :
+                                           return Red;
+                                         case
+                                         "Red" :
+                                           return Black;}
+                                        _E.Case($moduleName,"between lines 179 and 183");
                                       }();
+                             };
+             var bubble = F5(function (c,k,v,l,r)
+                             {
+                               return isBBlack(l) || isBBlack(r) ? A5(balance,
+                                                                      moreBlack(c),
+                                                                      k,
+                                                                      v,
+                                                                      lessBlackTree(l),
+                                                                      lessBlackTree(r)) : A5(RBNode,
+                                                                                             c,
+                                                                                             k,
+                                                                                             v,
+                                                                                             l,
+                                                                                             r);
+                             });
+             var remove_max = function (t)
+                              {
+                                return function ()
+                                       {
+                                         switch (t.ctor)
+                                         {case
+                                          "RBNode" :
+                                            switch (t._4.ctor)
+                                            {case
+                                             "RBEmpty" :
+                                               return rem(t);}
+                                            return A5(bubble,t._0,t._1,t._2,t._3,remove_max(t._4));}
+                                         _E.Case($moduleName,"between lines 234 and 236");
+                                       }();
+                              };
+             var rem = function (t)
+                       {
+                         return function ()
+                                {
+                                  switch (t.ctor)
+                                  {case
+                                   "RBNode" :
+                                     switch (t._3.ctor)
+                                     {case
+                                      "RBEmpty" :
+                                        switch (t._4.ctor)
+                                        {case
+                                         "RBEmpty" :
+                                           return function ()
+                                                  {
+                                                    switch (t._0.ctor)
+                                                    {case
+                                                     "Black" :
+                                                       return RBEmpty(LBBlack);
+                                                     case
+                                                     "Red" :
+                                                       return RBEmpty(LBlack);}
+                                                    _E.Case($moduleName,
+                                                            "between lines 213 and 216");
+                                                  }();}}
+                                     switch (t._0.ctor)
+                                     {case
+                                      "Black" :
+                                        switch (t._3.ctor)
+                                        {case
+                                         "RBEmpty" :
+                                           switch (t._4.ctor)
+                                           {case
+                                            "RBNode" :
+                                              return A5(RBNode,
+                                                        Black,
+                                                        t._4._1,
+                                                        t._4._2,
+                                                        t._4._3,
+                                                        t._4._4);}
+                                         case
+                                         "RBNode" :
+                                           switch (t._4.ctor)
+                                           {case
+                                            "RBEmpty" :
+                                              return A5(RBNode,
+                                                        Black,
+                                                        t._3._1,
+                                                        t._3._2,
+                                                        t._3._3,
+                                                        t._3._4);}}}
+                                     return function ()
+                                            {
+                                              var l$ = remove_max(t._3);
+                                              var $ = max(t._3),k = $._0,v = $._1;
+                                              return A5(bubble,t._0,k,v,l$,t._4);
+                                            }();}
+                                  _E.Case($moduleName,"between lines 212 and 224");
+                                }();
+                       };
+             var del = F2(function (k,t)
+                          {
+                            return function ()
+                                   {
+                                     switch (t.ctor)
+                                     {case
+                                      "RBEmpty" :
+                                        return t;
+                                      case
+                                      "RBNode" :
+                                        return function ()
+                                               {
+                                                 var _case293 = A2(Native.Utils.compare,k,t._1);
+                                                 switch (_case293.ctor)
+                                                 {case
+                                                  "EQ" :
+                                                    return rem(t);
+                                                  case
+                                                  "GT" :
+                                                    return A5(bubble,
+                                                              t._0,
+                                                              t._1,
+                                                              t._2,
+                                                              t._3,
+                                                              A2(del,k,t._4));
+                                                  case
+                                                  "LT" :
+                                                    return A5(bubble,
+                                                              t._0,
+                                                              t._1,
+                                                              t._2,
+                                                              A2(del,k,t._3),
+                                                              t._4);}
+                                                 _E.Case($moduleName,"between lines 205 and 208");
+                                               }();}
+                                     _E.Case($moduleName,"between lines 203 and 208");
+                                   }();
+                          });
+             var remove = F2(function (k,t)
+                             {
+                               return blacken(A2(del,k,t));
                              });
              var diff = F2(function (t1,t2)
                            {
@@ -3715,6 +4412,25 @@ Elm.Color = function (elm)
                                        t1,
                                        t2);
                            });
+             var moreBlackTree = function (t)
+                                 {
+                                   return function ()
+                                          {
+                                            switch (t.ctor)
+                                            {case
+                                             "RBEmpty" :
+                                               return RBEmpty(LBBlack);
+                                             case
+                                             "RBNode" :
+                                               return A5(RBNode,
+                                                         moreBlack(t._0),
+                                                         t._1,
+                                                         t._2,
+                                                         t._3,
+                                                         t._4);}
+                                            _E.Case($moduleName,"between lines 192 and 194");
+                                          }();
+                                 };
              elm.Dict = {_op: _op, empty: empty, singleton: singleton, insert: insert, lookup: lookup, findWithDefault: findWithDefault, remove: remove, member: member, foldl: foldl, foldr: foldr, map: map, union: union, intersect: intersect, diff: diff, keys: keys, values: values, toList: toList, fromList: fromList};
              return elm.Dict;
            };Elm.Char = function (elm)
@@ -3961,7 +4677,7 @@ Elm.Color = function (elm)
                Native.Random = Elm.Native.Random(elm);
                var _op = {};
                var range = Native.Random.range;
-               var $float = Native.Random.float;
+               var $float = Native.Random.$float;
                elm.Random = {_op: _op, range: range, $float: $float};
                return elm.Random;
              };Elm.Keyboard = function (elm)
@@ -4051,7 +4767,7 @@ Elm.Color = function (elm)
                                               {case
                                                "_Tuple2" :
                                                  return {ctor: "_Tuple2", _0: {ctor: "::", _0: x, _1: arg0._0}, _1: arg0._1};}
-                                              _E.Case($moduleName,"on line 72, column 22 to 31");
+                                              _E.Case($moduleName,"on line 93, column 22 to 31");
                                             }();
                                    });
                   var empty = {ctor: "_Tuple2", _0: _J.toList([]), _1: _J.toList([])};
@@ -4076,7 +4792,7 @@ Elm.Color = function (elm)
                                                case
                                                "[]" :
                                                  return dequeue({ctor: "_Tuple2", _0: _J.toList([]), _1: List.reverse(q._0)});}}
-                                           _E.Case($moduleName,"between lines 73 and 76");
+                                           _E.Case($moduleName,"between lines 94 and 99");
                                          }();
                                 };
                   var Step = function (a)
@@ -4129,10 +4845,10 @@ Elm.Color = function (elm)
                                                                                      "Nothing" :
                                                                                        return {ctor: "_Tuple2", _0: {ctor: "_Tuple3", _0: arg0._0, _1: arg0._1, _2: arg0._2}, _1: 0};}
                                                                                     _E.Case($moduleName,
-                                                                                            "between lines 85 and 89");
+                                                                                            "between lines 106 and 110");
                                                                                   }();}
                                                                         _E.Case($moduleName,
-                                                                                "between lines 85 and 89");
+                                                                                "between lines 106 and 110");
                                                                       }();
                                                              });
                                            var step = F2(function (n,arg0)
@@ -4145,12 +4861,11 @@ Elm.Color = function (elm)
                                                                        return _N.eq(arg0._1,
                                                                                     k) ? A2(stepFull,
                                                                                             n,
-                                                                                            {ctor: "_Tuple3", _0: arg0._0, _1: arg0._1, _2: arg0._2}) : Basics.otherwise ? {ctor: "_Tuple2", _0: {ctor: "_Tuple3", _0: A2(enqueue,
-                                                                                                                                                                                                                          n,
-                                                                                                                                                                                                                          arg0._0), _1: arg0._1 + 1, _2: arg0._2 + n}, _1: (arg0._2 + n) / (Basics.toFloat(arg0._1) + 1)} : _E.If($moduleName,
-                                                                                                                                                                                                                                                                                                                                  "between lines 82 and 83");}
+                                                                                            {ctor: "_Tuple3", _0: arg0._0, _1: arg0._1, _2: arg0._2}) : {ctor: "_Tuple2", _0: {ctor: "_Tuple3", _0: A2(enqueue,
+                                                                                                                                                                                                       n,
+                                                                                                                                                                                                       arg0._0), _1: arg0._1 + 1, _2: arg0._2 + n}, _1: (arg0._2 + n) / (Basics.toFloat(arg0._1) + 1)};}
                                                                     _E.Case($moduleName,
-                                                                            "between lines 82 and 83");
+                                                                            "between lines 103 and 104");
                                                                   }();
                                                          });
                                            return A2(hiddenState,
@@ -4181,7 +4896,7 @@ Elm.Color = function (elm)
                                                                        "Step" :
                                                                          return arg0._0._0(a);}}
                                                                    _E.Case($moduleName,
-                                                                           "on line 18, column 28 to 31");
+                                                                           "on line 33, column 28 to 31");
                                                                  }();
                                                         });
                                           return A2(Signal.lift,
@@ -4194,7 +4909,7 @@ Elm.Color = function (elm)
                                                                 "_Tuple2" :
                                                                   return arg0._1;}
                                                                _E.Case($moduleName,
-                                                                       "on line 19, column 23 to 24");
+                                                                       "on line 34, column 23 to 24");
                                                              }();
                                                     },
                                                     A3(Signal.foldp,
@@ -4233,7 +4948,7 @@ Elm.Color = function (elm)
                                            {case
                                             "Step" :
                                               return arg0._0(a);}
-                                           _E.Case($moduleName,"on line 23, column 19 to 22");
+                                           _E.Case($moduleName,"on line 38, column 19 to 22");
                                          }();
                                 });
                   var combine = function (autos)
@@ -4343,7 +5058,7 @@ Elm.Color = function (elm)
                                          case
                                          "Nothing" :
                                            return b;}
-                                        _E.Case($moduleName,"between lines 14 and 16");
+                                        _E.Case($moduleName,"between lines 28 and 33");
                                       }();
                              });
               var cons = F2(function (mx,xs)
@@ -4471,7 +5186,7 @@ Elm.Color = function (elm)
                                               case
                                               "[]" :
                                                 return _J.toList([]);}
-                                             _E.Case($moduleName,"between lines 176 and 179");
+                                             _E.Case($moduleName,"between lines 215 and 220");
                                            }();
                                   });
              var partition = F2(function (pred,lst)
@@ -4486,13 +5201,12 @@ Elm.Color = function (elm)
                                                        var $ = A2(partition,pred,lst._1),
                                                            bs = $._0,
                                                            cs = $._1;
-                                                       return pred(lst._0) ? {ctor: "_Tuple2", _0: {ctor: "::", _0: lst._0, _1: bs}, _1: cs} : Basics.otherwise ? {ctor: "_Tuple2", _0: bs, _1: {ctor: "::", _0: lst._0, _1: cs}} : _E.If($moduleName,
-                                                                                                                                                                                                                                          "on line 134, column 16 to 57");
+                                                       return pred(lst._0) ? {ctor: "_Tuple2", _0: {ctor: "::", _0: lst._0, _1: bs}, _1: cs} : {ctor: "_Tuple2", _0: bs, _1: {ctor: "::", _0: lst._0, _1: cs}};
                                                      }();
                                             case
                                             "[]" :
                                               return {ctor: "_Tuple2", _0: _J.toList([]), _1: _J.toList([])};}
-                                           _E.Case($moduleName,"between lines 131 and 134");
+                                           _E.Case($moduleName,"between lines 165 and 175");
                                          }();
                                 });
              var unzip = function (pairs)
@@ -4513,7 +5227,7 @@ Elm.Color = function (elm)
                                      case
                                      "[]" :
                                        return {ctor: "_Tuple2", _0: _J.toList([]), _1: _J.toList([])};}
-                                    _E.Case($moduleName,"between lines 154 and 156");
+                                    _E.Case($moduleName,"between lines 190 and 197");
                                   }();
                          };
              _op["++"] = Native.List.append;
@@ -4561,7 +5275,27 @@ Elm.Color = function (elm)
              var Text = {ctor: "Text"};
              elm.Text = {_op: _op, toText: toText, typeface: typeface, monospace: monospace, header: header, link: link, height: height, color: color, bold: bold, italic: italic, overline: overline, underline: underline, strikeThrough: strikeThrough, justified: justified, centered: centered, righted: righted, text: text, plainText: plainText, markdown: markdown, asText: asText, Text: Text};
              return elm.Text;
-           };Elm.Either = function (elm)
+           };Elm.CLI = function (elm)
+          {
+            if (elm.CLI)
+            return elm.CLI;
+            var N = Elm.Native,
+                _N = N.Utils(elm),
+                _L = N.List(elm),
+                _E = N.Error(elm),
+                _J = N.JavaScript(elm),
+                _str = _J.toString,
+                $moduleName = "CLI";
+            var JavaScript = Elm.JavaScript(elm);
+            var Native = Native || {};
+            Native.CLI = Elm.Native.CLI(elm);
+            var Signal = Elm.Signal(elm);
+            var _op = {};
+            var stdouteffect = Native.CLI.stdouteffect;
+            var stdin = Native.CLI.stdin;
+            elm.CLI = {_op: _op, stdin: stdin, stdouteffect: stdouteffect};
+            return elm.CLI;
+          };Elm.Either = function (elm)
              {
                if (elm.Either)
                return elm.Either;
@@ -4610,9 +5344,9 @@ Elm.Color = function (elm)
                                                            "Right" :
                                                              return {ctor: "_Tuple2", _0: arg0._0, _1: {ctor: "::", _0: e._0, _1: arg0._1}};}
                                                           _E.Case($moduleName,
-                                                                  "between lines 50 and 52");
+                                                                  "between lines 78 and 80");
                                                         }();}
-                                              _E.Case($moduleName,"between lines 50 and 52");
+                                              _E.Case($moduleName,"between lines 78 and 80");
                                             }();
                                    });
                var partition = function (es)
@@ -4633,7 +5367,7 @@ Elm.Color = function (elm)
                                              case
                                              "Right" :
                                                return vs;}
-                                            _E.Case($moduleName,"between lines 40 and 42");
+                                            _E.Case($moduleName,"between lines 60 and 66");
                                           }();
                                  });
                var lefts = function (es)
@@ -4651,7 +5385,7 @@ Elm.Color = function (elm)
                                               case
                                               "Right" :
                                                 return {ctor: "::", _0: e._0, _1: vs};}
-                                             _E.Case($moduleName,"between lines 45 and 47");
+                                             _E.Case($moduleName,"between lines 69 and 75");
                                            }();
                                   });
                var rights = function (es)
@@ -4669,7 +5403,7 @@ Elm.Color = function (elm)
                                            case
                                            "Right" :
                                              return g(e._0);}
-                                          _E.Case($moduleName,"on line 16, column 16 to 60");
+                                          _E.Case($moduleName,"on line 31, column 16 to 60");
                                         }();
                                });
                var isLeft = function (e)
@@ -5019,7 +5753,7 @@ Elm.Graphics.Collage = function (elm)
                                                                         ["y",f.y + arg1._1]],
                                                                        f);}
                                                   _E.Case($moduleName,
-                                                          "on line 142, column 20 to 48");
+                                                          "on line 182, column 20 to 48");
                                                 }();
                                        });
                          var form = function (f)
@@ -5449,43 +6183,42 @@ Elm.Graphics.Element = function (elm)
                                                   var hs = A2(List.map,heightOf,es);
                                                   return _N.eq(es,_J.toList([])) ? A2(spacer,
                                                                                       0,
-                                                                                      0) : Basics.otherwise ? function ()
-                                                                                                              {
-                                                                                                                switch (dir.ctor)
-                                                                                                                {case
-                                                                                                                 "DDown" :
-                                                                                                                   return A2(newFlow,
-                                                                                                                             List.maximum(ws),
-                                                                                                                             List.sum(hs));
-                                                                                                                 case
-                                                                                                                 "DIn" :
-                                                                                                                   return A2(newFlow,
-                                                                                                                             List.maximum(ws),
-                                                                                                                             List.maximum(hs));
-                                                                                                                 case
-                                                                                                                 "DLeft" :
-                                                                                                                   return A2(newFlow,
-                                                                                                                             List.sum(ws),
-                                                                                                                             List.maximum(hs));
-                                                                                                                 case
-                                                                                                                 "DOut" :
-                                                                                                                   return A2(newFlow,
-                                                                                                                             List.maximum(ws),
-                                                                                                                             List.maximum(hs));
-                                                                                                                 case
-                                                                                                                 "DRight" :
-                                                                                                                   return A2(newFlow,
-                                                                                                                             List.sum(ws),
-                                                                                                                             List.maximum(hs));
-                                                                                                                 case
-                                                                                                                 "DUp" :
-                                                                                                                   return A2(newFlow,
-                                                                                                                             List.maximum(ws),
-                                                                                                                             List.sum(hs));}
-                                                                                                                _E.Case($moduleName,
-                                                                                                                        "between lines 156 and 162");
-                                                                                                              }() : _E.If($moduleName,
-                                                                                                                          "between lines 155 and 162");
+                                                                                      0) : function ()
+                                                                                           {
+                                                                                             switch (dir.ctor)
+                                                                                             {case
+                                                                                              "DDown" :
+                                                                                                return A2(newFlow,
+                                                                                                          List.maximum(ws),
+                                                                                                          List.sum(hs));
+                                                                                              case
+                                                                                              "DIn" :
+                                                                                                return A2(newFlow,
+                                                                                                          List.maximum(ws),
+                                                                                                          List.maximum(hs));
+                                                                                              case
+                                                                                              "DLeft" :
+                                                                                                return A2(newFlow,
+                                                                                                          List.sum(ws),
+                                                                                                          List.maximum(hs));
+                                                                                              case
+                                                                                              "DOut" :
+                                                                                                return A2(newFlow,
+                                                                                                          List.maximum(ws),
+                                                                                                          List.maximum(hs));
+                                                                                              case
+                                                                                              "DRight" :
+                                                                                                return A2(newFlow,
+                                                                                                          List.sum(ws),
+                                                                                                          List.maximum(hs));
+                                                                                              case
+                                                                                              "DUp" :
+                                                                                                return A2(newFlow,
+                                                                                                          List.maximum(ws),
+                                                                                                          List.sum(hs));}
+                                                                                             _E.Case($moduleName,
+                                                                                                     "between lines 199 and 210");
+                                                                                           }();
                                                 }();
                                        });
                          var Custom = {ctor: "Custom"};
@@ -5557,6 +6290,10 @@ Elm.worker = function(module) {
     return init(ElmRuntime.Display.NONE, {}, module);
 };
 
+Elm.node = function(module) {
+    return init(ElmRuntime.Display.NODE, {}, module);
+};
+
 function init(display, container, module, moduleToReplace) {
   // defining state needed for an instance of the Elm RTS
   var inputs = [];
@@ -5597,16 +6334,35 @@ function init(display, container, module, moduleToReplace) {
       inputs:inputs
   };
 
-  // Set up methods to communicate with Elm program from JS.
-  function send(name, value) {
+  var send, recv;
+  if (display !== ElmRuntime.Display.NODE) {
+    
+    // Set up methods to communicate with Elm program from JS.
+    
+    send = function(name, value) {
       if (typeof value === 'undefined') return function(v) { return send(name,v); };
       var e = document.createEvent('Event');
       e.initEvent(name + '_' + elm.id, true, true);
       e.value = value;
       document.dispatchEvent(e);
-  }
-  function recv(name, handler) {
+    }
+
+    recv = function(name, handler) {
       document.addEventListener(name + '_' + elm.id, handler);
+    }
+  
+  } else {
+
+    // TODO
+    
+    send = function(name, value) {
+      emitter.emit(name + '_' + elm.id, value)
+    }
+
+    recv = function(name, handler) {
+      emitter.on(name + '_' + elm.id, handler)
+    }
+
   }
 
   recv('log', function(e) {console.log(e.value)});
@@ -5631,13 +6387,17 @@ function init(display, container, module, moduleToReplace) {
   try {
       Module = module(elm);
   } catch(e) {
-      var directions = "<br/>&nbsp; &nbsp; Open the developer console for more details."
-      Module.main = Elm.Text(elm).text('<code>' + e.message + directions + '</code>');
-      reportAnyErrors = function() { throw e; }
+      if (display !== ElmRuntime.Display.NODE) {
+        var directions = "<br/>&nbsp; &nbsp; Open the developer console for more details.";
+        Module.main = Elm.Text(elm).text('<code>' + e.message + directions + '</code>');
+        reportAnyErrors = function() { throw e; }
+      } else {
+        throw e;
+      }e
   }
   inputs = ElmRuntime.filterDeadInputs(inputs);
   filterListeners(inputs, listeners);
-  if (display !== ElmRuntime.Display.NONE) {
+  if (display !== ElmRuntime.Display.NONE && display !== ElmRuntime.Display.NODE) {
       var graphicsNode = initGraphics(elm, Module);
   }
   if (typeof moduleToReplace !== 'undefined') {
@@ -5677,6 +6437,8 @@ function initGraphics(elm, Module) {
   if (!('main' in Module))
       throw new Error("'main' is missing! What do I display?!");
 
+  ElmRuntime.setupBrowser();
+
   var signalGraph = Module.main;
 
   // make sure the signal graph is actually a signal & extract the visual model
@@ -5708,56 +6470,61 @@ function initGraphics(elm, Module) {
 }
 
 }());
+
 (function() {
-'use strict';
+  'use strict';
 
-ElmRuntime.Display = { FULLSCREEN: 0, COMPONENT: 1, NONE: 2 };
+  ElmRuntime.Display = { FULLSCREEN: 0, COMPONENT: 1, NONE: 2, NODE: 3 };
 
-ElmRuntime.counter = 0;
-ElmRuntime.guid = function() { return ElmRuntime.counter++; }
+  ElmRuntime.counter = 0;
+  ElmRuntime.guid = function() { return ElmRuntime.counter++; }
 
-ElmRuntime.use = function(M) {
+  ElmRuntime.use = function(M) {
     if (typeof M === 'function') M = M();
     return M;
-};
+  };
 
-function isAlive(input) {
+  function isAlive(input) {
     if (!('defaultNumberOfKids' in input)) return true;
     var len = input.kids.length;
     if (len === 0) return false;
     if (len > input.defaultNumberOfKids) return true;
     var alive = false;
     for (var i = len; i--; ) {
-        alive = alive || isAlive(input.kids[i]);
+      alive = alive || isAlive(input.kids[i]);
     }
     return alive;
-}
+  }
 
-ElmRuntime.filterDeadInputs = function(inputs) {
+  ElmRuntime.filterDeadInputs = function(inputs) {
     var temp = [];
     for (var i = inputs.length; i--; ) {
-        if (isAlive(inputs[i])) temp.push(inputs[i]);
+      if (isAlive(inputs[i])) temp.push(inputs[i]);
     }
     return temp;
-};
+  };
 
-// define the draw function
-var vendors = ['ms', 'moz', 'webkit', 'o'];
-for (var i = 0; i < vendors.length && !window.requestAnimationFrame; ++i) {
-    window.requestAnimationFrame = window[vendors[i]+'RequestAnimationFrame'];
-    window.cancelAnimationFrame  = window[vendors[i]+'CancelAnimationFrame'] ||
-                                   window[vendors[i]+'CancelRequestAnimationFrame'];
-}
+  ElmRuntime.setupBrowser = function() {
 
-if (window.requestAnimationFrame && window.cancelAnimationFrame) {
-    var previous = 0;
-    ElmRuntime.draw = function(callback) {
+    // define the draw function
+    var vendors = ['ms', 'moz', 'webkit', 'o'];
+    for (var i = 0; i < vendors.length && !window.requestAnimationFrame; ++i) {
+      window.requestAnimationFrame = window[vendors[i]+'RequestAnimationFrame'];
+      window.cancelAnimationFrame  = window[vendors[i]+'CancelAnimationFrame'] ||
+        window[vendors[i]+'CancelRequestAnimationFrame'];
+    }
+
+    if (window.requestAnimationFrame && window.cancelAnimationFrame) {
+      var previous = 0;
+      ElmRuntime.draw = function(callback) {
         window.cancelAnimationFrame(previous);
         previous = window.requestAnimationFrame(callback);
-    };
-} else {
-    ElmRuntime.draw = function(callback) { callback(); };
-}
+      };
+    } else {
+      ElmRuntime.draw = function(callback) { callback(); };
+    }
+
+  }
 
 }());
 (function() {
