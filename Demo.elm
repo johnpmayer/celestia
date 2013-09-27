@@ -87,8 +87,12 @@ draw n gs =
 main = combineSElems outward <|
   [ spaceBlack <~ (.window <~ gameInputs) ~ (draw <~ (fst <~ timestamp gameInputs) ~ withPhantom)
   , combineSElems down
-    [ (color white . asText . prepend "Focus " . show . .focus) <~ current
-    , (color white . asText . prepend "Build " . show . .build . .mode) <~ current
-  --  , (color white . asText . prepend "Ship4 " . show . D.lookup 4 . .entities) <~ current
+    [ (color white . asText) <~ constant "Celestia"
+    , (color white . asText) <~ constant "Use WASD to control your current ship, and X to brake"
+    , (color white . asText) <~ constant "Use 1-4 and the mouse to build parts on the skeleton structure"
+    , (color white . asText) <~ constant "Use C to cycle between ships, including the skeleton ship"
+    --, (color white . asText . prepend "Focus " . show . .focus) <~ current
+    --, (color white . asText . prepend "Build " . show . .build . .mode) <~ current
+    --, (color white . asText . prepend "Ship4 " . show . D.lookup 4 . .entities) <~ current
     ]
   ]

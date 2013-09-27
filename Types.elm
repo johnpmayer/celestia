@@ -125,7 +125,7 @@ data BuildStage
   = Place
   | Rotate BuildCache
 
-type BuildMode = { entity : Int, stage : BuildStage, absRotate : Maybe Float, placement : Maybe LabelDist, part : Maybe Part }
+type BuildMode = { entity : Int, stage : BuildStage, absRotate : Maybe Float, placement : Maybe LabelDist, part : Maybe Structure }
 
 type GameStep = State GameState ()
 

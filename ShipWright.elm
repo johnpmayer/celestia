@@ -116,20 +116,19 @@ walkLocalDisp placement e =
   in foldTagTree dispPart dispLabelBeam dispAttach labelStruct
 
 
-placeStructure : Part -> Float -> LabelDist -> Entity -> Structure
-placeStructure p theta best e =
+placeStructure : Structure -> Float -> LabelDist -> Entity -> Structure
+placeStructure placeS theta best e =
   let s = e.cache.structure
   in  if best.id < 0
       then s
       else
-        let placePart p = part p
-            placeBeam b subs = beam {b - id} <|
+        let placeBeam b subs = beam {b - id} <|
               if best.id == b.id
-              then ({offset=best.offset,theta=theta}, part p) :: subs
+              then ({offset=best.offset,theta=theta}, placeS) :: subs
               else subs
-        in foldTagTree' placePart placeBeam <| labelBeams s
+        in foldTagTree' part placeBeam <| labelBeams s
 
-placePhantomPart : Part -> Float -> LabelDist -> Entity -> Entity
+placePhantomPart : Structure -> Float -> LabelDist -> Entity -> Entity
 placePhantomPart p theta best e =
   let c = e.cache
       s = placeStructure p theta best e
