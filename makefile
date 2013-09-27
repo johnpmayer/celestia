@@ -1,13 +1,14 @@
 
 ELM=elm --runtime elm-runtime.js
 
-all: build/index.html
+all: build/index.html build/Cat.js
 
 fresh: clean all
 
 SOURCES=*.elm
 
-ELM_VER=$(shell ghc-pkg latest Elm)
+#ELM_VER=$(shell ghc-pkg latest Elm)
+ELM_VER=Elm-0.9.0.2
 
 RUNTIME="build/elm-runtime.js"
 
@@ -19,6 +20,9 @@ build/index.html: build/Demo.html
 
 build/Demo.html: ${RUNTIME} ${SOURCES}
 	${ELM} --make Demo.elm 
+
+build/Cat.js: ${RUNTIME} ${SOURCES}
+	${ELM} --only-js --node Cat.elm
 
 clean:
 	rm -rf cache
