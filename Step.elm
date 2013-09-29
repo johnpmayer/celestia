@@ -85,13 +85,19 @@ updateModeTree n =
     ST.get >>= (\state ->
     let mode = state.mode
         buildMode = mode.build
-        placeS = case n of
-          1 -> Just <| part <| Brain { r=10 }
-          2 -> Just <| part <| FuelTank { l=20, w=10 }
-          3 -> Just <| part <| Engine { r=10, config=Forward }
-          4 -> Just <| beam { r=30 } []
-          _ -> Nothing
-        newBuildMode = { buildMode | part <- placeS }
+        placeS = buildMode.part
+        newPlaceS = case placeS of
+          Nothing -> case n of
+              1 -> Just <| part <| Brain { r=10 }
+              2 -> Just <| part <| FuelTank { l=20, w=10 }
+              3 -> Just <| part <| Engine { r=10, config=Forward }
+              4 -> Just <| beam { r=30 } []
+              _ -> Nothing
+          Just beam {-@(Node {r} subs)-} -> Just beam
+          Just part {-@(Leaf (Brain {r}))-} -> Just part
+          Just part {-@(Leaf (FuelTank {l,w}))-} -> Just part
+          Just part {-@(Leaf (Engine {r,config}))-} -> Just part
+        newBuildMode = { buildMode | part <- newPlaceS }
         newMode = { mode | build <- newBuildMode }
         newState = { state | mode <- newMode }
     in ST.put newState)
