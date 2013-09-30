@@ -51,6 +51,14 @@ data EngineConfig = Disabled
                   | TurnLeft 
                   | TurnRight
 
+nextConfig : EngineConfig -> EngineConfig
+nextConfig e = case e of
+  Disabled  -> Forward
+  Forward   -> Reverse
+  Reverse   -> TurnLeft
+  TurnLeft  -> TurnRight
+  TurnRight -> Disabled
+
 data Part = Brain { r : Float }
           | FuelTank { l : Float, w : Float }
           | Engine { r : Float, config : EngineConfig }

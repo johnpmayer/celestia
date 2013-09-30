@@ -30,6 +30,8 @@ import Public.State.State (State)
 
 import Public.Vec2.Vec2 as V
 
+import open Public.TagTree.TagTree
+
 import open Types
 import open Utils
 import open Physics
@@ -93,7 +95,10 @@ updateModeTree n =
               3 -> Just <| part <| Engine { r=10, config=Forward }
               4 -> Just <| beam { r=30 } []
               _ -> Nothing
-          Just beam {-@(Node {r} subs)-} -> Just beam
+          Just (Node {r} subs) -> case n of
+              1 -> Just <| beam {r = r + 10} subs
+              2 -> Just <| beam {r = max 0 (r - 10)} subs
+              _ -> Just <| beam {r = r} subs
           Just part {-@(Leaf (Brain {r}))-} -> Just part
           Just part {-@(Leaf (FuelTank {l,w}))-} -> Just part
           Just part {-@(Leaf (Engine {r,config}))-} -> Just part
