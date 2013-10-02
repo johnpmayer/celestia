@@ -5,11 +5,11 @@ Demo on gh-pages http://johnpmayer.github.io/celestia/
 
 you can build satellites and spaceships spacecraft out of parts
 spacecraft are represented as a heirarchy of parts
-all spacecraft are simulated and can be destroyed
 
-asteroids give you metal 
-metal used to make parts 
+all spacecraft physics is simulated 
 
-comets give you ice
-ice used to make fuel
+Next steps:
+- some sort of resource gathering
+- some sort of structure coupling
+- multiplayer
 
