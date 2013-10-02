@@ -95,25 +95,25 @@ updateModeTree n =
               3 -> Just <| part <| Engine { r=10, config=Forward }
               4 -> Just <| beam { r=30 } []
               _ -> Nothing
-          Just (Node {r} subs) -> case n of
+          (Just (Node {r} subs) as p) -> case n of
               1 -> Just <| beam {r = r + 10} subs
               2 -> Just <| beam {r = max 0 (r - 10)} subs
-              _ -> Just <| beam {r = r} subs
-          Just (Leaf (Brain {r})) -> case n of
+              _ -> p
+          (Just (Leaf (Brain {r})) as p) -> case n of
               1 -> Just <| part <| Brain {r = r + 10}
               2 -> Just <| part <| Brain {r = max 0 (r - 10)}
-              _ -> Just <| part <| Brain {r = r}
-          Just (Leaf (FuelTank {l,w})) -> case n of
+              _ -> p
+          (Just (Leaf (FuelTank {l,w})) as p) -> case n of
               1 -> Just <| part <| FuelTank {l = l + 10, w = w}
               2 -> Just <| part <| FuelTank {l = max 0 (l - 10), w = w}
               3 -> Just <| part <| FuelTank {l = l, w = w + 10}
               4 -> Just <| part <| FuelTank {l = l, w = max 0 (w - 10)}
-              _ -> Just <| part <| FuelTank {l = l, w = w}
-          Just (Leaf (Engine {r,config})) -> case n of
+              _ -> p
+          (Just (Leaf (Engine {r,config})) as p) -> case n of
               1 -> Just <| part <| Engine {r = r + 10, config = config}
               2 -> Just <| part <| Engine {r = max 0 (r - 10), config = config}
               3 -> Just <| part <| Engine {r = r, config = nextConfig config}
-              _ -> Just <| part <| Engine {r = r, config = config }
+              _ -> p
         newBuildMode = { buildMode | part <- newPlaceS }
         newMode = { mode | build <- newBuildMode }
         newState = { state | mode <- newMode }
