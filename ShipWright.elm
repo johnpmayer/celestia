@@ -27,10 +27,10 @@ import Dict as D
 
 import open Draw
 import open Physics
-import open Public.TagTree.TagTree
+import open Data.TagTree
 import open Types
 import open Utils
-import open Public.Vec2.Vec2
+import open Data.Vec2
 
 buildPoints : LabelStructure -> [BuildPoint]
 buildPoints = 

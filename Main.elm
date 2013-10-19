@@ -29,7 +29,7 @@ import open Draw
 import open Physics 
 import open Types 
 import open Utils
-import open Public.Vec2.Vec2
+import open Data.Vec2
 
 attitude : EngineConfig -> Structure
 attitude ec = beam { r=10 } <|

@@ -29,12 +29,12 @@ import Dict as D
 import open Physics
 
 import Draw (drawEntity)
-import Public.State.State (execState)
+import Control.State (execState)
 import Step (step)
 import GameInputs (gameInputs)
 import open Types
 import open Utils
-import open Public.Vec2.Vec2
+import open Data.Vec2
 
 import Main (simpleShip)
 import ShipWright (addPhantom)

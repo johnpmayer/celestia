@@ -20,8 +20,8 @@
 
 module Physics where
 
-import open Public.Vec2.Vec2
-import open Public.TagTree.TagTree
+import open Data.Vec2
+import open Data.TagTree
 import open Types
 import open Utils
 

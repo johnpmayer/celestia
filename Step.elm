@@ -25,12 +25,12 @@ import Char as C
 import Dict as D
 import open Either
 
-import Public.State.State as ST
-import Public.State.State (State)
+import Control.State as ST
+import Control.State (State)
 
-import Public.Vec2.Vec2 as V
+import Data.Vec2 as V
 
-import open Public.TagTree.TagTree
+import open Data.TagTree
 
 import open Types
 import open Utils

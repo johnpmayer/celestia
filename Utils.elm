@@ -22,7 +22,7 @@
 module Utils where
 
 import open Dict
-import open Public.Vec2.Vec2
+import open Data.Vec2
 
 import open Types
 

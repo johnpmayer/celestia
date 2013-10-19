@@ -1,3 +1,12 @@
 [submodule "build"]
 	path = build
 	url = git@github.com:johnpmayer/celestia
+[submodule "elm_modules/state"]
+	path = elm_modules/state
+	url = https://github.com/johnpmayer/state
+[submodule "elm_modules/vec2"]
+	path = elm_modules/vec2
+	url = https://github.com/johnpmayer/vec2
+[submodule "elm_modules/tagtree"]
+	path = elm_modules/tagtree
+	url = https://github.com/johnpmayer/tagtree

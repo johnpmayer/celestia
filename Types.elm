@@ -23,9 +23,9 @@ module Types where
 import Dict (Dict)
 import Either (Either)
 
-import open Public.State.State
-import open Public.TagTree.TagTree
-import open Public.Vec2.Vec2
+import open Control.State
+import open Data.TagTree
+import open Data.Vec2
 
 {- Structures -}
 
