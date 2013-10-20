@@ -40,16 +40,14 @@ Elm.Demo.make = function (elm)
                   var Dict = Elm.Dict.make(elm);
                   var Physics = Elm.Physics.make(elm);
                   var Draw = Elm.Draw.make(elm);
-                  var Public = Public || {};
-                  Public.State = Public.State || {};
-                  Public.State.State = Elm.Public.State.State.make(elm);
+                  var Control = Control || {};
+                  Control.State = Elm.Control.State.make(elm);
                   var Step = Elm.Step.make(elm);
                   var GameInputs = Elm.GameInputs.make(elm);
                   var Types = Elm.Types.make(elm);
                   var Utils = Elm.Utils.make(elm);
-                  var Public = Public || {};
-                  Public.Vec2 = Public.Vec2 || {};
-                  Public.Vec2.Vec2 = Elm.Public.Vec2.Vec2.make(elm);
+                  var Data = Data || {};
+                  Data.Vec2 = Elm.Data.Vec2.make(elm);
                   var Main = Elm.Main.make(elm);
                   var ShipWright = Elm.ShipWright.make(elm);
                   var _op = {};
@@ -61,8 +59,8 @@ Elm.Demo.make = function (elm)
                   var station = {_: {}, cache: Physics.genEntityCache(spine), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 0, x: 0, y: 200}, v: {_: {}, x: 0, y: 0}}};
                   var initialShips = _J.toList([{_: {}, cache: Physics.genEntityCache(Main.simpleShip), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 0, x: 0, y: 0}, v: {_: {}, x: 0, y: 0}}},
                                                 {_: {}, cache: Physics.genEntityCache(Main.simpleShip), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 1, x: 60, y: 50}, v: {_: {}, x: 0, y: 0}}},
-                                                {_: {}, cache: Physics.genEntityCache(Main.simpleShip), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 4, x: 0 - 80, y: 40}, v: {_: {}, x: 0, y: 0}}},
-                                                {_: {}, cache: Physics.genEntityCache(Main.simpleShip), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 3, x: 120, y: 0 - 20}, v: {_: {}, x: 0, y: 0}}}]);
+                                                {_: {}, cache: Physics.genEntityCache(Main.simpleShip), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 4, x: -80, y: 40}, v: {_: {}, x: 0, y: 0}}},
+                                                {_: {}, cache: Physics.genEntityCache(Main.simpleShip), controls: Either.Right(_J.toList([])), motion: {_: {}, omega: 0, pos: {_: {}, theta: 3, x: 120, y: -20}, v: {_: {}, x: 0, y: 0}}}]);
                   var initialEntities = Dict.fromList({ctor: "::", _0: {ctor: "_Tuple2", _0: 4, _1: station}, _1: A2(List.zip,
                                                                                                                      _J.toList([0,
                                                                                                                                 1,
@@ -83,14 +81,14 @@ Elm.Demo.make = function (elm)
                                                                 Draw.drawEntity(n),
                                                                 entities);
                                            var camera = gs.cache.camera;
-                                           var cameraTransform = Public.Vec2.Vec2.vecTranslate(Public.Vec2.Vec2.negVec(camera));
+                                           var cameraTransform = Data.Vec2.vecTranslate(Data.Vec2.negVec(camera));
                                            return _J.toList([Graphics.Collage.groupTransform(cameraTransform)(entityForms)]);
                                          }();
                                 });
                   var current = A3(Signal.foldp,
                                    function ($)
                                    {
-                                     return Public.State.State.execState(Step.step($));
+                                     return Control.State.execState(Step.step($));
                                    },
                                    initialState,
                                    GameInputs.gameInputs);
@@ -184,18 +182,14 @@ Elm.Step.make = function (elm)
                   var Char = Elm.Char.make(elm);
                   var Dict = Elm.Dict.make(elm);
                   var Either = Elm.Either.make(elm);
-                  var Public = Public || {};
-                  Public.State = Public.State || {};
-                  Public.State.State = Elm.Public.State.State.make(elm);
-                  var Public = Public || {};
-                  Public.State = Public.State || {};
-                  Public.State.State = Elm.Public.State.State.make(elm);
-                  var Public = Public || {};
-                  Public.Vec2 = Public.Vec2 || {};
-                  Public.Vec2.Vec2 = Elm.Public.Vec2.Vec2.make(elm);
-                  var Public = Public || {};
-                  Public.TagTree = Public.TagTree || {};
-                  Public.TagTree.TagTree = Elm.Public.TagTree.TagTree.make(elm);
+                  var Control = Control || {};
+                  Control.State = Elm.Control.State.make(elm);
+                  var Control = Control || {};
+                  Control.State = Elm.Control.State.make(elm);
+                  var Data = Data || {};
+                  Data.Vec2 = Elm.Data.Vec2.make(elm);
+                  var Data = Data || {};
+                  Data.TagTree = Elm.Data.TagTree.make(elm);
                   var Types = Elm.Types.make(elm);
                   var Utils = Elm.Utils.make(elm);
                   var Physics = Elm.Physics.make(elm);
@@ -205,10 +199,10 @@ Elm.Step.make = function (elm)
                                        {
                                          return function ()
                                                 {
-                                                  var pure = Public.State.State.returnS;
-                                                  _op[">>="] = Public.State.State.bindS;
+                                                  var pure = Control.State.returnS;
+                                                  _op[">>="] = Control.State.bindS;
                                                   return A2(_op[">>="],
-                                                            Public.State.State.get,
+                                                            Control.State.get,
                                                             function (state)
                                                             {
                                                               return function ()
@@ -337,37 +331,37 @@ Elm.Step.make = function (elm)
                                                                        var newState = _N.replace([["mode",
                                                                                                    newMode]],
                                                                                                  state);
-                                                                       return Public.State.State.put(newState);
+                                                                       return Control.State.put(newState);
                                                                      }();
                                                             });
                                                 }();
                                        };
                   var setStage = function (newStage)
                                  {
-                                   return Public.State.State.updateS(function (state)
-                                                                     {
-                                                                       return function ()
-                                                                              {
-                                                                                var mode = state.mode;
-                                                                                var buildMode = mode.build;
-                                                                                var newBuildMode = _N.replace([["stage",
-                                                                                                                newStage]],
-                                                                                                              buildMode);
-                                                                                var newMode = _N.replace([["build",
-                                                                                                           newBuildMode]],
-                                                                                                         mode);
-                                                                                return _N.replace([["mode",
-                                                                                                    newMode]],
-                                                                                                  state);
-                                                                              }();
-                                                                     });
+                                   return Control.State.updateS(function (state)
+                                                                {
+                                                                  return function ()
+                                                                         {
+                                                                           var mode = state.mode;
+                                                                           var buildMode = mode.build;
+                                                                           var newBuildMode = _N.replace([["stage",
+                                                                                                           newStage]],
+                                                                                                         buildMode);
+                                                                           var newMode = _N.replace([["build",
+                                                                                                      newBuildMode]],
+                                                                                                    mode);
+                                                                           return _N.replace([["mode",
+                                                                                               newMode]],
+                                                                                             state);
+                                                                         }();
+                                                                });
                                  };
                   var rotateFocus = function ()
                                     {
-                                      var pure = Public.State.State.returnS;
-                                      _op[">>="] = Public.State.State.bindS;
+                                      var pure = Control.State.returnS;
+                                      _op[">>="] = Control.State.bindS;
                                       return A2(_op[">>="],
-                                                Public.State.State.get,
+                                                Control.State.get,
                                                 function (state)
                                                 {
                                                   return function ()
@@ -379,16 +373,16 @@ Elm.Step.make = function (elm)
                                                            var newState = _N.replace([["focus",
                                                                                        newFocus]],
                                                                                      state);
-                                                           return Public.State.State.put(newState);
+                                                           return Control.State.put(newState);
                                                          }();
                                                 });
                                     }();
                   var quitBuild = function ()
                                   {
-                                    var pure = Public.State.State.returnS;
-                                    _op[">>="] = Public.State.State.bindS;
+                                    var pure = Control.State.returnS;
+                                    _op[">>="] = Control.State.bindS;
                                     return A2(_op[">>="],
-                                              Public.State.State.get,
+                                              Control.State.get,
                                               function (state)
                                               {
                                                 return function ()
@@ -404,9 +398,9 @@ Elm.Step.make = function (elm)
                                                          var newMode = _N.replace([["build",
                                                                                     newBuildMode]],
                                                                                   mode);
-                                                         return Public.State.State.put(_N.replace([["mode",
-                                                                                                    newMode]],
-                                                                                                  state));
+                                                         return Control.State.put(_N.replace([["mode",
+                                                                                               newMode]],
+                                                                                             state));
                                                        }();
                                               });
                                   }();
@@ -414,8 +408,8 @@ Elm.Step.make = function (elm)
                                    {
                                      return function ()
                                             {
-                                              var pure = Public.State.State.returnS;
-                                              _op[">>="] = Public.State.State.bindS;
+                                              var pure = Control.State.returnS;
+                                              _op[">>="] = Control.State.bindS;
                                               return function ()
                                                      {
                                                        switch (m.ctor)
@@ -431,18 +425,18 @@ Elm.Step.make = function (elm)
                                                         case
                                                         "Pause" :
                                                           return A2(_op[">>="],
-                                                                    Public.State.State.get,
+                                                                    Control.State.get,
                                                                     function (state)
                                                                     {
                                                                       return function ()
                                                                              {
                                                                                var pause = Basics.not(state.mode.pause);
                                                                                var mode = state.mode;
-                                                                               return Public.State.State.put(_N.replace([["mode",
-                                                                                                                          _N.replace([["pause",
-                                                                                                                                       pause]],
-                                                                                                                                     mode)]],
-                                                                                                                        state));
+                                                                               return Control.State.put(_N.replace([["mode",
+                                                                                                                     _N.replace([["pause",
+                                                                                                                                  pause]],
+                                                                                                                                mode)]],
+                                                                                                                   state));
                                                                              }();
                                                                     });}
                                                        _E.Case($moduleName,
@@ -450,15 +444,15 @@ Elm.Step.make = function (elm)
                                                      }();
                                             }();
                                    };
-                  var noStep = Public.State.State.returnS({ctor: "_Tuple0"});
+                  var noStep = Control.State.returnS({ctor: "_Tuple0"});
                   var updatePhantom = function (pointer)
                                       {
                                         return function ()
                                                {
-                                                 var pure = Public.State.State.returnS;
-                                                 _op[">>="] = Public.State.State.bindS;
+                                                 var pure = Control.State.returnS;
+                                                 _op[">>="] = Control.State.bindS;
                                                  return A2(_op[">>="],
-                                                           Public.State.State.get,
+                                                           Control.State.get,
                                                            function (state)
                                                            {
                                                              return function ()
@@ -469,7 +463,7 @@ Elm.Step.make = function (elm)
                                                                        "Just" :
                                                                          return function ()
                                                                                 {
-                                                                                  var relPointerV = Public.Vec2.Vec2.fromIntPair(pointer);
+                                                                                  var relPointerV = Data.Vec2.fromIntPair(pointer);
                                                                                   var myShip = A2(Dict.lookup,
                                                                                                   state.focus,
                                                                                                   state.entities);
@@ -493,12 +487,12 @@ Elm.Step.make = function (elm)
                                                                                                              var mode = state.mode;
                                                                                                              var buildPos = _case17._1._0.motion.pos;
                                                                                                              var buildMode = mode.build;
-                                                                                                             var absPointerV = A2(Public.Vec2.Vec2.addVec,
+                                                                                                             var absPointerV = A2(Data.Vec2.addVec,
                                                                                                                                   state.cache.camera,
                                                                                                                                   relPointerV);
-                                                                                                             var localPointerV = Public.Vec2.Vec2.rotVec(0 - buildPos.theta)(A2(Public.Vec2.Vec2.subVec,
-                                                                                                                                                                                buildPos,
-                                                                                                                                                                                absPointerV));
+                                                                                                             var localPointerV = Data.Vec2.rotVec(0 - buildPos.theta)(A2(Data.Vec2.subVec,
+                                                                                                                                                                         buildPos,
+                                                                                                                                                                         absPointerV));
                                                                                                              return function ()
                                                                                                                     {
                                                                                                                       var _case22 = buildMode.stage;
@@ -519,13 +513,13 @@ Elm.Step.make = function (elm)
                                                                                                                                   var newState = _N.replace([["mode",
                                                                                                                                                               newMode]],
                                                                                                                                                             state);
-                                                                                                                                  return Public.State.State.put(newState);
+                                                                                                                                  return Control.State.put(newState);
                                                                                                                                 }();
                                                                                                                        case
                                                                                                                        "Rotate" :
                                                                                                                          return function ()
                                                                                                                                 {
-                                                                                                                                  var dispPointer = A2(Public.Vec2.Vec2.subVec,
+                                                                                                                                  var dispPointer = A2(Data.Vec2.subVec,
                                                                                                                                                        _case22._0.localDisp,
                                                                                                                                                        localPointerV);
                                                                                                                                   var absRotate = A2(Basics.atan2,
@@ -541,7 +535,7 @@ Elm.Step.make = function (elm)
                                                                                                                                   var newState = _N.replace([["mode",
                                                                                                                                                               newMode]],
                                                                                                                                                             state);
-                                                                                                                                  return Public.State.State.put(newState);
+                                                                                                                                  return Control.State.put(newState);
                                                                                                                                 }();}
                                                                                                                       _E.Case($moduleName,
                                                                                                                               "between lines 192 and 207");
@@ -563,10 +557,10 @@ Elm.Step.make = function (elm)
                                       };
                   var gamePaused = function ()
                                    {
-                                     var pure = Public.State.State.returnS;
-                                     _op[">>="] = Public.State.State.bindS;
+                                     var pure = Control.State.returnS;
+                                     _op[">>="] = Control.State.bindS;
                                      return A2(_op[">>="],
-                                               Public.State.State.get,
+                                               Control.State.get,
                                                function (state)
                                                {
                                                  return pure(state.mode.pause);
@@ -576,10 +570,10 @@ Elm.Step.make = function (elm)
                                       {
                                         return function ()
                                                {
-                                                 var pure = Public.State.State.returnS;
-                                                 _op[">>="] = Public.State.State.bindS;
+                                                 var pure = Control.State.returnS;
+                                                 _op[">>="] = Control.State.bindS;
                                                  return A2(_op[">>="],
-                                                           Public.State.State.get,
+                                                           Control.State.get,
                                                            function (state)
                                                            {
                                                              return function ()
@@ -606,7 +600,7 @@ Elm.Step.make = function (elm)
                                                                                            var newState = _N.replace([["entities",
                                                                                                                        newEntities]],
                                                                                                                      state);
-                                                                                           return Public.State.State.put(newState);
+                                                                                           return Control.State.put(newState);
                                                                                          }();
                                                                                 case
                                                                                 "Nothing" :
@@ -651,10 +645,10 @@ Elm.Step.make = function (elm)
                                        };
                   var physicsStep = function ()
                                     {
-                                      var pure = Public.State.State.returnS;
-                                      _op[">>="] = Public.State.State.bindS;
+                                      var pure = Control.State.returnS;
+                                      _op[">>="] = Control.State.bindS;
                                       return A2(_op[">>="],
-                                                Public.State.State.get,
+                                                Control.State.get,
                                                 function (state)
                                                 {
                                                   return function ()
@@ -671,16 +665,16 @@ Elm.Step.make = function (elm)
                                                                                       ["cache",
                                                                                        newCache]],
                                                                                      state);
-                                                           return Public.State.State.put(newState);
+                                                           return Control.State.put(newState);
                                                          }();
                                                 });
                                     }();
                   var build = function ()
                               {
-                                var pure = Public.State.State.returnS;
-                                _op[">>="] = Public.State.State.bindS;
+                                var pure = Control.State.returnS;
+                                _op[">>="] = Control.State.bindS;
                                 return A2(_op[">>="],
-                                          Public.State.State.get,
+                                          Control.State.get,
                                           function (state)
                                           {
                                             return function ()
@@ -714,7 +708,7 @@ Elm.Step.make = function (elm)
                                                                            case
                                                                            "Rotate" :
                                                                              return A2(_op[">>="],
-                                                                                       Public.State.State.updateS(ShipWright.addPhantom),
+                                                                                       Control.State.updateS(ShipWright.addPhantom),
                                                                                        function (arg0)
                                                                                        {
                                                                                          return function ()
@@ -738,8 +732,8 @@ Elm.Step.make = function (elm)
                              {
                                return function ()
                                       {
-                                        var pure = Public.State.State.returnS;
-                                        _op[">>="] = Public.State.State.bindS;
+                                        var pure = Control.State.returnS;
+                                        _op[">>="] = Control.State.bindS;
                                         return function ()
                                                {
                                                  var _case36 = input.trigger;
@@ -804,14 +798,12 @@ Elm.ShipWright.make = function (elm)
                         var Dict = Elm.Dict.make(elm);
                         var Draw = Elm.Draw.make(elm);
                         var Physics = Elm.Physics.make(elm);
-                        var Public = Public || {};
-                        Public.TagTree = Public.TagTree || {};
-                        Public.TagTree.TagTree = Elm.Public.TagTree.TagTree.make(elm);
+                        var Data = Data || {};
+                        Data.TagTree = Elm.Data.TagTree.make(elm);
                         var Types = Elm.Types.make(elm);
                         var Utils = Elm.Utils.make(elm);
-                        var Public = Public || {};
-                        Public.Vec2 = Public.Vec2 || {};
-                        Public.Vec2.Vec2 = Elm.Public.Vec2.Vec2.make(elm);
+                        var Data = Data || {};
+                        Data.Vec2 = Elm.Data.Vec2.make(elm);
                         var _op = {};
                         var walkLocalDisp = F2(function (placement,e)
                                                {
@@ -859,7 +851,7 @@ Elm.ShipWright.make = function (elm)
                                                                                                  "between lines 79 and 83");
                                                                                        }();
                                                                               });
-                                                          return A4(Public.TagTree.TagTree.foldTagTree,
+                                                          return A4(Data.TagTree.foldTagTree,
                                                                     dispPart,
                                                                     dispLabelBeam,
                                                                     dispAttach,
@@ -870,7 +862,7 @@ Elm.ShipWright.make = function (elm)
                                            {
                                              return function ()
                                                     {
-                                                      var dist = A3(Public.Vec2.Vec2.minimumDist,
+                                                      var dist = A3(Data.Vec2.minimumDist,
                                                                     bp.start,
                                                                     bp.end,
                                                                     pointerV);
@@ -895,7 +887,7 @@ Elm.ShipWright.make = function (elm)
                                                                                                                                          b))(_N.eq(best.id,
                                                                                                                                                    b.id) ? {ctor: "::", _0: {ctor: "_Tuple2", _0: {_: {}, offset: best.offset, theta: roundTheta}, _1: placeS}, _1: subs} : subs);
                                                                                                            });
-                                                                                        return A2(Public.TagTree.TagTree.foldTagTree$,
+                                                                                        return A2(Data.TagTree.foldTagTree$,
                                                                                                   Types.part,
                                                                                                   placeBeam)(Types.labelBeams(s));
                                                                                       }();
@@ -958,7 +950,7 @@ Elm.ShipWright.make = function (elm)
                                                          var labeledDists = A2(List.map,
                                                                                pointDist(pointerV),
                                                                                bps);
-                                                         var fakePoint = {_: {}, id: 0 - 1, offset: 0, r: minDist};
+                                                         var fakePoint = {_: {}, id: -1, offset: 0, r: minDist};
                                                          return A3(List.foldl,
                                                                    compareDists,
                                                                    fakePoint,
@@ -970,7 +962,7 @@ Elm.ShipWright.make = function (elm)
                                             var partPoints = Utils.cnst(_J.toList([]));
                                             var beamPoint = function (beam)
                                                             {
-                                                              return {_: {}, end: {_: {}, x: beam.r, y: 0}, id: beam.id, start: Public.Vec2.Vec2.origin};
+                                                              return {_: {}, end: {_: {}, x: beam.r, y: 0}, id: beam.id, start: Data.Vec2.origin};
                                                             };
                                             var beamPoints = F2(function (beam,subs)
                                                                 {
@@ -984,7 +976,7 @@ Elm.ShipWright.make = function (elm)
                                                                                    {
                                                                                      var place = function ($)
                                                                                                  {
-                                                                                                   return Public.Vec2.Vec2.addVec({_: {}, x: arg1.offset, y: 0})(Public.Vec2.Vec2.rotVec(arg1.theta)($));
+                                                                                                   return Data.Vec2.addVec({_: {}, x: arg1.offset, y: 0})(Data.Vec2.rotVec(arg1.theta)($));
                                                                                                  };
                                                                                      return _N.replace([["start",
                                                                                                          place(bp.start)],
@@ -998,7 +990,7 @@ Elm.ShipWright.make = function (elm)
                                                                {
                                                                  return List.map(attachPoint(attach));
                                                                };
-                                            return A3(Public.TagTree.TagTree.foldTagTree,
+                                            return A3(Data.TagTree.foldTagTree,
                                                       partPoints,
                                                       beamPoints,
                                                       attachPoints);
@@ -1105,9 +1097,8 @@ Elm.Main.make = function (elm)
                   var Physics = Elm.Physics.make(elm);
                   var Types = Elm.Types.make(elm);
                   var Utils = Elm.Utils.make(elm);
-                  var Public = Public || {};
-                  Public.Vec2 = Public.Vec2 || {};
-                  Public.Vec2.Vec2 = Elm.Public.Vec2.Vec2.make(elm);
+                  var Data = Data || {};
+                  Data.Vec2 = Elm.Data.Vec2.make(elm);
                   var _op = {};
                   var startPos = {_: {}, omega: 0, pos: {_: {}, theta: 0, x: 0, y: 0}, v: {_: {}, x: 0, y: 0}};
                   var reverseR = Types.beam({_: {}, r: 10})(_J.toList([{ctor: "_Tuple2", _0: {_: {}, offset: 10, theta: Basics.pi / 2}, _1: Types.part(Types.Engine({_: {}, config: Types.Reverse, r: 4}))}]));
@@ -1128,7 +1119,7 @@ Elm.Main.make = function (elm)
                   var gamePointer = A2(Signal._op["<~"],
                                        Utils.convertPos(canvasWH),
                                        Mouse.position);
-                  var brakes = Keyboard.isDown(Char.toCode("x"));
+                  var brakes = Keyboard.isDown(Char.toCode(_N.chr("x")));
                   var attitude = function (ec)
                                  {
                                    return Types.beam({_: {}, r: 10})(_J.toList([{ctor: "_Tuple2", _0: {_: {}, offset: 10, theta: 0}, _1: Types.part(Types.Engine({_: {}, config: ec, r: 4}))}]));
@@ -1173,14 +1164,12 @@ Elm.Draw.make = function (elm)
                   Graphics.Collage = Elm.Graphics.Collage.make(elm);
                   var Transform2D = Elm.Transform2D.make(elm);
                   var Transform2D = Elm.Transform2D.make(elm);
+                  var Data = Data || {};
+                  Data.TagTree = Elm.Data.TagTree.make(elm);
+                  var Data = Data || {};
+                  Data.Vec2 = Elm.Data.Vec2.make(elm);
                   var Physics = Elm.Physics.make(elm);
-                  var Public = Public || {};
-                  Public.TagTree = Public.TagTree || {};
-                  Public.TagTree.TagTree = Elm.Public.TagTree.TagTree.make(elm);
                   var Types = Elm.Types.make(elm);
-                  var Public = Public || {};
-                  Public.Vec2 = Public.Vec2 || {};
-                  Public.Vec2.Vec2 = Elm.Public.Vec2.Vec2.make(elm);
                   var _op = {};
                   var translation = A4(Transform2D.matrix,1,0,0,1);
                   var drawPart = F3(function (noise,ecs,part)
@@ -1216,7 +1205,7 @@ Elm.Draw.make = function (elm)
                                                                                                           part._0.l,
                                                                                                           part._0.w));}
                                                         _E.Case($moduleName,
-                                                                "between lines 42 and 52");
+                                                                "between lines 41 and 51");
                                                       }();
                                              }();
                                     });
@@ -1269,7 +1258,7 @@ Elm.Draw.make = function (elm)
                                       });
                   var drawStructure = F3(function (noise,ec,structure)
                                          {
-                                           return A4(Public.TagTree.TagTree.foldTagTree,
+                                           return A4(Data.TagTree.foldTagTree,
                                                      A2(drawPart,noise,ec),
                                                      drawBeam,
                                                      drawAttach,
@@ -1299,7 +1288,7 @@ Elm.Draw.make = function (elm)
                                                                            "Right" :
                                                                              return _case7._0;}
                                                                           _E.Case($moduleName,
-                                                                                  "between lines 75 and 78");
+                                                                                  "between lines 74 and 77");
                                                                         }();
                                                           return Graphics.Collage.groupTransform(modelM)(_J.toList([A3(drawStructure,
                                                                                                                        noise,
@@ -1310,116 +1299,7 @@ Elm.Draw.make = function (elm)
                                       });
                   elm.Draw.values = {_op: _op, translation: translation, drawPart: drawPart, drawAttach: drawAttach, drawBeam: drawBeam, drawStructure: drawStructure, drawEntity: drawEntity, drawBuildArea: drawBuildArea};
                   return elm.Draw.values;
-                };Elm.GameInputs = Elm.GameInputs || {};
-Elm.GameInputs.make = function (elm)
-                      {
-                        elm.GameInputs = elm.GameInputs || {};
-                        if (elm.GameInputs.values)
-                        return elm.GameInputs.values;
-                        var N = Elm.Native,
-                            _N = N.Utils.make(elm),
-                            _L = N.List.make(elm),
-                            _E = N.Error.make(elm),
-                            _J = N.JavaScript.make(elm),
-                            $moduleName = "GameInputs";
-                        var Text = Elm.Text.make(elm);
-                        var Text = Elm.Text.make(elm);
-                        var Basics = Elm.Basics.make(elm);
-                        var Signal = Elm.Signal.make(elm);
-                        var List = Elm.List.make(elm);
-                        var Maybe = Elm.Maybe.make(elm);
-                        var Time = Elm.Time.make(elm);
-                        var Prelude = Elm.Prelude.make(elm);
-                        var Graphics = Graphics || {};
-                        Graphics.Element = Elm.Graphics.Element.make(elm);
-                        var Color = Elm.Color.make(elm);
-                        var Graphics = Graphics || {};
-                        Graphics.Collage = Elm.Graphics.Collage.make(elm);
-                        var Either = Elm.Either.make(elm);
-                        var Char = Elm.Char.make(elm);
-                        var Dict = Elm.Dict.make(elm);
-                        var Dict = Elm.Dict.make(elm);
-                        var Keyboard = Elm.Keyboard.make(elm);
-                        var Keyboard = Elm.Keyboard.make(elm);
-                        var Mouse = Elm.Mouse.make(elm);
-                        var Time = Elm.Time.make(elm);
-                        var Window = Elm.Window.make(elm);
-                        var Types = Elm.Types.make(elm);
-                        var Utils = Elm.Utils.make(elm);
-                        var _op = {};
-                        var watchKeymap = Dict.fromList(_J.toList([{ctor: "_Tuple2", _0: Char.toCode("1"), _1: Types.Number(1)},
-                                                                   {ctor: "_Tuple2", _0: Char.toCode("2"), _1: Types.Number(2)},
-                                                                   {ctor: "_Tuple2", _0: Char.toCode("3"), _1: Types.Number(3)},
-                                                                   {ctor: "_Tuple2", _0: Char.toCode("4"), _1: Types.Number(4)},
-                                                                   {ctor: "_Tuple2", _0: Char.toCode("5"), _1: Types.Number(5)},
-                                                                   {ctor: "_Tuple2", _0: Char.toCode("p"), _1: Types.Pause},
-                                                                   {ctor: "_Tuple2", _0: Char.toCode("c"), _1: Types.Cycle},
-                                                                   {ctor: "_Tuple2", _0: 27, _1: Types.Exit}]));
-                        var ticks = A2(Signal._op["<~"],Types.FPS,Time.fps(25));
-                        var modeKeysDown = function ()
-                                           {
-                                             var watchKeys = Dict.toList(watchKeymap);
-                                             var keysDown = A2(List.map,
-                                                               function (arg0)
-                                                               {
-                                                                 return function ()
-                                                                        {
-                                                                          switch (arg0.ctor)
-                                                                          {case
-                                                                           "_Tuple2" :
-                                                                             return Signal.lift(Utils.cnst(arg0._1))(A2(Signal.keepIf,
-                                                                                                                        Basics.id,
-                                                                                                                        true)(Keyboard.isDown(arg0._0)));}
-                                                                          _E.Case($moduleName,
-                                                                                  "on line 76, column 38 to 87");
-                                                                        }();
-                                                               },
-                                                               watchKeys);
-                                             return Signal.merges(keysDown);
-                                           }();
-                        var modes = A2(Signal._op["<~"],Types.Modal,modeKeysDown);
-                        var engines = function ()
-                                      {
-                                        var override = F2(function (b,ecs)
-                                                          {
-                                                            return b ? Either.Left(Types.Brakes) : Either.Right(ecs);
-                                                          });
-                                        var controls = A2(Signal._op["<~"],
-                                                          Utils.controlEngines,
-                                                          Keyboard.wasd);
-                                        var brakes = Keyboard.isDown(Char.toCode("x"));
-                                        return A2(Signal._op["~"],
-                                                  A2(Signal._op["<~"],override,brakes),
-                                                  controls);
-                                      }();
-                        var dimensions = Window.dimensions;
-                        var pointer = A2(Signal._op["<~"],
-                                         Types.Pointer,
-                                         A2(Signal._op["~"],
-                                            A2(Signal._op["<~"],Utils.convertPos,dimensions),
-                                            Mouse.position));
-                        var clicks = A2(Signal._op["<~"],
-                                        Utils.cnst(Types.Click),
-                                        Mouse.clicks);
-                        var triggers = Signal.merges(_J.toList([clicks,
-                                                                modes,
-                                                                ticks,
-                                                                pointer]));
-                        var gameInputs = Signal.sampleOn(triggers)(A2(Signal._op["~"],
-                                                                      A2(Signal._op["~"],
-                                                                         A2(Signal._op["<~"],
-                                                                            F3(function (engines,
-                                                                                         window,
-                                                                                         trigger)
-                                                                               {
-                                                                                 return {_: {}, engines: engines, trigger: trigger, window: window};
-                                                                               }),
-                                                                            engines),
-                                                                         dimensions),
-                                                                      triggers));
-                        elm.GameInputs.values = {_op: _op, gameInputs: gameInputs, dimensions: dimensions, engines: engines, triggers: triggers, clicks: clicks, watchKeymap: watchKeymap, modeKeysDown: modeKeysDown, modes: modes, ticks: ticks, pointer: pointer};
-                        return elm.GameInputs.values;
-                      };Elm.Physics = Elm.Physics || {};
+                };Elm.Physics = Elm.Physics || {};
 Elm.Physics.make = function (elm)
                    {
                      elm.Physics = elm.Physics || {};
@@ -1444,12 +1324,10 @@ Elm.Physics.make = function (elm)
                      var Color = Elm.Color.make(elm);
                      var Graphics = Graphics || {};
                      Graphics.Collage = Elm.Graphics.Collage.make(elm);
-                     var Public = Public || {};
-                     Public.Vec2 = Public.Vec2 || {};
-                     Public.Vec2.Vec2 = Elm.Public.Vec2.Vec2.make(elm);
-                     var Public = Public || {};
-                     Public.TagTree = Public.TagTree || {};
-                     Public.TagTree.TagTree = Elm.Public.TagTree.TagTree.make(elm);
+                     var Data = Data || {};
+                     Data.Vec2 = Elm.Data.Vec2.make(elm);
+                     var Data = Data || {};
+                     Data.TagTree = Elm.Data.TagTree.make(elm);
                      var Types = Elm.Types.make(elm);
                      var Utils = Elm.Utils.make(elm);
                      var _op = {};
@@ -1459,30 +1337,26 @@ Elm.Physics.make = function (elm)
                                                     {
                                                       var oldTheta = state.pos.theta;
                                                       var oldRootPos = state.pos;
-                                                      var oldComOffset = A2(Public.Vec2.Vec2.rotVec,
+                                                      var oldComOffset = A2(Data.Vec2.rotVec,
                                                                             oldTheta,
                                                                             cache.comOffset);
-                                                      var oldComPos = A2(Public.Vec2.Vec2.addVec,
+                                                      var oldComPos = A2(Data.Vec2.addVec,
                                                                          oldComOffset,
                                                                          oldRootPos);
                                                       var newTheta = oldTheta + state.omega;
                                                       var newOmega = state.omega + delta.alpha;
-                                                      var newComOffset = A2(Public.Vec2.Vec2.rotVec,
+                                                      var newComOffset = A2(Data.Vec2.rotVec,
                                                                             newTheta,
                                                                             cache.comOffset);
-                                                      var absA = A2(Public.Vec2.Vec2.rotVec,
+                                                      var absA = A2(Data.Vec2.rotVec,
                                                                     oldTheta,
                                                                     delta.a);
-                                                      var newV = A2(Public.Vec2.Vec2.addVec,
-                                                                    absA,
-                                                                    state.v);
-                                                      var midV = A2(Public.Vec2.Vec2.midVec,
-                                                                    state.v,
-                                                                    newV);
-                                                      var newComPos = Public.Vec2.Vec2.addVec(midV)(_N.replace([["theta",
-                                                                                                                 newTheta]],
-                                                                                                               oldComPos));
-                                                      var newRootPos = A2(Public.Vec2.Vec2.subVec,
+                                                      var newV = A2(Data.Vec2.addVec,absA,state.v);
+                                                      var midV = A2(Data.Vec2.midVec,state.v,newV);
+                                                      var newComPos = Data.Vec2.addVec(midV)(_N.replace([["theta",
+                                                                                                          newTheta]],
+                                                                                                        oldComPos));
+                                                      var newRootPos = A2(Data.Vec2.subVec,
                                                                           newComOffset,
                                                                           newComPos);
                                                       return _N.replace([["pos",newRootPos],
@@ -1496,18 +1370,18 @@ Elm.Physics.make = function (elm)
                                              return function ()
                                                     {
                                                       var brakeVelY = A3(Basics.clamp,
-                                                                         0 - 0.1,
+                                                                         -0.1,
                                                                          0.1,
                                                                          state.v.y);
                                                       var brakeVelX = A3(Basics.clamp,
-                                                                         0 - 0.1,
+                                                                         -0.1,
                                                                          0.1,
                                                                          state.v.x);
                                                       var brakeTheta = A3(Basics.clamp,
-                                                                          0 - 1.0e-3,
+                                                                          -1.0e-3,
                                                                           1.0e-3,
                                                                           state.omega);
-                                                      var fakeDelta = {_: {}, a: A2(Public.Vec2.Vec2.rotVec,
+                                                      var fakeDelta = {_: {}, a: A2(Data.Vec2.rotVec,
                                                                                     0 - state.pos.theta,
                                                                                     {_: {}, x: 0 - brakeVelX, y: 0 - brakeVelY}), alpha: 0 - brakeTheta};
                                                       return A3(updateMotion,cache,fakeDelta,state);
@@ -1534,7 +1408,7 @@ Elm.Physics.make = function (elm)
                                               });
                      var torqueMag = function (t)
                                      {
-                                       return A2(Public.Vec2.Vec2.crossVecMag,t.disp,t.force);
+                                       return A2(Data.Vec2.crossVecMag,t.disp,t.force);
                                      };
                      var sumMasses = function ($)
                                      {
@@ -1547,7 +1421,7 @@ Elm.Physics.make = function (elm)
                                              {
                                                return function ()
                                                       {
-                                                        var r = Public.Vec2.Vec2.magnitude(pm);
+                                                        var r = Data.Vec2.magnitude(pm);
                                                         return pm.m * r * r;
                                                       }();
                                              };
@@ -1565,8 +1439,8 @@ Elm.Physics.make = function (elm)
                                                                   },
                                                                   ecs) ? function ()
                                                                          {
-                                                                           var force = (0 - 8) * part._0.r;
-                                                                           return _J.toList([{_: {}, disp: Public.Vec2.Vec2.origin, force: {_: {}, x: force, y: 0}}]);
+                                                                           var force = -8 * part._0.r;
+                                                                           return _J.toList([{_: {}, disp: Data.Vec2.origin, force: {_: {}, x: force, y: 0}}]);
                                                                          }() : _J.toList([]);}
                                                      return _J.toList([]);
                                                    }();
@@ -1606,7 +1480,7 @@ Elm.Physics.make = function (elm)
                                                        "ParallelAxis" :
                                                          return function ()
                                                                 {
-                                                                  var pav = Public.Vec2.Vec2.extractVec(m._0);
+                                                                  var pav = Data.Vec2.extractVec(m._0);
                                                                   var paf = f(pav);
                                                                   return Types.ParallelAxis(_N.replace([["x",
                                                                                                          paf.x],
@@ -1618,7 +1492,7 @@ Elm.Physics.make = function (elm)
                                                        "Point" :
                                                          return function ()
                                                                 {
-                                                                  var pmv = Public.Vec2.Vec2.extractVec(m._0);
+                                                                  var pmv = Data.Vec2.extractVec(m._0);
                                                                   var pmf = f(pmv);
                                                                   return Types.Point(_N.replace([["x",
                                                                                                   pmf.x],
@@ -1639,14 +1513,14 @@ Elm.Physics.make = function (elm)
                                                      "ParallelAxis" :
                                                        return function ()
                                                               {
-                                                                var r = Public.Vec2.Vec2.magnitude(m._0);
+                                                                var r = Data.Vec2.magnitude(m._0);
                                                                 return m._0.m * r * r + m._0.localMoment;
                                                               }();
                                                      case
                                                      "Point" :
                                                        return function ()
                                                               {
-                                                                var r = Public.Vec2.Vec2.magnitude(m._0);
+                                                                var r = Data.Vec2.magnitude(m._0);
                                                                 return m._0.m * r * r;
                                                               }();}
                                                     _E.Case($moduleName,"between lines 96 and 102");
@@ -1654,7 +1528,7 @@ Elm.Physics.make = function (elm)
                                          };
                      var massContrib = function (pm)
                                        {
-                                         return Public.Vec2.Vec2.scaleVec(pm.m)(Public.Vec2.Vec2.extractVec(pm));
+                                         return Data.Vec2.scaleVec(pm.m)(Data.Vec2.extractVec(pm));
                                        };
                      var beamThrusts = Utils.cnst(List.concat);
                      var beamMoment = F2(function (beam,subs)
@@ -1677,7 +1551,7 @@ Elm.Physics.make = function (elm)
                                                        var rotateForce = function (t)
                                                                          {
                                                                            return _N.replace([["force",
-                                                                                               A2(Public.Vec2.Vec2.rotVec,
+                                                                                               A2(Data.Vec2.rotVec,
                                                                                                   attach.theta,
                                                                                                   t.force)]],
                                                                                              t);
@@ -1685,7 +1559,7 @@ Elm.Physics.make = function (elm)
                                                        var rotateDisp = function (t)
                                                                         {
                                                                           return _N.replace([["disp",
-                                                                                              A2(Public.Vec2.Vec2.rotVec,
+                                                                                              A2(Data.Vec2.rotVec,
                                                                                                  attach.theta,
                                                                                                  t.disp)]],
                                                                                             t);
@@ -1693,7 +1567,7 @@ Elm.Physics.make = function (elm)
                                                        var offsetDisp = function (t)
                                                                         {
                                                                           return _N.replace([["disp",
-                                                                                              A2(Public.Vec2.Vec2.addVec,
+                                                                                              A2(Data.Vec2.addVec,
                                                                                                  {_: {}, x: attach.offset, y: 0},
                                                                                                  t.disp)]],
                                                                                             t);
@@ -1706,25 +1580,25 @@ Elm.Physics.make = function (elm)
                                             });
                      var structureThrusts = function (ec)
                                             {
-                                              return A3(Public.TagTree.TagTree.foldTagTree,
+                                              return A3(Data.TagTree.foldTagTree,
                                                         partThrusts(ec),
                                                         beamThrusts,
                                                         attachThrusts);
                                             };
                      var netForce = F2(function (controls,cache)
                                        {
-                                         return Public.Vec2.Vec2.sumVec(List.map(function (_)
-                                                                                 {
-                                                                                   return _.force;
-                                                                                 })(A2(structureThrusts,
-                                                                                       controls,
-                                                                                       cache.structure)));
+                                         return Data.Vec2.sumVec(List.map(function (_)
+                                                                          {
+                                                                            return _.force;
+                                                                          })(A2(structureThrusts,
+                                                                                controls,
+                                                                                cache.structure)));
                                        });
                      var netAcceleration = F2(function (controls,cache)
                                               {
-                                                return Public.Vec2.Vec2.scaleVec(1 / cache.totalMass)(A2(netForce,
-                                                                                                         controls,
-                                                                                                         cache));
+                                                return Data.Vec2.scaleVec(1 / cache.totalMass)(A2(netForce,
+                                                                                                  controls,
+                                                                                                  cache));
                                               });
                      var netTorque = F2(function (controls,cache)
                                         {
@@ -1737,7 +1611,7 @@ Elm.Physics.make = function (elm)
                                                    var center = function (thrust)
                                                                 {
                                                                   return _N.replace([["disp",
-                                                                                      A2(Public.Vec2.Vec2.subVec,
+                                                                                      A2(Data.Vec2.subVec,
                                                                                          com,
                                                                                          thrust.disp)]],
                                                                                     thrust);
@@ -1762,7 +1636,7 @@ Elm.Physics.make = function (elm)
                                         {
                                           return List.map(translateMoment(attach));
                                         };
-                     var structureMoments = A3(Public.TagTree.TagTree.foldTagTree,
+                     var structureMoments = A3(Data.TagTree.foldTagTree,
                                                partMoment,
                                                beamMoment,
                                                attachMoment);
@@ -1770,7 +1644,7 @@ Elm.Physics.make = function (elm)
                                         {
                                           return List.map(Types.translateAttach(attach));
                                         };
-                     var structureMasses = A3(Public.TagTree.TagTree.foldTagTree,
+                     var structureMasses = A3(Data.TagTree.foldTagTree,
                                               partMasses,
                                               beamMasses,
                                               attachMasses);
@@ -1780,11 +1654,11 @@ Elm.Physics.make = function (elm)
                                      };
                      var centerOfMass = function (structure)
                                         {
-                                          return Public.Vec2.Vec2.scaleVec(1 / totalMass(structure))(Public.Vec2.Vec2.sumVec(List.map(massContrib)(structureMasses(structure))));
+                                          return Data.Vec2.scaleVec(1 / totalMass(structure))(Data.Vec2.sumVec(List.map(massContrib)(structureMasses(structure))));
                                         };
                      var rotInertia = function (structure)
                                       {
-                                        return List.sum(List.map(momentContrib)(List.map(momentMapVec(Public.Vec2.Vec2.subVec(centerOfMass(structure))))(structureMoments(structure))));
+                                        return List.sum(List.map(momentContrib)(List.map(momentMapVec(Data.Vec2.subVec(centerOfMass(structure))))(structureMoments(structure))));
                                       };
                      var genEntityCache = function (s)
                                           {
@@ -1807,8 +1681,8 @@ Elm.Physics.make = function (elm)
                                                                 {
                                                                   return _N.cmp(n,
                                                                                 factor) < 0 && _N.cmp(n,
-                                                                                                      (0 - 1) * factor) > 0 ? 0 : _N.cmp(n,
-                                                                                                                                         0) > 0 ? n - factor : n + factor;
+                                                                                                      -1 * factor) > 0 ? 0 : _N.cmp(n,
+                                                                                                                                    0) > 0 ? n - factor : n + factor;
                                                                 });
                                                   return {_: {}, newOmega: A2(damp,
                                                                               rotfactor,
@@ -1821,7 +1695,116 @@ Elm.Physics.make = function (elm)
                                        };
                      elm.Physics.values = {_op: _op, sumMasses: sumMasses, massContrib: massContrib, partMasses: partMasses, beamMasses: beamMasses, attachMasses: attachMasses, structureMasses: structureMasses, totalMass: totalMass, centerOfMass: centerOfMass, partMoment: partMoment, beamMoment: beamMoment, momentMapVec: momentMapVec, translateMoment: translateMoment, attachMoment: attachMoment, structureMoments: structureMoments, momentContrib: momentContrib, rotInertiaContrib: rotInertiaContrib, rotInertia: rotInertia, genEntityCache: genEntityCache, partThrusts: partThrusts, beamThrusts: beamThrusts, attachThrusts: attachThrusts, structureThrusts: structureThrusts, netForce: netForce, netAcceleration: netAcceleration, torqueMag: torqueMag, netTorque: netTorque, netRotAcceleration: netRotAcceleration, netDelta: netDelta, applyBrakes: applyBrakes, updateBrakes: updateBrakes, updateMotion: updateMotion};
                      return elm.Physics.values;
-                   };Elm.Utils = Elm.Utils || {};
+                   };Elm.GameInputs = Elm.GameInputs || {};
+Elm.GameInputs.make = function (elm)
+                      {
+                        elm.GameInputs = elm.GameInputs || {};
+                        if (elm.GameInputs.values)
+                        return elm.GameInputs.values;
+                        var N = Elm.Native,
+                            _N = N.Utils.make(elm),
+                            _L = N.List.make(elm),
+                            _E = N.Error.make(elm),
+                            _J = N.JavaScript.make(elm),
+                            $moduleName = "GameInputs";
+                        var Text = Elm.Text.make(elm);
+                        var Text = Elm.Text.make(elm);
+                        var Basics = Elm.Basics.make(elm);
+                        var Signal = Elm.Signal.make(elm);
+                        var List = Elm.List.make(elm);
+                        var Maybe = Elm.Maybe.make(elm);
+                        var Time = Elm.Time.make(elm);
+                        var Prelude = Elm.Prelude.make(elm);
+                        var Graphics = Graphics || {};
+                        Graphics.Element = Elm.Graphics.Element.make(elm);
+                        var Color = Elm.Color.make(elm);
+                        var Graphics = Graphics || {};
+                        Graphics.Collage = Elm.Graphics.Collage.make(elm);
+                        var Either = Elm.Either.make(elm);
+                        var Char = Elm.Char.make(elm);
+                        var Dict = Elm.Dict.make(elm);
+                        var Dict = Elm.Dict.make(elm);
+                        var Keyboard = Elm.Keyboard.make(elm);
+                        var Keyboard = Elm.Keyboard.make(elm);
+                        var Mouse = Elm.Mouse.make(elm);
+                        var Time = Elm.Time.make(elm);
+                        var Window = Elm.Window.make(elm);
+                        var Types = Elm.Types.make(elm);
+                        var Utils = Elm.Utils.make(elm);
+                        var _op = {};
+                        var watchKeymap = Dict.fromList(_J.toList([{ctor: "_Tuple2", _0: Char.toCode(_N.chr("1")), _1: Types.Number(1)},
+                                                                   {ctor: "_Tuple2", _0: Char.toCode(_N.chr("2")), _1: Types.Number(2)},
+                                                                   {ctor: "_Tuple2", _0: Char.toCode(_N.chr("3")), _1: Types.Number(3)},
+                                                                   {ctor: "_Tuple2", _0: Char.toCode(_N.chr("4")), _1: Types.Number(4)},
+                                                                   {ctor: "_Tuple2", _0: Char.toCode(_N.chr("5")), _1: Types.Number(5)},
+                                                                   {ctor: "_Tuple2", _0: Char.toCode(_N.chr("p")), _1: Types.Pause},
+                                                                   {ctor: "_Tuple2", _0: Char.toCode(_N.chr("c")), _1: Types.Cycle},
+                                                                   {ctor: "_Tuple2", _0: 27, _1: Types.Exit}]));
+                        var ticks = A2(Signal._op["<~"],Types.FPS,Time.fps(25));
+                        var modeKeysDown = function ()
+                                           {
+                                             var watchKeys = Dict.toList(watchKeymap);
+                                             var keysDown = A2(List.map,
+                                                               function (arg0)
+                                                               {
+                                                                 return function ()
+                                                                        {
+                                                                          switch (arg0.ctor)
+                                                                          {case
+                                                                           "_Tuple2" :
+                                                                             return Signal.lift(Utils.cnst(arg0._1))(A2(Signal.keepIf,
+                                                                                                                        Basics.id,
+                                                                                                                        true)(Keyboard.isDown(arg0._0)));}
+                                                                          _E.Case($moduleName,
+                                                                                  "on line 76, column 38 to 87");
+                                                                        }();
+                                                               },
+                                                               watchKeys);
+                                             return Signal.merges(keysDown);
+                                           }();
+                        var modes = A2(Signal._op["<~"],Types.Modal,modeKeysDown);
+                        var engines = function ()
+                                      {
+                                        var override = F2(function (b,ecs)
+                                                          {
+                                                            return b ? Either.Left(Types.Brakes) : Either.Right(ecs);
+                                                          });
+                                        var controls = A2(Signal._op["<~"],
+                                                          Utils.controlEngines,
+                                                          Keyboard.wasd);
+                                        var brakes = Keyboard.isDown(Char.toCode(_N.chr("x")));
+                                        return A2(Signal._op["~"],
+                                                  A2(Signal._op["<~"],override,brakes),
+                                                  controls);
+                                      }();
+                        var dimensions = Window.dimensions;
+                        var pointer = A2(Signal._op["<~"],
+                                         Types.Pointer,
+                                         A2(Signal._op["~"],
+                                            A2(Signal._op["<~"],Utils.convertPos,dimensions),
+                                            Mouse.position));
+                        var clicks = A2(Signal._op["<~"],
+                                        Utils.cnst(Types.Click),
+                                        Mouse.clicks);
+                        var triggers = Signal.merges(_J.toList([clicks,
+                                                                modes,
+                                                                ticks,
+                                                                pointer]));
+                        var gameInputs = Signal.sampleOn(triggers)(A2(Signal._op["~"],
+                                                                      A2(Signal._op["~"],
+                                                                         A2(Signal._op["<~"],
+                                                                            F3(function (engines,
+                                                                                         window,
+                                                                                         trigger)
+                                                                               {
+                                                                                 return {_: {}, engines: engines, trigger: trigger, window: window};
+                                                                               }),
+                                                                            engines),
+                                                                         dimensions),
+                                                                      triggers));
+                        elm.GameInputs.values = {_op: _op, gameInputs: gameInputs, dimensions: dimensions, engines: engines, triggers: triggers, clicks: clicks, watchKeymap: watchKeymap, modeKeysDown: modeKeysDown, modes: modes, ticks: ticks, pointer: pointer};
+                        return elm.GameInputs.values;
+                      };Elm.Utils = Elm.Utils || {};
 Elm.Utils.make = function (elm)
                  {
                    elm.Utils = elm.Utils || {};
@@ -1847,9 +1830,8 @@ Elm.Utils.make = function (elm)
                    var Graphics = Graphics || {};
                    Graphics.Collage = Elm.Graphics.Collage.make(elm);
                    var Dict = Elm.Dict.make(elm);
-                   var Public = Public || {};
-                   Public.Vec2 = Public.Vec2 || {};
-                   Public.Vec2.Vec2 = Elm.Public.Vec2.Vec2.make(elm);
+                   var Data = Data || {};
+                   Data.Vec2 = Elm.Data.Vec2.make(elm);
                    var Types = Elm.Types.make(elm);
                    var _op = {};
                    var updateDict = F3(function (k,f,d)
@@ -1905,17 +1887,17 @@ Elm.Utils.make = function (elm)
                                                                            return function ()
                                                                                   {
                                                                                     var pos = _case5._0.motion.pos;
-                                                                                    var rootPos = Public.Vec2.Vec2.extractVec(pos);
-                                                                                    var comOffset = A2(Public.Vec2.Vec2.rotVec,
+                                                                                    var rootPos = Data.Vec2.extractVec(pos);
+                                                                                    var comOffset = A2(Data.Vec2.rotVec,
                                                                                                        pos.theta,
                                                                                                        _case5._0.cache.comOffset);
-                                                                                    return A2(Public.Vec2.Vec2.addVec,
+                                                                                    return A2(Data.Vec2.addVec,
                                                                                               comOffset,
                                                                                               rootPos);
                                                                                   }();
                                                                          case
                                                                          "Nothing" :
-                                                                           return Public.Vec2.Vec2.origin;}
+                                                                           return Data.Vec2.origin;}
                                                                         _E.Case($moduleName,
                                                                                 "between lines 58 and 65");
                                                                       }();
@@ -1996,15 +1978,12 @@ Elm.Types.make = function (elm)
                    Graphics.Collage = Elm.Graphics.Collage.make(elm);
                    var Dict = Elm.Dict.make(elm);
                    var Either = Elm.Either.make(elm);
-                   var Public = Public || {};
-                   Public.State = Public.State || {};
-                   Public.State.State = Elm.Public.State.State.make(elm);
-                   var Public = Public || {};
-                   Public.TagTree = Public.TagTree || {};
-                   Public.TagTree.TagTree = Elm.Public.TagTree.TagTree.make(elm);
-                   var Public = Public || {};
-                   Public.Vec2 = Public.Vec2 || {};
-                   Public.Vec2.Vec2 = Elm.Public.Vec2.Vec2.make(elm);
+                   var Control = Control || {};
+                   Control.State = Elm.Control.State.make(elm);
+                   var Data = Data || {};
+                   Data.TagTree = Elm.Data.TagTree.make(elm);
+                   var Data = Data || {};
+                   Data.Vec2 = Elm.Data.Vec2.make(elm);
                    var _op = {};
                    var translateAttach = function (arg0)
                                          {
@@ -2012,22 +1991,22 @@ Elm.Types.make = function (elm)
                                                   {
                                                     return function ($)
                                                            {
-                                                             return Public.Vec2.Vec2.addVec({_: {}, x: arg0.offset, y: 0})(Public.Vec2.Vec2.rotVec(arg0.theta)($));
+                                                             return Data.Vec2.addVec({_: {}, x: arg0.offset, y: 0})(Data.Vec2.rotVec(arg0.theta)($));
                                                            };
                                                   }();
                                          };
-                   var part = Public.TagTree.TagTree.Leaf;
-                   var fresh = A2(Public.State.State.bindS,
-                                  Public.State.State.get,
+                   var part = Data.TagTree.Leaf;
+                   var fresh = A2(Control.State.bindS,
+                                  Control.State.get,
                                   function (i)
                                   {
-                                    return A2(Public.State.State.bindS,
-                                              Public.State.State.put(i + 1),
+                                    return A2(Control.State.bindS,
+                                              Control.State.put(i + 1),
                                               function (arg0)
                                               {
                                                 return function ()
                                                        {
-                                                         return Public.State.State.returnS(i);
+                                                         return Control.State.returnS(i);
                                                        }();
                                               });
                                   });
@@ -2037,7 +2016,7 @@ Elm.Types.make = function (elm)
                                              {
                                                var labelBeam = function (beam)
                                                                {
-                                                                 return A2(Public.State.State.fmapS,
+                                                                 return A2(Control.State.fmapS,
                                                                            function (i)
                                                                            {
                                                                              return _N.insert("id",
@@ -2046,16 +2025,16 @@ Elm.Types.make = function (elm)
                                                                            },
                                                                            fresh);
                                                                };
-                                               var modifyStructure = A3(Public.TagTree.TagTree.walkModify,
-                                                                        Public.State.State.returnS,
+                                               var modifyStructure = A3(Data.TagTree.walkModify,
+                                                                        Control.State.returnS,
                                                                         labelBeam,
-                                                                        Public.State.State.returnS);
-                                               return A2(Public.State.State.evalState,
+                                                                        Control.State.returnS);
+                                               return A2(Control.State.evalState,
                                                          modifyStructure(s),
                                                          0);
                                              }();
                                     };
-                   var beam = Public.TagTree.TagTree.Node;
+                   var beam = Data.TagTree.Node;
                    var TurnRight = {ctor: "TurnRight"};
                    var TurnLeft = {ctor: "TurnLeft"};
                    var Thrust = F2(function (a,b)
@@ -2196,479 +2175,459 @@ Elm.Types.make = function (elm)
                                    });
                    elm.Types.values = {_op: _op, translateAttach: translateAttach, beam: beam, part: part, nextConfig: nextConfig, fresh: fresh, labelBeams: labelBeams, Disabled: Disabled, Forward: Forward, Reverse: Reverse, TurnLeft: TurnLeft, TurnRight: TurnRight, Brain: Brain, FuelTank: FuelTank, Engine: Engine, Point: Point, ParallelAxis: ParallelAxis, Brakes: Brakes, Click: Click, Modal: Modal, FPS: FPS, Pointer: Pointer, Pause: Pause, Cycle: Cycle, Exit: Exit, Number: Number, Place: Place, Rotate: Rotate, Attach: Attach, Beam: Beam, LabelBeamExt: LabelBeamExt, Thrust: Thrust, MotionState: MotionState, MotionDelta: MotionDelta, Entity: Entity, EntityCache: EntityCache, GameInput: GameInput, GameState: GameState, GameStateCache: GameStateCache, Mode: Mode, LabelDist: LabelDist, BuildPoint: BuildPoint, BuildCache: BuildCache, BuildMode: BuildMode};
                    return elm.Types.values;
-                 };Elm.Public = Elm.Public || {};
-Elm.Public.TagTree = Elm.Public.TagTree || {};
-Elm.Public.TagTree.TagTree = Elm.Public.TagTree.TagTree || {};
-Elm.Public.TagTree.TagTree.make = function (elm)
-                                  {
-                                    elm.Public = elm.Public || {};
-                                    elm.Public.TagTree = elm.Public.TagTree || {};
-                                    elm.Public.TagTree.TagTree = elm.Public.TagTree.TagTree || {};
-                                    if (elm.Public.TagTree.TagTree.values)
-                                    return elm.Public.TagTree.TagTree.values;
-                                    var N = Elm.Native,
-                                        _N = N.Utils.make(elm),
-                                        _L = N.List.make(elm),
-                                        _E = N.Error.make(elm),
-                                        _J = N.JavaScript.make(elm),
-                                        $moduleName = "Public.TagTree.TagTree";
-                                    var Text = Elm.Text.make(elm);
-                                    var Text = Elm.Text.make(elm);
-                                    var Basics = Elm.Basics.make(elm);
-                                    var Signal = Elm.Signal.make(elm);
-                                    var List = Elm.List.make(elm);
-                                    var Maybe = Elm.Maybe.make(elm);
-                                    var Time = Elm.Time.make(elm);
-                                    var Prelude = Elm.Prelude.make(elm);
-                                    var Graphics = Graphics || {};
-                                    Graphics.Element = Elm.Graphics.Element.make(elm);
-                                    var Color = Elm.Color.make(elm);
-                                    var Graphics = Graphics || {};
-                                    Graphics.Collage = Elm.Graphics.Collage.make(elm);
-                                    var Public = Public || {};
-                                    Public.State = Public.State || {};
-                                    Public.State.State = Elm.Public.State.State.make(elm);
-                                    var _op = {};
-                                    var Node = F2(function (a,b)
-                                                  {
-                                                    return {ctor: "Node", _0: a, _1: b};
-                                                  });
-                                    var Leaf = function (a)
+                 };Elm.Data = Elm.Data || {};
+Elm.Data.TagTree = Elm.Data.TagTree || {};
+Elm.Data.TagTree.make = function (elm)
+                        {
+                          elm.Data = elm.Data || {};
+                          elm.Data.TagTree = elm.Data.TagTree || {};
+                          if (elm.Data.TagTree.values)
+                          return elm.Data.TagTree.values;
+                          var N = Elm.Native,
+                              _N = N.Utils.make(elm),
+                              _L = N.List.make(elm),
+                              _E = N.Error.make(elm),
+                              _J = N.JavaScript.make(elm),
+                              $moduleName = "Data.TagTree";
+                          var Text = Elm.Text.make(elm);
+                          var Text = Elm.Text.make(elm);
+                          var Basics = Elm.Basics.make(elm);
+                          var Signal = Elm.Signal.make(elm);
+                          var List = Elm.List.make(elm);
+                          var Maybe = Elm.Maybe.make(elm);
+                          var Time = Elm.Time.make(elm);
+                          var Prelude = Elm.Prelude.make(elm);
+                          var Graphics = Graphics || {};
+                          Graphics.Element = Elm.Graphics.Element.make(elm);
+                          var Color = Elm.Color.make(elm);
+                          var Graphics = Graphics || {};
+                          Graphics.Collage = Elm.Graphics.Collage.make(elm);
+                          var Control = Control || {};
+                          Control.State = Elm.Control.State.make(elm);
+                          var _op = {};
+                          var Node = F2(function (a,b)
+                                        {
+                                          return {ctor: "Node", _0: a, _1: b};
+                                        });
+                          var Leaf = function (a)
+                                     {
+                                       return {ctor: "Leaf", _0: a};
+                                     };
+                          var foldTagTree = F4(function (fLeaf,fNode,fEdge,tree)
                                                {
-                                                 return {ctor: "Leaf", _0: a};
-                                               };
-                                    var foldTagTree = F4(function (fLeaf,fNode,fEdge,tree)
-                                                         {
-                                                           return function ()
-                                                                  {
-                                                                    var y = A3(foldTagTree,
-                                                                               fLeaf,
-                                                                               fNode,
-                                                                               fEdge);
-                                                                    var fChild = function (arg0)
-                                                                                 {
-                                                                                   return function ()
-                                                                                          {
-                                                                                            switch (arg0.ctor)
-                                                                                            {case
-                                                                                             "_Tuple2" :
-                                                                                               return fEdge(arg0._0)(y(arg0._1));}
-                                                                                            _E.Case($moduleName,
-                                                                                                    "on line 32, column 30 to 51");
-                                                                                          }();
-                                                                                 };
-                                                                    return function ()
-                                                                           {
-                                                                             switch (tree.ctor)
-                                                                             {case
-                                                                              "Leaf" :
-                                                                                return fLeaf(tree._0);
-                                                                              case
-                                                                              "Node" :
-                                                                                return fNode(tree._0)(A2(List.map,
-                                                                                                         fChild,
-                                                                                                         tree._1));}
-                                                                             _E.Case($moduleName,
-                                                                                     "between lines 33 and 35");
-                                                                           }();
-                                                                  }();
-                                                         });
-                                    var foldTagTree$ = F3(function (fLeaf,fNode,tree)
-                                                          {
-                                                            return function ()
-                                                                   {
-                                                                     var y = A2(foldTagTree$,
-                                                                                fLeaf,
-                                                                                fNode);
-                                                                     return function ()
-                                                                            {
-                                                                              switch (tree.ctor)
-                                                                              {case
-                                                                               "Leaf" :
-                                                                                 return fLeaf(tree._0);
-                                                                               case
-                                                                               "Node" :
-                                                                                 return function ()
-                                                                                        {
-                                                                                          var mapAttach = F2(function (f,
-                                                                                                                       arg0)
-                                                                                                             {
-                                                                                                               return function ()
-                                                                                                                      {
-                                                                                                                        switch (arg0.ctor)
-                                                                                                                        {case
-                                                                                                                         "_Tuple2" :
-                                                                                                                           return {ctor: "_Tuple2", _0: arg0._0, _1: f(arg0._1)};}
-                                                                                                                        _E.Case($moduleName,
-                                                                                                                                "on line 46, column 38 to 49");
-                                                                                                                      }();
-                                                                                                             });
-                                                                                          var subs$ = A2(List.map,
-                                                                                                         mapAttach(y),
-                                                                                                         tree._1);
-                                                                                          return A2(fNode,
-                                                                                                    tree._0,
-                                                                                                    subs$);
-                                                                                        }();}
-                                                                              _E.Case($moduleName,
-                                                                                      "between lines 43 and 48");
-                                                                            }();
-                                                                   }();
-                                                          });
-                                    var walkModify = F4(function (uLeaf,uNode,uEdge,tree)
+                                                 return function ()
                                                         {
+                                                          var y = A3(foldTagTree,fLeaf,fNode,fEdge);
+                                                          var fChild = function (arg0)
+                                                                       {
+                                                                         return function ()
+                                                                                {
+                                                                                  switch (arg0.ctor)
+                                                                                  {case
+                                                                                   "_Tuple2" :
+                                                                                     return fEdge(arg0._0)(y(arg0._1));}
+                                                                                  _E.Case($moduleName,
+                                                                                          "on line 34, column 30 to 51");
+                                                                                }();
+                                                                       };
                                                           return function ()
                                                                  {
-                                                                   var y = A3(walkModify,
-                                                                              uLeaf,
-                                                                              uNode,
-                                                                              uEdge);
-                                                                   var uSub = function (arg0)
-                                                                              {
-                                                                                return function ()
-                                                                                       {
-                                                                                         switch (arg0.ctor)
-                                                                                         {case
-                                                                                          "_Tuple2" :
-                                                                                            return A2(Public.State.State.bindS,
-                                                                                                      uEdge(arg0._0),
-                                                                                                      function (edge$)
-                                                                                                      {
-                                                                                                        return A2(Public.State.State.bindS,
-                                                                                                                  y(arg0._1),
-                                                                                                                  function (sub$)
-                                                                                                                  {
-                                                                                                                    return Public.State.State.returnS({ctor: "_Tuple2", _0: edge$, _1: sub$});
-                                                                                                                  });
-                                                                                                      });}
-                                                                                         _E.Case($moduleName,
-                                                                                                 "between lines 59 and 61");
-                                                                                       }();
-                                                                              };
-                                                                   return function ()
-                                                                          {
-                                                                            switch (tree.ctor)
-                                                                            {case
-                                                                             "Leaf" :
-                                                                               return Public.State.State.fmapS(Leaf)(uLeaf(tree._0));
-                                                                             case
-                                                                             "Node" :
-                                                                               return A2(Public.State.State.bindS,
-                                                                                         A2(Public.State.State.mapMS,
-                                                                                            uSub,
-                                                                                            tree._1),
-                                                                                         function (subs$)
-                                                                                         {
-                                                                                           return A2(Public.State.State.bindS,
-                                                                                                     uNode(tree._0),
-                                                                                                     function (node$)
-                                                                                                     {
-                                                                                                       return Public.State.State.returnS(A2(Node,
-                                                                                                                                            node$,
-                                                                                                                                            subs$));
-                                                                                                     });
-                                                                                         });}
-                                                                            _E.Case($moduleName,
-                                                                                    "between lines 62 and 67");
-                                                                          }();
+                                                                   switch (tree.ctor)
+                                                                   {case
+                                                                    "Leaf" :
+                                                                      return fLeaf(tree._0);
+                                                                    case
+                                                                    "Node" :
+                                                                      return fNode(tree._0)(A2(List.map,
+                                                                                               fChild,
+                                                                                               tree._1));}
+                                                                   _E.Case($moduleName,
+                                                                           "between lines 35 and 37");
                                                                  }();
-                                                        });
-                                    elm.Public.TagTree.TagTree.values = {_op: _op, foldTagTree: foldTagTree, foldTagTree$: foldTagTree$, walkModify: walkModify, Leaf: Leaf, Node: Node};
-                                    return elm.Public.TagTree.TagTree.values;
-                                  };Elm.Public = Elm.Public || {};
-Elm.Public.State = Elm.Public.State || {};
-Elm.Public.State.State = Elm.Public.State.State || {};
-Elm.Public.State.State.make = function (elm)
-                              {
-                                elm.Public = elm.Public || {};
-                                elm.Public.State = elm.Public.State || {};
-                                elm.Public.State.State = elm.Public.State.State || {};
-                                if (elm.Public.State.State.values)
-                                return elm.Public.State.State.values;
-                                var N = Elm.Native,
-                                    _N = N.Utils.make(elm),
-                                    _L = N.List.make(elm),
-                                    _E = N.Error.make(elm),
-                                    _J = N.JavaScript.make(elm),
-                                    $moduleName = "Public.State.State";
-                                var Text = Elm.Text.make(elm);
-                                var Text = Elm.Text.make(elm);
-                                var Basics = Elm.Basics.make(elm);
-                                var Signal = Elm.Signal.make(elm);
-                                var List = Elm.List.make(elm);
-                                var Maybe = Elm.Maybe.make(elm);
-                                var Time = Elm.Time.make(elm);
-                                var Prelude = Elm.Prelude.make(elm);
-                                var Graphics = Graphics || {};
-                                Graphics.Element = Elm.Graphics.Element.make(elm);
-                                var Color = Elm.Color.make(elm);
-                                var Graphics = Graphics || {};
-                                Graphics.Collage = Elm.Graphics.Collage.make(elm);
-                                var _op = {};
-                                var execState = function (st)
-                                                {
-                                                  return function ($)
-                                                         {
-                                                           return Basics.snd(st.runState($));
-                                                         };
-                                                };
-                                var evalState = function (st)
-                                                {
-                                                  return function ($)
-                                                         {
-                                                           return Basics.fst(st.runState($));
-                                                         };
-                                                };
-                                var State = function (a)
-                                            {
-                                              return {_: {}, runState: a};
-                                            };
-                                var bindS = F2(function (st,f)
-                                               {
-                                                 return State(function (s)
-                                                              {
-                                                                return function ()
-                                                                       {
-                                                                         var $ = st.runState(s),
-                                                                             x = $._0,
-                                                                             s$ = $._1;
-                                                                         return f(x).runState(s$);
-                                                                       }();
-                                                              });
+                                                        }();
                                                });
-                                var get = State(function (s)
+                          var foldTagTree$ = F3(function (fLeaf,fNode,tree)
                                                 {
-                                                  return {ctor: "_Tuple2", _0: s, _1: s};
+                                                  return function ()
+                                                         {
+                                                           var y = A2(foldTagTree$,fLeaf,fNode);
+                                                           return function ()
+                                                                  {
+                                                                    switch (tree.ctor)
+                                                                    {case
+                                                                     "Leaf" :
+                                                                       return fLeaf(tree._0);
+                                                                     case
+                                                                     "Node" :
+                                                                       return function ()
+                                                                              {
+                                                                                var mapAttach = F2(function (f,
+                                                                                                             arg0)
+                                                                                                   {
+                                                                                                     return function ()
+                                                                                                            {
+                                                                                                              switch (arg0.ctor)
+                                                                                                              {case
+                                                                                                               "_Tuple2" :
+                                                                                                                 return {ctor: "_Tuple2", _0: arg0._0, _1: f(arg0._1)};}
+                                                                                                              _E.Case($moduleName,
+                                                                                                                      "on line 48, column 38 to 49");
+                                                                                                            }();
+                                                                                                   });
+                                                                                var subs$ = A2(List.map,
+                                                                                               mapAttach(y),
+                                                                                               tree._1);
+                                                                                return A2(fNode,
+                                                                                          tree._0,
+                                                                                          subs$);
+                                                                              }();}
+                                                                    _E.Case($moduleName,
+                                                                            "between lines 45 and 50");
+                                                                  }();
+                                                         }();
                                                 });
-                                var put = function (s$)
+                          var walkModify = F4(function (uLeaf,uNode,uEdge,tree)
+                                              {
+                                                return function ()
+                                                       {
+                                                         var y = A3(walkModify,uLeaf,uNode,uEdge);
+                                                         var uSub = function (arg0)
+                                                                    {
+                                                                      return function ()
+                                                                             {
+                                                                               switch (arg0.ctor)
+                                                                               {case
+                                                                                "_Tuple2" :
+                                                                                  return A2(Control.State.bindS,
+                                                                                            uEdge(arg0._0),
+                                                                                            function (edge$)
+                                                                                            {
+                                                                                              return A2(Control.State.bindS,
+                                                                                                        y(arg0._1),
+                                                                                                        function (sub$)
+                                                                                                        {
+                                                                                                          return Control.State.returnS({ctor: "_Tuple2", _0: edge$, _1: sub$});
+                                                                                                        });
+                                                                                            });}
+                                                                               _E.Case($moduleName,
+                                                                                       "between lines 61 and 63");
+                                                                             }();
+                                                                    };
+                                                         return function ()
+                                                                {
+                                                                  switch (tree.ctor)
+                                                                  {case
+                                                                   "Leaf" :
+                                                                     return Control.State.fmapS(Leaf)(uLeaf(tree._0));
+                                                                   case
+                                                                   "Node" :
+                                                                     return A2(Control.State.bindS,
+                                                                               A2(Control.State.mapMS,
+                                                                                  uSub,
+                                                                                  tree._1),
+                                                                               function (subs$)
+                                                                               {
+                                                                                 return A2(Control.State.bindS,
+                                                                                           uNode(tree._0),
+                                                                                           function (node$)
+                                                                                           {
+                                                                                             return Control.State.returnS(A2(Node,
+                                                                                                                             node$,
+                                                                                                                             subs$));
+                                                                                           });
+                                                                               });}
+                                                                  _E.Case($moduleName,
+                                                                          "between lines 64 and 69");
+                                                                }();
+                                                       }();
+                                              });
+                          elm.Data.TagTree.values = {_op: _op, foldTagTree: foldTagTree, foldTagTree$: foldTagTree$, walkModify: walkModify, Leaf: Leaf, Node: Node};
+                          return elm.Data.TagTree.values;
+                        };Elm.Control = Elm.Control || {};
+Elm.Control.State = Elm.Control.State || {};
+Elm.Control.State.make = function (elm)
+                         {
+                           elm.Control = elm.Control || {};
+                           elm.Control.State = elm.Control.State || {};
+                           if (elm.Control.State.values)
+                           return elm.Control.State.values;
+                           var N = Elm.Native,
+                               _N = N.Utils.make(elm),
+                               _L = N.List.make(elm),
+                               _E = N.Error.make(elm),
+                               _J = N.JavaScript.make(elm),
+                               $moduleName = "Control.State";
+                           var Text = Elm.Text.make(elm);
+                           var Text = Elm.Text.make(elm);
+                           var Basics = Elm.Basics.make(elm);
+                           var Signal = Elm.Signal.make(elm);
+                           var List = Elm.List.make(elm);
+                           var Maybe = Elm.Maybe.make(elm);
+                           var Time = Elm.Time.make(elm);
+                           var Prelude = Elm.Prelude.make(elm);
+                           var Graphics = Graphics || {};
+                           Graphics.Element = Elm.Graphics.Element.make(elm);
+                           var Color = Elm.Color.make(elm);
+                           var Graphics = Graphics || {};
+                           Graphics.Collage = Elm.Graphics.Collage.make(elm);
+                           var _op = {};
+                           var execState = function (st)
+                                           {
+                                             return function ($)
+                                                    {
+                                                      return Basics.snd(st.runState($));
+                                                    };
+                                           };
+                           var evalState = function (st)
+                                           {
+                                             return function ($)
+                                                    {
+                                                      return Basics.fst(st.runState($));
+                                                    };
+                                           };
+                           var State = function (a)
+                                       {
+                                         return {_: {}, runState: a};
+                                       };
+                           var bindS = F2(function (st,f)
                                           {
                                             return State(function (s)
                                                          {
-                                                           return {ctor: "_Tuple2", _0: {ctor: "_Tuple0"}, _1: s$};
+                                                           return function ()
+                                                                  {
+                                                                    var $ = st.runState(s),
+                                                                        x = $._0,
+                                                                        s$ = $._1;
+                                                                    return f(x).runState(s$);
+                                                                  }();
                                                          });
-                                          };
-                                var updateS = function (f)
-                                              {
-                                                return A2(bindS,
-                                                          get,
-                                                          function (s)
-                                                          {
-                                                            return put(f(s));
-                                                          });
-                                              };
-                                var returnS = function (x)
-                                              {
-                                                return State(function (s)
-                                                             {
-                                                               return {ctor: "_Tuple2", _0: x, _1: s};
-                                                             });
-                                              };
-                                var fmapS = F2(function (f,st)
-                                               {
-                                                 return A2(bindS,
-                                                           st,
-                                                           function (x)
-                                                           {
-                                                             return returnS(f(x));
-                                                           });
-                                               });
-                                var sequenceS = function (ms)
-                                                {
-                                                  return function ()
-                                                         {
-                                                           var k = F2(function (m,m$)
-                                                                      {
-                                                                        return A2(bindS,
-                                                                                  m,
-                                                                                  function (x)
-                                                                                  {
-                                                                                    return A2(bindS,
-                                                                                              m$,
-                                                                                              function (xs)
-                                                                                              {
-                                                                                                return returnS({ctor: "::", _0: x, _1: xs});
-                                                                                              });
-                                                                                  });
-                                                                      });
-                                                           return A3(List.foldr,
-                                                                     k,
-                                                                     returnS(_J.toList([])),
-                                                                     ms);
-                                                         }();
-                                                };
-                                var mapMS = function (f)
-                                            {
-                                              return function ($)
+                                          });
+                           var get = State(function (s)
+                                           {
+                                             return {ctor: "_Tuple2", _0: s, _1: s};
+                                           });
+                           var put = function (s$)
+                                     {
+                                       return State(function (s)
+                                                    {
+                                                      return {ctor: "_Tuple2", _0: {ctor: "_Tuple0"}, _1: s$};
+                                                    });
+                                     };
+                           var updateS = function (f)
+                                         {
+                                           return A2(bindS,
+                                                     get,
+                                                     function (s)
                                                      {
-                                                       return sequenceS(List.map(f)($));
-                                                     };
-                                            };
-                                elm.Public.State.State.values = {_op: _op, get: get, put: put, evalState: evalState, execState: execState, returnS: returnS, bindS: bindS, sequenceS: sequenceS, mapMS: mapMS, fmapS: fmapS, updateS: updateS, State: State};
-                                return elm.Public.State.State.values;
-                              };Elm.Public = Elm.Public || {};
-Elm.Public.Vec2 = Elm.Public.Vec2 || {};
-Elm.Public.Vec2.Vec2 = Elm.Public.Vec2.Vec2 || {};
-Elm.Public.Vec2.Vec2.make = function (elm)
-                            {
-                              elm.Public = elm.Public || {};
-                              elm.Public.Vec2 = elm.Public.Vec2 || {};
-                              elm.Public.Vec2.Vec2 = elm.Public.Vec2.Vec2 || {};
-                              if (elm.Public.Vec2.Vec2.values)
-                              return elm.Public.Vec2.Vec2.values;
-                              var N = Elm.Native,
-                                  _N = N.Utils.make(elm),
-                                  _L = N.List.make(elm),
-                                  _E = N.Error.make(elm),
-                                  _J = N.JavaScript.make(elm),
-                                  $moduleName = "Public.Vec2.Vec2";
-                              var Text = Elm.Text.make(elm);
-                              var Text = Elm.Text.make(elm);
-                              var Basics = Elm.Basics.make(elm);
-                              var Signal = Elm.Signal.make(elm);
-                              var List = Elm.List.make(elm);
-                              var Maybe = Elm.Maybe.make(elm);
-                              var Time = Elm.Time.make(elm);
-                              var Prelude = Elm.Prelude.make(elm);
-                              var Graphics = Graphics || {};
-                              Graphics.Element = Elm.Graphics.Element.make(elm);
-                              var Color = Elm.Color.make(elm);
-                              var Graphics = Graphics || {};
-                              Graphics.Collage = Elm.Graphics.Collage.make(elm);
-                              var Transform2D = Elm.Transform2D.make(elm);
-                              var _op = {};
-                              var vecTranslate = function (v)
-                                                 {
-                                                   return A6(Transform2D.matrix,1,0,0,1,v.x,v.y);
-                                                 };
-                              var scaleVec = F2(function (a,v)
+                                                       return put(f(s));
+                                                     });
+                                         };
+                           var returnS = function (x)
+                                         {
+                                           return State(function (s)
+                                                        {
+                                                          return {ctor: "_Tuple2", _0: x, _1: s};
+                                                        });
+                                         };
+                           var fmapS = F2(function (f,st)
+                                          {
+                                            return A2(bindS,
+                                                      st,
+                                                      function (x)
+                                                      {
+                                                        return returnS(f(x));
+                                                      });
+                                          });
+                           var sequenceS = function (ms)
+                                           {
+                                             return function ()
+                                                    {
+                                                      var k = F2(function (m,m$)
+                                                                 {
+                                                                   return A2(bindS,
+                                                                             m,
+                                                                             function (x)
+                                                                             {
+                                                                               return A2(bindS,
+                                                                                         m$,
+                                                                                         function (xs)
+                                                                                         {
+                                                                                           return returnS({ctor: "::", _0: x, _1: xs});
+                                                                                         });
+                                                                             });
+                                                                 });
+                                                      return A3(List.foldr,
+                                                                k,
+                                                                returnS(_J.toList([])),
+                                                                ms);
+                                                    }();
+                                           };
+                           var mapMS = function (f)
+                                       {
+                                         return function ($)
                                                 {
-                                                  return _N.replace([["x",v.x * a],["y",v.y * a]],
-                                                                    v);
-                                                });
-                              var rotVec = F2(function (theta,v)
-                                              {
-                                                return function ()
-                                                       {
-                                                         var newY = v.x * Basics.sin(theta) + v.y * Basics.cos(theta);
-                                                         var newX = v.x * Basics.cos(theta) - v.y * Basics.sin(theta);
-                                                         return _N.replace([["x",newX],["y",newY]],
-                                                                           v);
-                                                       }();
-                                              });
-                              var origin = {_: {}, x: 0, y: 0};
-                              var negVec = scaleVec(0 - 1);
-                              var magnitude = function (v)
-                                              {
-                                                return Basics.sqrt(v.x * v.x + v.y * v.y);
-                                              };
-                              var magSquared = function (v)
-                                               {
-                                                 return v.x * v.x + v.y * v.y;
-                                               };
-                              var fromIntPair = function (arg0)
-                                                {
-                                                  return function ()
-                                                         {
-                                                           switch (arg0.ctor)
-                                                           {case
-                                                            "_Tuple2" :
-                                                              return {_: {}, x: Basics.toFloat(arg0._0), y: Basics.toFloat(arg0._1)};}
-                                                           _E.Case($moduleName,
-                                                                   "on line 31, column 23 to 51");
-                                                         }();
+                                                  return sequenceS(List.map(f)($));
                                                 };
-                              var extractVec = function (v)
-                                               {
-                                                 return {_: {}, x: v.x, y: v.y};
-                                               };
-                              var dotVec = F2(function (v1,v2)
-                                              {
-                                                return v1.x * v2.x + v1.y * v2.y;
-                                              });
-                              var crossVecMag = F2(function (v1,v2)
-                                                   {
-                                                     return v1.x * v2.y - v1.y * v2.x;
-                                                   });
-                              var addVec = F2(function (v1,v2)
-                                              {
-                                                return function ()
-                                                       {
-                                                         var newY = v1.y + v2.y;
-                                                         var newX = v1.x + v2.x;
-                                                         return _N.replace([["x",newX],["y",newY]],
-                                                                           v2);
-                                                       }();
-                                              });
-                              var addVec2 = addVec;
-                              var midVec = F2(function (v1,v2)
-                                              {
-                                                return scaleVec(1 / 2)(A2(addVec,v1,v2));
-                                              });
-                              var subVec = function (v1)
-                                           {
-                                             return addVec(A2(scaleVec,0 - 1,v1));
-                                           };
-                              var distance = F2(function (v1,v2)
+                                       };
+                           elm.Control.State.values = {_op: _op, get: get, put: put, evalState: evalState, execState: execState, returnS: returnS, bindS: bindS, sequenceS: sequenceS, mapMS: mapMS, fmapS: fmapS, updateS: updateS, State: State};
+                           return elm.Control.State.values;
+                         };Elm.Data = Elm.Data || {};
+Elm.Data.Vec2 = Elm.Data.Vec2 || {};
+Elm.Data.Vec2.make = function (elm)
+                     {
+                       elm.Data = elm.Data || {};
+                       elm.Data.Vec2 = elm.Data.Vec2 || {};
+                       if (elm.Data.Vec2.values)
+                       return elm.Data.Vec2.values;
+                       var N = Elm.Native,
+                           _N = N.Utils.make(elm),
+                           _L = N.List.make(elm),
+                           _E = N.Error.make(elm),
+                           _J = N.JavaScript.make(elm),
+                           $moduleName = "Data.Vec2";
+                       var Text = Elm.Text.make(elm);
+                       var Text = Elm.Text.make(elm);
+                       var Basics = Elm.Basics.make(elm);
+                       var Signal = Elm.Signal.make(elm);
+                       var List = Elm.List.make(elm);
+                       var Maybe = Elm.Maybe.make(elm);
+                       var Time = Elm.Time.make(elm);
+                       var Prelude = Elm.Prelude.make(elm);
+                       var Graphics = Graphics || {};
+                       Graphics.Element = Elm.Graphics.Element.make(elm);
+                       var Color = Elm.Color.make(elm);
+                       var Graphics = Graphics || {};
+                       Graphics.Collage = Elm.Graphics.Collage.make(elm);
+                       var Transform2D = Elm.Transform2D.make(elm);
+                       var _op = {};
+                       var vecTranslate = function (v)
+                                          {
+                                            return A6(Transform2D.matrix,1,0,0,1,v.x,v.y);
+                                          };
+                       var scaleVec = F2(function (a,v)
+                                         {
+                                           return _N.replace([["x",v.x * a],["y",v.y * a]],v);
+                                         });
+                       var rotVec = F2(function (theta,v)
+                                       {
+                                         return function ()
                                                 {
-                                                  return magnitude(A2(subVec,v2,v1));
+                                                  var newY = v.x * Basics.sin(theta) + v.y * Basics.cos(theta);
+                                                  var newX = v.x * Basics.cos(theta) - v.y * Basics.sin(theta);
+                                                  return _N.replace([["x",newX],["y",newY]],v);
+                                                }();
+                                       });
+                       var origin = {_: {}, x: 0, y: 0};
+                       var negVec = scaleVec(-1);
+                       var magnitude = function (v)
+                                       {
+                                         return Basics.sqrt(v.x * v.x + v.y * v.y);
+                                       };
+                       var magSquared = function (v)
+                                        {
+                                          return v.x * v.x + v.y * v.y;
+                                        };
+                       var fromIntPair = function (arg0)
+                                         {
+                                           return function ()
+                                                  {
+                                                    switch (arg0.ctor)
+                                                    {case
+                                                     "_Tuple2" :
+                                                       return {_: {}, x: Basics.toFloat(arg0._0), y: Basics.toFloat(arg0._1)};}
+                                                    _E.Case($moduleName,
+                                                            "on line 33, column 23 to 51");
+                                                  }();
+                                         };
+                       var extractVec = function (v)
+                                        {
+                                          return {_: {}, x: v.x, y: v.y};
+                                        };
+                       var dotVec = F2(function (v1,v2)
+                                       {
+                                         return v1.x * v2.x + v1.y * v2.y;
+                                       });
+                       var crossVecMag = F2(function (v1,v2)
+                                            {
+                                              return v1.x * v2.y - v1.y * v2.x;
+                                            });
+                       var addVec = F2(function (v1,v2)
+                                       {
+                                         return function ()
+                                                {
+                                                  var newY = v1.y + v2.y;
+                                                  var newX = v1.x + v2.x;
+                                                  return _N.replace([["x",newX],["y",newY]],v2);
+                                                }();
+                                       });
+                       var addVec2 = addVec;
+                       var midVec = F2(function (v1,v2)
+                                       {
+                                         return scaleVec(1 / 2)(A2(addVec,v1,v2));
+                                       });
+                       var subVec = function (v1)
+                                    {
+                                      return addVec(A2(scaleVec,-1,v1));
+                                    };
+                       var distance = F2(function (v1,v2)
+                                         {
+                                           return magnitude(A2(subVec,v2,v1));
+                                         });
+                       var distanceSquared = F2(function (v1,v2)
+                                                {
+                                                  return magSquared(A2(subVec,v2,v1));
                                                 });
-                              var distanceSquared = F2(function (v1,v2)
-                                                       {
-                                                         return magSquared(A2(subVec,v2,v1));
-                                                       });
-                              var minimumDist = F3(function (v,w,p)
-                                                   {
-                                                     return function ()
-                                                            {
-                                                              var l2 = A2(distanceSquared,v,w);
-                                                              return _N.eq(l2,
-                                                                           0) ? {_: {}, offset: 0, r: A2(distance,
-                                                                                                         v,
-                                                                                                         p)} : function ()
-                                                                                                               {
-                                                                                                                 var t = A2(dotVec,
-                                                                                                                            A2(subVec,
-                                                                                                                               v,
-                                                                                                                               p),
-                                                                                                                            A2(subVec,
-                                                                                                                               v,
-                                                                                                                               w)) / l2;
-                                                                                                                 var tFix = A3(Basics.clamp,
-                                                                                                                               0,
-                                                                                                                               1,
-                                                                                                                               t);
-                                                                                                                 var r = _N.cmp(t,
-                                                                                                                                0) < 0 ? A2(distance,
-                                                                                                                                            p,
-                                                                                                                                            v) : _N.cmp(t,
-                                                                                                                                                        1) > 0 ? A2(distance,
-                                                                                                                                                                    p,
-                                                                                                                                                                    w) : function ()
-                                                                                                                                                                         {
-                                                                                                                                                                           var projection = addVec(v)(scaleVec(t)(A2(subVec,
-                                                                                                                                                                                                                     v,
-                                                                                                                                                                                                                     w)));
-                                                                                                                                                                           return A2(distance,
-                                                                                                                                                                                     p,
-                                                                                                                                                                                     projection);
-                                                                                                                                                                         }();
-                                                                                                                 return {_: {}, offset: tFix * Basics.sqrt(l2), r: r};
-                                                                                                               }();
-                                                            }();
-                                                   });
-                              var sumVec = function ($)
-                                           {
-                                             return A2(List.foldl,
-                                                       addVec,
-                                                       origin)(List.map(extractVec)($));
-                                           };
-                              var Vec2Ext = F3(function (a,b,c)
-                                               {
-                                                 return _N.insert("y",b,_N.insert("x",a,c));
-                                               });
-                              elm.Public.Vec2.Vec2.values = {_op: _op, origin: origin, fromIntPair: fromIntPair, scaleVec: scaleVec, negVec: negVec, rotVec: rotVec, addVec: addVec, subVec: subVec, addVec2: addVec2, midVec: midVec, extractVec: extractVec, sumVec: sumVec, magnitude: magnitude, magSquared: magSquared, distance: distance, distanceSquared: distanceSquared, dotVec: dotVec, crossVecMag: crossVecMag, vecTranslate: vecTranslate, minimumDist: minimumDist, Vec2Ext: Vec2Ext};
-                              return elm.Public.Vec2.Vec2.values;
-                            };
+                       var minimumDist = F3(function (v,w,p)
+                                            {
+                                              return function ()
+                                                     {
+                                                       var l2 = A2(distanceSquared,v,w);
+                                                       return _N.eq(l2,
+                                                                    0) ? {_: {}, offset: 0, r: A2(distance,
+                                                                                                  v,
+                                                                                                  p)} : function ()
+                                                                                                        {
+                                                                                                          var t = A2(dotVec,
+                                                                                                                     A2(subVec,
+                                                                                                                        v,
+                                                                                                                        p),
+                                                                                                                     A2(subVec,
+                                                                                                                        v,
+                                                                                                                        w)) / l2;
+                                                                                                          var tFix = A3(Basics.clamp,
+                                                                                                                        0,
+                                                                                                                        1,
+                                                                                                                        t);
+                                                                                                          var r = _N.cmp(t,
+                                                                                                                         0) < 0 ? A2(distance,
+                                                                                                                                     p,
+                                                                                                                                     v) : _N.cmp(t,
+                                                                                                                                                 1) > 0 ? A2(distance,
+                                                                                                                                                             p,
+                                                                                                                                                             w) : function ()
+                                                                                                                                                                  {
+                                                                                                                                                                    var projection = addVec(v)(scaleVec(t)(A2(subVec,
+                                                                                                                                                                                                              v,
+                                                                                                                                                                                                              w)));
+                                                                                                                                                                    return A2(distance,
+                                                                                                                                                                              p,
+                                                                                                                                                                              projection);
+                                                                                                                                                                  }();
+                                                                                                          return {_: {}, offset: tFix * Basics.sqrt(l2), r: r};
+                                                                                                        }();
+                                                     }();
+                                            });
+                       var sumVec = function ($)
+                                    {
+                                      return A2(List.foldl,addVec,origin)(List.map(extractVec)($));
+                                    };
+                       var Vec2Ext = F3(function (a,b,c)
+                                        {
+                                          return _N.insert("y",b,_N.insert("x",a,c));
+                                        });
+                       elm.Data.Vec2.values = {_op: _op, origin: origin, fromIntPair: fromIntPair, scaleVec: scaleVec, negVec: negVec, rotVec: rotVec, addVec: addVec, subVec: subVec, addVec2: addVec2, midVec: midVec, extractVec: extractVec, sumVec: sumVec, magnitude: magnitude, magSquared: magSquared, distance: distance, distanceSquared: distanceSquared, dotVec: dotVec, crossVecMag: crossVecMag, vecTranslate: vecTranslate, minimumDist: minimumDist, Vec2Ext: Vec2Ext};
+                       return elm.Data.Vec2.values;
+                     };
         </script>
     </head>
     <body>

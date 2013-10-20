@@ -2,71 +2,71 @@ var Elm = {}; Elm.Native = {}; Elm.Native.Graphics = {};
 var ElmRuntime = {}; ElmRuntime.Render = {};
 Elm.Native.Color = {};
 Elm.Native.Color.make = function(elm) {
- elm.Native = elm.Native || {};
- elm.Native.Color = elm.Native.Color || {};
- if (elm.Native.Color.values) return elm.Native.Color.values;
+    elm.Native = elm.Native || {};
+    elm.Native.Color = elm.Native.Color || {};
+    if (elm.Native.Color.values) return elm.Native.Color.values;
 
- var Utils = Elm.Native.Utils.make(elm);
+    var Utils = Elm.Native.Utils.make(elm);
 
- function complement(rgb) {
-     var hsv = toHSV(rgb);
-     hsv.hue = (hsv.hue + 180) % 360;
-     return toRGB(hsv);
- }
+    function complement(rgb) {
+        var hsv = toHSV(rgb);
+        hsv.hue = (hsv.hue + 180) % 360;
+        return toRGB(hsv);
+    }
 
- function hsva(h,s,v,a) {
-     var degree = A2(Utils.mod, h * 180 / Math.PI, 360);
-     var clr = toRGB({hue:degree, saturation:s, value:v});
-     clr._3 = a;
-     return clr;
- }
+    function hsva(h,s,v,a) {
+        var degree = A2(Utils.mod, h * 180 / Math.PI, 360);
+        var clr = toRGB({hue:degree, saturation:s, value:v});
+        clr._3 = a;
+        return clr;
+    }
 
- function hsv(h,s,v) {
-     var degree = A2(Utils.mod, h * 180 / Math.PI, 360);
-     return toRGB({hue:degree, saturation:s, value:v});
- }
+    function hsv(h,s,v) {
+        var degree = A2(Utils.mod, h * 180 / Math.PI, 360);
+        return toRGB({hue:degree, saturation:s, value:v});
+    }
 
- function toHSV(rgb) {
-  var hsv = {};
-  var r = rgb._0 / 255.0, g = rgb._1 / 255.0, b = rgb._2 / 255.0;
-  var M = Math.max(r,g,b);
-  var m = Math.min(r,g,b);
-  var c = M - m;
+    function toHSV(rgb) {
+        var hsv = {};
+        var r = rgb._0 / 255.0, g = rgb._1 / 255.0, b = rgb._2 / 255.0;
+        var M = Math.max(r,g,b);
+        var m = Math.min(r,g,b);
+        var c = M - m;
 
-  var h = 0;
-       if (c === 0) { h = 0; }
-  else if (M === r) { h = ((g - b) / c) % 6; }
-  else if (M === g) { h = ((b - r) / c) + 2; }
-  else if (M === b) { h = ((r - g) / c) + 4; }
-  h *= 60;
+        var h = 0;
+             if (c === 0) { h = 0; }
+        else if (M === r) { h = ((g - b) / c) % 6; }
+        else if (M === g) { h = ((b - r) / c) + 2; }
+        else if (M === b) { h = ((r - g) / c) + 4; }
+        h *= 60;
 
-  return { value : M, hue : h, saturation : (M === 0 ? 0 : c / M) };
- }
+        return { value : M, hue : h, saturation : (M === 0 ? 0 : c / M) };
+    }
 
- function between(lo,hi,x) { return lo <= x && x < hi; }
- function norm(n) { return Math.round(n*255); }
+    function between(lo,hi,x) { return lo <= x && x < hi; }
+    function norm(n) { return Math.round(n*255); }
 
- function toRGB(hsv) {
-  var c = hsv.value * hsv.saturation;
-  var hue = hsv.hue / 60;
-  var x = c * (1 - Math.abs((hue % 2) - 1));
-  var r = 0, g = 0, b = 0;
-       if (between(0,1,hue)) { r = c; g = x; b = 0; }
-  else if (between(1,2,hue)) { r = x; g = c; b = 0; }
-  else if (between(2,3,hue)) { r = 0; g = c; b = x; }
-  else if (between(3,4,hue)) { r = 0; g = x; b = c; }
-  else if (between(4,5,hue)) { r = x; g = 0; b = c; }
-  else if (between(5,6,hue)) { r = c; g = 0; b = x; }
+    function toRGB(hsv) {
+        var c = hsv.value * hsv.saturation;
+        var hue = hsv.hue / 60;
+        var x = c * (1 - Math.abs((hue % 2) - 1));
+        var r = 0, g = 0, b = 0;
+             if (between(0,1,hue)) { r = c; g = x; b = 0; }
+        else if (between(1,2,hue)) { r = x; g = c; b = 0; }
+        else if (between(2,3,hue)) { r = 0; g = c; b = x; }
+        else if (between(3,4,hue)) { r = 0; g = x; b = c; }
+        else if (between(4,5,hue)) { r = x; g = 0; b = c; }
+        else if (between(5,6,hue)) { r = c; g = 0; b = x; }
 
-  var m = hsv.value - c;
-  return { ctor:"Color", _0:norm(r+m), _1:norm(g+m), _2:norm(b+m), _3:1 };
- }
+        var m = hsv.value - c;
+        return { ctor:"Color", _0:norm(r+m), _1:norm(g+m), _2:norm(b+m), _3:1 };
+    }
 
- return elm.Native.Color.values = {
-    hsva:F4(hsva),
-    hsv:F3(hsv),
-    complement:complement
- };
+    return elm.Native.Color.values = {
+        hsva:F4(hsva),
+        hsv:F3(hsv),
+        complement:complement
+    };
 
 };Elm.Native.Date = {};
 Elm.Native.Date.make = function(elm) {
@@ -139,7 +139,7 @@ Elm.Native.Text.make = function(elm) {
     if (elm.Native.Text.values) return elm.Native.Text.values;
 
     var JS = Elm.JavaScript.make(elm);
-    var htmlHeight = Elm.Native.Utils.make(elm).htmlHeight;
+    var Utils = Elm.Native.Utils.make(elm);
     var Color = Elm.Native.Color.make(elm);
     var Element = Elm.Graphics.Element.make(elm);
     var show = Elm.Native.Show.make(elm).show;
@@ -185,15 +185,16 @@ Elm.Native.Text.make = function(elm) {
         return arr.join('<br/>');
     }
 
-    function toText(str) { return properEscape(JS.fromString(str)); }
+    function toText(str) { return Utils.txt(properEscape(JS.fromString(str))); }
 
-    function addTag(tag) { return function(text) {
-        return '<' + tag + ' style="padding:0;margin:0">' + text + '</' + tag + '>';
+    function addTag(tag) {
+        return function(text) {
+            return Utils.txt('<' + tag + '>' + text + '</' + tag + '>');
+        }
     }
-                         }
     
     function addStyle(style, value, text) {
-        return "<span style='" + style + ":" + value + "'>" + text + "</span>";
+        return Utils.txt("<span style='" + style + ":" + value + "'>" + text + "</span>");
     }
 
     function typeface(name, text) {
@@ -209,8 +210,8 @@ Elm.Native.Text.make = function(elm) {
     var bold = addTag('b');
 
     function extract(c) {
-        if (c._3 === 1) { return 'rgb(' + c._0 + ',' + c._1 + ',' + c._2 + ')'; }
-        return 'rgba(' + c._0 + ',' + c._1 + ',' + c._2 + ',' + c._3 + ')';
+        if (c._3 === 1) { return 'rgb(' + c._0 + ', ' + c._1 + ', ' + c._2 + ')'; }
+        return 'rgba(' + c._0 + ', ' + c._1 + ', ' + c._2 + ', ' + c._3 + ')';
     }
     function color(c, text) {
         return addStyle('color', extract(c), text);
@@ -221,7 +222,7 @@ Elm.Native.Text.make = function(elm) {
         return addStyle('text-decoration', 'line-through', text);
     }
     function link(href, text) {
-        return "<a href='" + toText(href) + "'>" + text + "</a>";
+        return Utils.txt("<a href='" + toText(href) + "'>" + text + "</a>");
     }
 
     function position(pos) {
@@ -230,7 +231,7 @@ Elm.Native.Text.make = function(elm) {
 	             _0: '<div style="padding:0;margin:0;text-align:' +
                      pos + '">' + text + '</div>'
                     };
-            var p = A2(htmlHeight, 0, text);
+            var p = A2(Utils.htmlHeight, 0, text);
             return A3(Element.newElement, p._0, p._1, e);
         }
     }
@@ -266,7 +267,6 @@ Elm.Native.Text.make = function(elm) {
 
         asText : asText
     };
-
 };
 Elm.Native.Basics = {};
 Elm.Native.Basics.make = function(elm) {
@@ -398,6 +398,18 @@ Elm.Native.Utils.make = function(elm) {
     var Tuple0 = { ctor: "_Tuple0" };
     function Tuple2(x,y) { return { ctor:"_Tuple2", _0:x, _1:y } }
 
+    function chr(c) {
+        var x = new String(c);
+        x.isChar = true;
+        return x;
+    }
+
+    function txt(str) {
+        var t = new String(str);
+        t.isText = true;
+        return t;
+    }
+
     var count = 0;
     function guid(_) { return count++ }
 
@@ -464,21 +476,26 @@ Elm.Native.Utils.make = function(elm) {
         return Tuple2(w,h);
     }
 
-    function adjustOffset() {
-        var node = elm.node;
-        var offsetX = 0, offsetY = 0;
-        if (node.offsetParent) {
-            do {
-                offsetX += node.offsetLeft;
-                offsetY += node.offsetTop;
-            } while (node = node.offsetParent);
+    function getXY(e) {
+        var posx = 0;
+        var posy = 0;
+        if (e.pageX || e.pageY) {
+            posx = e.pageX;
+            posy = e.pageY;
+        } else if (e.clientX || e.clientY) {
+            posx = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+            posy = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
         }
-        elm.node.offsetX = offsetX;
-        elm.node.offsetY = offsetY;
-    }
 
-    if (elm.display === ElmRuntime.Display.COMPONENT) {
-        elm.addListener(elm.inputs, elm.node, 'mouseover', adjustOffset);
+        if (elm.display === ElmRuntime.Display.COMPONENT) {
+            var rect = elm.node.getBoundingClientRect();
+            var relx = rect.left + document.body.scrollLeft + document.documentElement.scrollLeft;
+            var rely = rect.top + document.body.scrollTop + document.documentElement.scrollTop;
+            // TODO: figure out if there is a way to avoid rounding here
+            posx = posx - Math.round(relx) - elm.node.clientLeft;
+            posy = posy - Math.round(rely) - elm.node.clientTop;
+        }
+        return Tuple2(posx, posy);
     }
 
     return elm.Native.Utils.values = {
@@ -487,6 +504,8 @@ Elm.Native.Utils.make = function(elm) {
         compare:F2(compare),
         Tuple0:Tuple0,
         Tuple2:Tuple2,
+        chr:chr,
+        txt:txt,
         copy: copy,
         remove: remove,
         replace: replace,
@@ -496,7 +515,8 @@ Elm.Native.Utils.make = function(elm) {
         min : F2(min),
         mod : F2(mod),
         htmlHeight: F2(htmlHeight),
-        toFloat: function(x){return x}
+        getXY: getXY,
+        toFloat: function(x) { return +x; }
     };
 };
 Elm.Native.Show = {};
@@ -522,9 +542,10 @@ Elm.Native.Show.make = function(elm) {
             return v ? "True" : "False";
         } else if (type === "number") {
             return v+"";
+        } else if (v.isChar && v instanceof String) {
+            return "'" + addSlashes(v) + "'";
         } else if (type === "string") {
-            var quote = v.length === 1 ? "'" : '"';
-            return quote + addSlashes(v) + quote;
+            return '"' + addSlashes(v) + '"';
         } else if (type === "object" && '_' in v) {
             var output = [];
             for (var k in v._) {
@@ -604,7 +625,7 @@ Elm.Native.String.make = function(elm) {
     var Char = Elm.Char.make(elm);
     var Maybe = Elm.Maybe.make(elm);
     var JS = Elm.JavaScript.make(elm);
-    var Tuple2 = Elm.Native.Utils.make(elm).Tuple2;
+    var Utils = Elm.Native.Utils.make(elm);
 
     function isEmpty(str) {
         return str.length === 0;
@@ -613,8 +634,8 @@ Elm.Native.String.make = function(elm) {
         return chr + str;
     }
     function uncons(str) {
-        var chr;
-        return (chr = str[0]) ? Maybe.Just(Tuple2(chr, str.slice(1)))
+        var hd;
+        return (hd = str[0]) ? Maybe.Just(Utils.Tuple2(Utils.chr(hd), str.slice(1)))
                               : Maybe.Nothing;
     }
     function length(str) {
@@ -644,16 +665,16 @@ Elm.Native.String.make = function(elm) {
     }
 
     function split(sep, str) {
-        return str.split(sep);
+        return JS.toList(str.split(sep));
     }
     function join(sep, strs) {
         return JS.fromList(strs).join(sep);
     }
-    function repeat(n, chr) {
+    function repeat(n, str) {
         var result = '';
         while (n > 0) {
-            if (n & 1) result += chr;
-            n >>= 1, chr += chr;
+            if (n & 1) result += str;
+            n >>= 1, str += str;
         }
         return result;
     }
@@ -675,7 +696,7 @@ Elm.Native.String.make = function(elm) {
     }
 
     function pad(n,chr,str) {
-        var half = n - str.length / 2;
+        var half = (n - str.length) / 2;
         return repeat(Math.ceil(half),chr) + str + repeat(half|0,chr);
     }
     function padRight(n,chr,str) {
@@ -698,14 +719,8 @@ Elm.Native.String.make = function(elm) {
     function words(str) {
         return JS.toList(str.split(/\s+/g));
     }
-    function unwords(str) {
-        return JS.fromList(str).join(' ');
-    }
     function lines(str) {
         return JS.toList(str.split(/\r\n|\r|\n/g));
-    }
-    function unlines(str) {
-        return JS.fromList(str).join('\n');
     }
 
     function toUpper(str) {
@@ -814,9 +829,7 @@ Elm.Native.String.make = function(elm) {
         trimRight: trimRight,
 
         words: words,
-        unwords: unwords,
         lines: lines,
-        unlines: unlines,
 
         toUpper: toUpper,
         toLower: toLower,
@@ -1039,7 +1052,8 @@ Elm.Native.List.make = function(elm) {
     }
 
     function append(xs,ys) {
-        if (typeof xs === "string") { return xs.concat(ys); }
+        if (xs.isText) return Utils.txt(xs.concat(ys));
+        if (typeof xs === "string") return xs.concat(ys);
         if (xs.ctor === '[]') { return ys; }
         var root = Cons(xs._0, Nil);
         var curr = root;
@@ -1238,6 +1252,7 @@ Elm.Native.List.make = function(elm) {
     }
 
     function join(sep, xss) {
+        if (sep.isText) return Utils.txt(toArray(xss).join(sep));
         if (typeof sep === 'string') return toArray(xss).join(sep);
         if (xss.ctor === '[]') return Nil;
         var s = toArray(sep);
@@ -1597,39 +1612,40 @@ Elm.Native.Json.make = function(elm) {
 Elm.Native.Random = {};
 Elm.Native.Random.make = function(elm) {
 
-  elm.Native = elm.Native || {};
-  elm.Native.Random = elm.Native.Random || {};
-  if (elm.Native.Random.values) return elm.Native.Random.values;
+    elm.Native = elm.Native || {};
+    elm.Native.Random = elm.Native.Random || {};
+    if (elm.Native.Random.values) return elm.Native.Random.values;
 
-  var Signal = Elm.Signal.make(elm);
-  var List = Elm.Native.List.make(elm);
+    var Signal = Elm.Signal.make(elm);
+    var List = Elm.Native.List.make(elm);
 
-  function range(min, max, signal) {
-    function f(x) { return Math.floor(Math.random() * (max-min+1)) + min; }
-    return A2( Signal.lift, f, signal );
-  }
-
-  function flt(signal) {
-    function f(x) { return Math.random(); }
-    return A2( Signal.lift, f, signal );
-  }
-
-  function flts(signal) {
-    function f(x) {
-      var arr = new Array(Math.max(0,x));
-      for (var i = 0; i < x; i++) {
-        arr[i] = Math.random();
-      }
-      return List.fromArray(arr);
+    function range(min, max, signal) {
+        function f(x) { return Math.floor(Math.random() * (max-min+1)) + min; }
+        return A2( Signal.lift, f, signal );
     }
-    return A2( Signal.lift, f, signal );
-  }
 
-  return elm.Native.Random.values = {
-      range: F3(range),
-      flt: flt,
-      floatList: flts
-  };
+    function float_(signal) {
+        function f(x) { return Math.random(); }
+        return A2( Signal.lift, f, signal );
+    }
+
+    function floatList(signal) {
+        function f(n) {
+            if (n < 0) return List.Nil;
+            var arr = new Array(n);
+            for (var i = n; i--; ) {
+                arr[i] = Math.random();
+            }
+            return List.fromArray(arr);
+        }
+        return A2( Signal.lift, f, signal );
+    }
+
+    return elm.Native.Random.values = {
+        range: F3(range),
+        float_: float_,
+        floatList: floatList
+    };
 
 };
 Elm.Native.WebSocket = {};
@@ -1749,10 +1765,13 @@ Elm.Native.Keyboard.make = function(elm) {
 
   function keySignal(f) {
     var signal = A2(Signal.lift, f, keysDown);
-    // what's the significance of these two following lines? -jpm
+    // must set the default number of kids to make it possible to filter
+    // these signals if they are not actually used.
     keysDown.defaultNumberOfKids += 1;
-    signal.defaultNumberOfKids = 0;
-    return signal;
+    signal.defaultNumberOfKids = 1;
+    var filtered = Signal.dropRepeats(signal)
+    filtered.defaultNumberOfKids = 0;
+    return filtered;
   }
 
   function dir(up, down, left, right) {
@@ -1961,150 +1980,153 @@ Elm.Native.Http.make = function(elm) {
 Elm.Native.Touch = {};
 Elm.Native.Touch.make = function(elm) {
 
-  elm.Native = elm.Native || {};
-  elm.Native.Touch = elm.Native.Touch || {};
-  if (elm.Native.Touch.values) return elm.Native.Touch.values;
+    elm.Native = elm.Native || {};
+    elm.Native.Touch = elm.Native.Touch || {};
+    if (elm.Native.Touch.values) return elm.Native.Touch.values;
 
-  var Signal = Elm.Signal.make(elm);
-  var JS = Elm.JavaScript.make(elm);
-  var _ = Elm.Native.Utils.make(elm);
+    var Signal = Elm.Signal.make(elm);
+    var JS = Elm.JavaScript.make(elm);
+    var Utils = Elm.Native.Utils.make(elm);
 
-  function Dict() {
-    this.keys = [];
-    this.values = [];
-
-    this.insert = function(key,value) {
-      this.keys.push(key);
-      this.values.push(value);
-    };
-    this.lookup = function(key) {
-      var i = this.keys.indexOf(key)
-      return i >= 0 ? this.values[i] : {x:0,y:0,t:0};
-    };
-    this.remove = function(key) {
-      var i = this.keys.indexOf(key);
-      if (i < 0) return;
-      var t = this.values[i];
-      this.keys.splice(i,1);
-      this.values.splice(i,1);
-      return t;
-    };
-    this.clear = function() {
+    function Dict() {
         this.keys = [];
         this.values = [];
-    };
-  }
-  
-  var root = Signal.constant([]),
-      tapTime = 500,
-      hasTap = false,
-      tap = {_:{},x:0,y:0},
-      dict = new Dict();
 
-  function touch(t) {
-      var r = dict.lookup(t.identifier);
-      return {_ : {},
-	      id: t.identifier,
-	      x : t.pageX - elm.node.offsetX,
-	      y : t.pageY - elm.node.offsetY,
-	      x0: r.x,
-	      y0: r.y,
-	      t0: r.t
-	      };
-  }
-
-  var node = elm.display === ElmRuntime.Display.FULLSCREEN ? document : elm.node;
-
-  function start(e) {
-    dict.insert(e.identifier,
-                {x: e.pageX - elm.node.offsetX,
-                 y: e.pageY - elm.node.offsetY,
-                 t: Date.now()});
-  }
-  function end(e) {
-    var t = dict.remove(e.identifier);
-    if (Date.now() - t.t < tapTime) {
-        hasTap = true;
-        tap = {_:{}, x:t.x, y:t.y};
+        this.insert = function(key,value) {
+            this.keys.push(key);
+            this.values.push(value);
+        };
+        this.lookup = function(key) {
+            var i = this.keys.indexOf(key)
+            return i >= 0 ? this.values[i] : {x:0,y:0,t:0};
+        };
+        this.remove = function(key) {
+            var i = this.keys.indexOf(key);
+            if (i < 0) return;
+            var t = this.values[i];
+            this.keys.splice(i,1);
+            this.values.splice(i,1);
+            return t;
+        };
+        this.clear = function() {
+            this.keys = [];
+            this.values = [];
+        };
     }
-  }
+    
+    var root = Signal.constant([]),
+    tapTime = 500,
+    hasTap = false,
+    tap = {_:{},x:0,y:0},
+    dict = new Dict();
 
-  function listen(name, f) {
-    function update(e) {
-      for (var i = e.changedTouches.length; i--; ) { f(e.changedTouches[i]); }
-      var ts = new Array(e.touches.length);
-      for (var i = e.touches.length; i--; ) { ts[i] = touch(e.touches[i]); }
-      elm.notify(root.id, ts);
-      e.preventDefault();
+    function touch(t) {
+        var r = dict.lookup(t.identifier);
+        var point = Utils.getXY(t);
+        return {_ : {},
+	        id: t.identifier,
+	        x : point._0,
+	        y : point._1,
+	        x0: r.x,
+	        y0: r.y,
+	        t0: r.t
+	       };
     }
-    elm.addListener([root.id], node, name, update);
-  }
 
-  listen("touchstart", start);
-  listen("touchmove", function(_){});
-  listen("touchend", end);
-  listen("touchcancel", end);
-  listen("touchleave", end);
+    var node = elm.display === ElmRuntime.Display.FULLSCREEN ? document : elm.node;
 
-  var mouseID = -1;
-  function move(e) {
-      for (var i = root.value.length; i--; ) {
-          if (root.value[i].id === mouseID) {
-              root.value[i].x = e.pageX - elm.node.offsetX;
-              root.value[i].y = e.pageY - elm.node.offsetY;
-              elm.notify(root.id, root.value);
-              break;
-          }
-      }
-  }
-  elm.addListener([root.id], node, "mousedown", function down(e) {
-          node.addEventListener("mousemove", move);
-          e.identifier = mouseID;
-          start(e);
-          root.value.push(touch(e));
-          elm.notify(root.id, root.value);
-      });
-  elm.addListener([root.id], node, "mouseup", function up(e) {
-          node.removeEventListener("mousemove", move);
-          e.identifier = mouseID;
-          end(e);
-          for (var i = root.value.length; i--; ) {
-              if (root.value[i].id === mouseID) {
-                  root.value.splice(i, 1);
-                  --mouseID;
-                  break;
-              }
-          }
-          elm.notify(root.id, root.value);
-      });
-  elm.addListener([root.id], node, "blur", function blur(e) {
-          node.removeEventListener("mousemove", move);
-          if (root.value.length > 0) {
-              elm.notify(root.id, []);
-              --mouseID;
-          }
-          dict.clear();
-      });
+    function start(e) {
+        var point = Utils.getXY(e);
+        dict.insert(e.identifier,
+                    {x: point._0,
+                     y: point._1,
+                     t: Date.now()});
+    }
+    function end(e) {
+        var t = dict.remove(e.identifier);
+        if (Date.now() - t.t < tapTime) {
+            hasTap = true;
+            tap = {_:{}, x:t.x, y:t.y};
+        }
+    }
 
-  function dependency(f) {
-      var sig = A2( Signal.lift, f, root );
-      root.defaultNumberOfKids += 1;
-      sig.defaultNumberOfKids = 0;
-      return sig;
-  }
+    function listen(name, f) {
+        function update(e) {
+            for (var i = e.changedTouches.length; i--; ) { f(e.changedTouches[i]); }
+            var ts = new Array(e.touches.length);
+            for (var i = e.touches.length; i--; ) { ts[i] = touch(e.touches[i]); }
+            elm.notify(root.id, ts);
+            e.preventDefault();
+        }
+        elm.addListener([root.id], node, name, update);
+    }
 
-  var touches = dependency(JS.toList);
+    listen("touchstart", start);
+    listen("touchmove", function(_){});
+    listen("touchend", end);
+    listen("touchcancel", end);
+    listen("touchleave", end);
 
-  var taps = function() {
-      var sig = dependency(function(_) { return tap; });
-      sig.defaultNumberOfKids = 1;
-      function pred(_) { var b = hasTap; hasTap = false; return b; }
-      var sig2 = A3( Signal.keepIf, pred, {_:{},x:0,y:0}, sig);
-      sig2.defaultNumberOfKids = 0;
-      return sig2;
-  }();
+    var mouseID = -1;
+    function move(e) {
+        var point = Utils.getXY(e);
+        for (var i = root.value.length; i--; ) {
+            if (root.value[i].id === mouseID) {
+                root.value[i].x = point._0;
+                root.value[i].y = point._1;
+                elm.notify(root.id, root.value);
+                break;
+            }
+        }
+    }
+    elm.addListener([root.id], node, "mousedown", function down(e) {
+        node.addEventListener("mousemove", move);
+        e.identifier = mouseID;
+        start(e);
+        root.value.push(touch(e));
+        elm.notify(root.id, root.value);
+    });
+    elm.addListener([root.id], node, "mouseup", function up(e) {
+        node.removeEventListener("mousemove", move);
+        e.identifier = mouseID;
+        end(e);
+        for (var i = root.value.length; i--; ) {
+            if (root.value[i].id === mouseID) {
+                root.value.splice(i, 1);
+                --mouseID;
+                break;
+            }
+        }
+        elm.notify(root.id, root.value);
+    });
+    elm.addListener([root.id], node, "blur", function blur(e) {
+        node.removeEventListener("mousemove", move);
+        if (root.value.length > 0) {
+            elm.notify(root.id, []);
+            --mouseID;
+        }
+        dict.clear();
+    });
 
-  return elm.Native.Touch.values = { touches: touches, taps: taps };
+    function dependency(f) {
+        var sig = A2( Signal.lift, f, root );
+        root.defaultNumberOfKids += 1;
+        sig.defaultNumberOfKids = 0;
+        return sig;
+    }
+
+    var touches = dependency(JS.toList);
+
+    var taps = function() {
+        var sig = dependency(function(_) { return tap; });
+        sig.defaultNumberOfKids = 1;
+        function pred(_) { var b = hasTap; hasTap = false; return b; }
+        var sig2 = A3( Signal.keepIf, pred, {_:{},x:0,y:0}, sig);
+        sig2.defaultNumberOfKids = 0;
+        return sig2;
+    }();
+
+    return elm.Native.Touch.values = { touches: touches, taps: taps };
 
 };
 Elm.Native.Signal = {};
@@ -2344,69 +2366,53 @@ Elm.Native.Signal.make = function(elm) {
 Elm.Native.Mouse = {};
 Elm.Native.Mouse.make = function(elm) {
 
-  elm.Native = elm.Native || {};
-  elm.Native.Mouse = elm.Native.Mouse || {};
-  if (elm.Native.Mouse.values) return elm.Native.Mouse.values;
+    elm.Native = elm.Native || {};
+    elm.Native.Mouse = elm.Native.Mouse || {};
+    if (elm.Native.Mouse.values) return elm.Native.Mouse.values;
 
-  var Signal = Elm.Signal.make(elm);
-  var Utils = Elm.Native.Utils.make(elm);
+    var Signal = Elm.Signal.make(elm);
+    var Utils = Elm.Native.Utils.make(elm);
 
-  var position  = Signal.constant(Utils.Tuple2(0,0));
-  position.defaultNumberOfKids = 2;
+    var position  = Signal.constant(Utils.Tuple2(0,0));
+    position.defaultNumberOfKids = 2;
 
-  // do not move x and y into Elm. By setting their default number
-  // of kids, it is possible to detatch the mouse listeners if
-  // they are not needed.
-  var x = A2( Signal.lift, function(p){return p._0}, position);
-  x.defaultNumberOfKids = 0;
-  var y = A2( Signal.lift, function(p){return p._1}, position);
-  y.defaultNumberOfKids = 0;
+    // do not move x and y into Elm. By setting their default number
+    // of kids, it is possible to detatch the mouse listeners if
+    // they are not needed.
+    var x = A2( Signal.lift, function(p){return p._0}, position);
+    x.defaultNumberOfKids = 0;
+    var y = A2( Signal.lift, function(p){return p._1}, position);
+    y.defaultNumberOfKids = 0;
 
-  var isDown    = Signal.constant(false);
-  var isClicked = Signal.constant(false);
-  var clicks = Signal.constant(Utils.Tuple0);
+    var isDown    = Signal.constant(false);
+    var isClicked = Signal.constant(false);
+    var clicks = Signal.constant(Utils.Tuple0);
 
-  function getXY(e) {
-    var posx = 0;
-    var posy = 0;
-    if (!e) e = window.event;
-    if (e.pageX || e.pageY) {
-	posx = e.pageX;
-	posy = e.pageY;
-    } else if (e.clientX || e.clientY) 	{
-	posx = e.clientX + document.body.scrollLeft +
-	  document.documentElement.scrollLeft;
-	posy = e.clientY + document.body.scrollTop +
-	  document.documentElement.scrollTop;
-    }
-    return Utils.Tuple2(posx-elm.node.offsetX, posy-elm.node.offsetY);
-  }
+    var node = elm.display === ElmRuntime.Display.FULLSCREEN ? document : elm.node;
 
-  var node = elm.display === ElmRuntime.Display.FULLSCREEN ? document : elm.node;
+    elm.addListener([isClicked.id, clicks.id], node, 'click', function click() {
+        elm.notify(isClicked.id, true);
+        elm.notify(clicks.id, Utils.Tuple0);
+        elm.notify(isClicked.id, false);
+    });
+    elm.addListener([isDown.id], node, 'mousedown', function down() {
+        elm.notify(isDown.id, true);
+    });
+    elm.addListener([isDown.id], node, 'mouseup', function up() {
+        elm.notify(isDown.id, false);
+    });
+    elm.addListener([position.id], node, 'mousemove', function move(e) {
+        elm.notify(position.id, Utils.getXY(e));
+    });
 
-  elm.addListener([isClicked.id, clicks.id], node, 'click', function click() {
-          elm.notify(isClicked.id, true);
-          elm.notify(clicks.id, Utils.Tuple0);
-          elm.notify(isClicked.id, false);
-      });
-  elm.addListener([isDown.id], node, 'mousedown', function down() {
-          elm.notify(isDown.id, true);
-      });
-  elm.addListener([isDown.id], node, 'mouseup', function up() {
-          elm.notify(isDown.id, false);
-      });
-  elm.addListener([position.id], node, 'mousemove', function move(e) {
-          elm.notify(position.id, getXY(e));
-      });
-
-  return elm.Native.Mouse.values = {
-      position: position,
-      x:x,
-      y:y,
-      isClicked: isClicked,
-      isDown: isDown,
-      clicks: clicks
-  };
+    return elm.Native.Mouse.values = {
+        position: position,
+        x:x,
+        y:y,
+        isClicked: isClicked,
+        isDown: isDown,
+        clicks: clicks
+    };
 };Elm.Native.Graphics.Collage = {};
 Elm.Native.Graphics.Collage.make = function(elm) {
 
@@ -3057,493 +3063,7 @@ Elm.Json.make = function (elm)
                               };
                   elm.Json.values = {_op: _op, toString: toString, toJSString: toJSString, fromString: fromString, fromJSString: fromJSString, fromJSObject: fromJSObject, toJSObject: toJSObject, String: String, Number: Number, Boolean: Boolean, Null: Null, Array: Array, Object: Object};
                   return elm.Json.values;
-                };Elm.AutomatonV2 = Elm.AutomatonV2 || {};
-Elm.AutomatonV2.make = function (elm)
-                       {
-                         elm.AutomatonV2 = elm.AutomatonV2 || {};
-                         if (elm.AutomatonV2.values)
-                         return elm.AutomatonV2.values;
-                         var N = Elm.Native,
-                             _N = N.Utils.make(elm),
-                             _L = N.List.make(elm),
-                             _E = N.Error.make(elm),
-                             _J = N.JavaScript.make(elm),
-                             $moduleName = "AutomatonV2";
-                         var Basics = Elm.Basics.make(elm);
-                         var Signal = Elm.Signal.make(elm);
-                         var List = Elm.List.make(elm);
-                         var Maybe = Elm.Maybe.make(elm);
-                         var _op = {};
-                         var enqueue = F2(function (x,arg0)
-                                          {
-                                            return function ()
-                                                   {
-                                                     switch (arg0.ctor)
-                                                     {case
-                                                      "_Tuple2" :
-                                                        return {ctor: "_Tuple2", _0: {ctor: "::", _0: x, _1: arg0._0}, _1: arg0._1};}
-                                                     _E.Case($moduleName,
-                                                             "on line 121, column 22 to 31");
-                                                   }();
-                                          });
-                         var empty = {ctor: "_Tuple2", _0: _J.toList([]), _1: _J.toList([])};
-                         var dequeue = function (q)
-                                       {
-                                         return function ()
-                                                {
-                                                  switch (q.ctor)
-                                                  {case
-                                                   "_Tuple2" :
-                                                     switch (q._0.ctor)
-                                                     {case
-                                                      "[]" :
-                                                        switch (q._1.ctor)
-                                                        {case
-                                                         "[]" :
-                                                           return Maybe.Nothing;}
-                                                        break;}
-                                                     switch (q._1.ctor)
-                                                     {case
-                                                      "::" :
-                                                        return Maybe.Just({ctor: "_Tuple2", _0: q._1._0, _1: {ctor: "_Tuple2", _0: q._0, _1: q._1._1}});
-                                                      case
-                                                      "[]" :
-                                                        return dequeue({ctor: "_Tuple2", _0: _J.toList([]), _1: List.reverse(q._0)});}
-                                                     break;}
-                                                  _E.Case($moduleName,"between lines 122 and 125");
-                                                }();
-                                       };
-                         var Stateful = F2(function (a,b)
-                                           {
-                                             return {ctor: "Stateful", _0: a, _1: b};
-                                           });
-                         var Pure = function (a)
-                                    {
-                                      return {ctor: "Pure", _0: a};
-                                    };
-                         var andThen = F2(function (first,second)
-                                          {
-                                            return function ()
-                                                   {
-                                                     switch (first.ctor)
-                                                     {case
-                                                      "Pure" :
-                                                        return function ()
-                                                               {
-                                                                 switch (second.ctor)
-                                                                 {case
-                                                                  "Pure" :
-                                                                    return Pure(function ($)
-                                                                                {
-                                                                                  return second._0(first._0($));
-                                                                                });
-                                                                  case
-                                                                  "Stateful" :
-                                                                    return A2(Stateful,
-                                                                              second._0,
-                                                                              function (i)
-                                                                              {
-                                                                                return second._1(first._0(i));
-                                                                              });}
-                                                                 _E.Case($moduleName,
-                                                                         "between lines 26 and 29");
-                                                               }();
-                                                      case
-                                                      "Stateful" :
-                                                        return function ()
-                                                               {
-                                                                 switch (second.ctor)
-                                                                 {case
-                                                                  "Pure" :
-                                                                    return A2(Stateful,
-                                                                              first._0,
-                                                                              F2(function (i,st)
-                                                                                 {
-                                                                                   return function ()
-                                                                                          {
-                                                                                            var $ = A2(first._1,
-                                                                                                       i,
-                                                                                                       st),
-                                                                                                inter = $._0,
-                                                                                                st$ = $._1;
-                                                                                            return {ctor: "_Tuple2", _0: second._0(inter), _1: st$};
-                                                                                          }();
-                                                                                 }));
-                                                                  case
-                                                                  "Stateful" :
-                                                                    return A2(Stateful,
-                                                                              {ctor: "_Tuple2", _0: first._0, _1: second._0},
-                                                                              F2(function (i,arg0)
-                                                                                 {
-                                                                                   return function ()
-                                                                                          {
-                                                                                            switch (arg0.ctor)
-                                                                                            {case
-                                                                                             "_Tuple2" :
-                                                                                               return function ()
-                                                                                                      {
-                                                                                                        var $ = A2(first._1,
-                                                                                                                   i,
-                                                                                                                   arg0._0),
-                                                                                                            inter = $._0,
-                                                                                                            fst$ = $._1;
-                                                                                                        var $ = A2(second._1,
-                                                                                                                   inter,
-                                                                                                                   arg0._1),
-                                                                                                            o = $._0,
-                                                                                                            sst$ = $._1;
-                                                                                                        return {ctor: "_Tuple2", _0: o, _1: {ctor: "_Tuple2", _0: fst$, _1: sst$}};
-                                                                                                      }();}
-                                                                                            _E.Case($moduleName,
-                                                                                                    "between lines 34 and 36");
-                                                                                          }();
-                                                                                 }));}
-                                                                 _E.Case($moduleName,
-                                                                         "between lines 29 and 36");
-                                                               }();}
-                                                     _E.Case($moduleName,"between lines 25 and 36");
-                                                   }();
-                                          });
-                         var extendDown = function (auto)
-                                          {
-                                            return function ()
-                                                   {
-                                                     switch (auto.ctor)
-                                                     {case
-                                                      "Pure" :
-                                                        return Pure(function (arg0)
-                                                                    {
-                                                                      return function ()
-                                                                             {
-                                                                               switch (arg0.ctor)
-                                                                               {case
-                                                                                "_Tuple2" :
-                                                                                  return {ctor: "_Tuple2", _0: auto._0(arg0._0), _1: arg0._1};}
-                                                                               _E.Case($moduleName,
-                                                                                       "on line 41, column 45 to 57");
-                                                                             }();
-                                                                    });
-                                                      case
-                                                      "Stateful" :
-                                                        return A2(Stateful,
-                                                                  auto._0,
-                                                                  F2(function (arg1,s)
-                                                                     {
-                                                                       return function ()
-                                                                              {
-                                                                                switch (arg1.ctor)
-                                                                                {case
-                                                                                 "_Tuple2" :
-                                                                                   return {ctor: "_Tuple2", _0: A2(auto._1,
-                                                                                                                   arg1._0,
-                                                                                                                   s), _1: arg1._1};}
-                                                                                _E.Case($moduleName,
-                                                                                        "on line 42, column 56 to 70");
-                                                                              }();
-                                                                     }));}
-                                                     _E.Case($moduleName,"between lines 40 and 42");
-                                                   }();
-                                          };
-                         var loop = F2(function (base,auto)
-                                       {
-                                         return function ()
-                                                {
-                                                  switch (auto.ctor)
-                                                  {case
-                                                   "Pure" :
-                                                     return A2(Stateful,base,Basics.curry(auto._0));
-                                                   case
-                                                   "Stateful" :
-                                                     return function ()
-                                                            {
-                                                              var newFun = F2(function (i,arg0)
-                                                                              {
-                                                                                return function ()
-                                                                                       {
-                                                                                         switch (arg0.ctor)
-                                                                                         {case
-                                                                                          "_Tuple2" :
-                                                                                            return function ()
-                                                                                                   {
-                                                                                                     var $ = A2(auto._1,
-                                                                                                                {ctor: "_Tuple2", _0: i, _1: arg0._0},
-                                                                                                                arg0._1);
-                                                                                                     var o = function ()
-                                                                                                             {
-                                                                                                               switch ($.ctor)
-                                                                                                               {case
-                                                                                                                "_Tuple2" :
-                                                                                                                  switch ($._0.ctor)
-                                                                                                                  {case
-                                                                                                                   "_Tuple2" :
-                                                                                                                     return $._0._0;}
-                                                                                                                  break;}
-                                                                                                               _E.Case($moduleName,
-                                                                                                                       "on line 50, column 28 to 41");
-                                                                                                             }();
-                                                                                                     var s$ = function ()
-                                                                                                              {
-                                                                                                                switch ($.ctor)
-                                                                                                                {case
-                                                                                                                 "_Tuple2" :
-                                                                                                                   switch ($._0.ctor)
-                                                                                                                   {case
-                                                                                                                    "_Tuple2" :
-                                                                                                                      return $._0._1;}
-                                                                                                                   break;}
-                                                                                                                _E.Case($moduleName,
-                                                                                                                        "on line 50, column 28 to 41");
-                                                                                                              }();
-                                                                                                     var s2$ = function ()
-                                                                                                               {
-                                                                                                                 switch ($.ctor)
-                                                                                                                 {case
-                                                                                                                  "_Tuple2" :
-                                                                                                                    switch ($._0.ctor)
-                                                                                                                    {case
-                                                                                                                     "_Tuple2" :
-                                                                                                                       return $._1;}
-                                                                                                                    break;}
-                                                                                                                 _E.Case($moduleName,
-                                                                                                                         "on line 50, column 28 to 41");
-                                                                                                               }();
-                                                                                                     return {ctor: "_Tuple2", _0: o, _1: {ctor: "_Tuple2", _0: s$, _1: s2$}};
-                                                                                                   }();}
-                                                                                         _E.Case($moduleName,
-                                                                                                 "between lines 50 and 51");
-                                                                                       }();
-                                                                              });
-                                                              return A2(Stateful,
-                                                                        {ctor: "_Tuple2", _0: base, _1: auto._0},
-                                                                        newFun);
-                                                            }();}
-                                                  _E.Case($moduleName,"between lines 46 and 52");
-                                                }();
-                                       });
-                         var pure = Pure;
-                         var extendUp = function (auto)
-                                        {
-                                          return function ()
-                                                 {
-                                                   var swap = function (arg0)
-                                                              {
-                                                                return function ()
-                                                                       {
-                                                                         switch (arg0.ctor)
-                                                                         {case
-                                                                          "_Tuple2" :
-                                                                            return {ctor: "_Tuple2", _0: arg0._1, _1: arg0._0};}
-                                                                         _E.Case($moduleName,
-                                                                                 "on line 89, column 22 to 26");
-                                                                       }();
-                                                              };
-                                                   return A2(andThen,
-                                                             A2(andThen,
-                                                                pure(swap),
-                                                                extendDown(auto)),
-                                                             pure(swap));
-                                                 }();
-                                        };
-                         var pair = F2(function (f,g)
-                                       {
-                                         return A2(andThen,extendDown(f),extendUp(g));
-                                       });
-                         var branch = F2(function (f,g)
-                                         {
-                                           return function ()
-                                                  {
-                                                    var $double = pure(function (i)
-                                                                       {
-                                                                         return {ctor: "_Tuple2", _0: i, _1: i};
-                                                                       });
-                                                    return A2(andThen,$double,A2(pair,f,g));
-                                                  }();
-                                         });
-                         var combi = F2(function (a1,a2)
-                                        {
-                                          return A2(andThen,
-                                                    A2(branch,a1,a2),
-                                                    pure(Basics.uncurry(F2(function (x,y)
-                                                                           {
-                                                                             return {ctor: "::", _0: x, _1: y};
-                                                                           }))));
-                                        });
-                         var combine = function (autos)
-                                       {
-                                         return function ()
-                                                {
-                                                  var l = List.length(autos);
-                                                  return _N.eq(l,0) ? pure(function (arg0)
-                                                                           {
-                                                                             return function ()
-                                                                                    {
-                                                                                      return _J.toList([]);
-                                                                                    }();
-                                                                           }) : A3(List.foldr,
-                                                                                   combi,
-                                                                                   A2(andThen,
-                                                                                      List.last(autos),
-                                                                                      pure(function (a)
-                                                                                           {
-                                                                                             return _J.toList([a]);
-                                                                                           })),
-                                                                                   A2(List.take,
-                                                                                      l - 1,
-                                                                                      autos));
-                                                }();
-                                       };
-                         var hiddenState = F2(function (base,fun)
-                                              {
-                                                return A2(loop,
-                                                          base,
-                                                          pure(function (arg0)
-                                                               {
-                                                                 return function ()
-                                                                        {
-                                                                          switch (arg0.ctor)
-                                                                          {case
-                                                                           "_Tuple2" :
-                                                                             return function ()
-                                                                                    {
-                                                                                      var $ = A2(fun,
-                                                                                                 arg0._0,
-                                                                                                 arg0._1),
-                                                                                          o = $._0,
-                                                                                          s$ = $._1;
-                                                                                      return {ctor: "_Tuple2", _0: s$, _1: o};
-                                                                                    }();}
-                                                                          _E.Case($moduleName,
-                                                                                  "between lines 83 and 84");
-                                                                        }();
-                                                               }));
-                                              });
-                         var average = function (k)
-                                       {
-                                         return function ()
-                                                {
-                                                  var stepFull = F2(function (n,arg0)
-                                                                    {
-                                                                      return function ()
-                                                                             {
-                                                                               switch (arg0.ctor)
-                                                                               {case
-                                                                                "_Tuple3" :
-                                                                                  return function ()
-                                                                                         {
-                                                                                           var _case66 = dequeue(arg0._0);
-                                                                                           switch (_case66.ctor)
-                                                                                           {case
-                                                                                            "Just" :
-                                                                                              switch (_case66._0.ctor)
-                                                                                              {case
-                                                                                               "_Tuple2" :
-                                                                                                 return function ()
-                                                                                                        {
-                                                                                                          var sum$ = arg0._2 + n - _case66._0._0;
-                                                                                                          return {ctor: "_Tuple2", _0: {ctor: "_Tuple3", _0: A2(enqueue,
-                                                                                                                                                                n,
-                                                                                                                                                                _case66._0._1), _1: arg0._1, _2: sum$}, _1: sum$ / Basics.toFloat(arg0._1)};
-                                                                                                        }();}
-                                                                                              break;
-                                                                                            case
-                                                                                            "Nothing" :
-                                                                                              return {ctor: "_Tuple2", _0: {ctor: "_Tuple3", _0: arg0._0, _1: arg0._1, _2: arg0._2}, _1: 0};}
-                                                                                           _E.Case($moduleName,
-                                                                                                   "between lines 134 and 138");
-                                                                                         }();}
-                                                                               _E.Case($moduleName,
-                                                                                       "between lines 134 and 138");
-                                                                             }();
-                                                                    });
-                                                  var step = F2(function (n,arg0)
-                                                                {
-                                                                  return function ()
-                                                                         {
-                                                                           switch (arg0.ctor)
-                                                                           {case
-                                                                            "_Tuple3" :
-                                                                              return _N.eq(arg0._1,
-                                                                                           k) ? A2(stepFull,
-                                                                                                   n,
-                                                                                                   {ctor: "_Tuple3", _0: arg0._0, _1: arg0._1, _2: arg0._2}) : {ctor: "_Tuple2", _0: {ctor: "_Tuple3", _0: A2(enqueue,
-                                                                                                                                                                                                              n,
-                                                                                                                                                                                                              arg0._0), _1: arg0._1 + 1, _2: arg0._2 + n}, _1: (arg0._2 + n) / (Basics.toFloat(arg0._1) + 1)};}
-                                                                           _E.Case($moduleName,
-                                                                                   "between lines 131 and 132");
-                                                                         }();
-                                                                });
-                                                  return A2(hiddenState,
-                                                            {ctor: "_Tuple3", _0: empty, _1: 0, _2: 0},
-                                                            step);
-                                                }();
-                                       };
-                         var state = F2(function (base,fun)
-                                        {
-                                          return A2(loop,
-                                                    base,
-                                                    pure(function (arg0)
-                                                         {
-                                                           return function ()
-                                                                  {
-                                                                    switch (arg0.ctor)
-                                                                    {case
-                                                                     "_Tuple2" :
-                                                                       return function ()
-                                                                              {
-                                                                                var s$ = A2(fun,
-                                                                                            arg0._0,
-                                                                                            arg0._1);
-                                                                                return {ctor: "_Tuple2", _0: s$, _1: s$};
-                                                                              }();}
-                                                                    _E.Case($moduleName,
-                                                                            "between lines 76 and 77");
-                                                                  }();
-                                                         }));
-                                        });
-                         var count = A2(state,
-                                        0,
-                                        F2(function (arg1,c)
-                                           {
-                                             return function ()
-                                                    {
-                                                      return c + 1;
-                                                    }();
-                                           }));
-                         var run = F3(function (auto,baseOut,input)
-                                      {
-                                        return function ()
-                                               {
-                                                 switch (auto.ctor)
-                                                 {case
-                                                  "Pure" :
-                                                    return A2(Signal.lift,auto._0,input);
-                                                  case
-                                                  "Stateful" :
-                                                    return A2(Signal.lift,
-                                                              Basics.fst,
-                                                              A3(Signal.foldp,
-                                                                 F2(function (i,arg0)
-                                                                    {
-                                                                      return function ()
-                                                                             {
-                                                                               switch (arg0.ctor)
-                                                                               {case
-                                                                                "_Tuple2" :
-                                                                                  return A2(auto._1,
-                                                                                            i,
-                                                                                            arg0._1);}
-                                                                               _E.Case($moduleName,
-                                                                                       "on line 59, column 47 to 54");
-                                                                             }();
-                                                                    }),
-                                                                 {ctor: "_Tuple2", _0: baseOut, _1: auto._0},
-                                                                 input));}
-                                                 _E.Case($moduleName,"between lines 56 and 60");
-                                               }();
-                                      });
-                         elm.AutomatonV2.values = {_op: _op, pure: pure, andThen: andThen, extendDown: extendDown, loop: loop, run: run, state: state, hiddenState: hiddenState, extendUp: extendUp, pair: pair, branch: branch, combi: combi, combine: combine, count: count, empty: empty, enqueue: enqueue, dequeue: dequeue, average: average, Pure: Pure, Stateful: Stateful};
-                         return elm.AutomatonV2.values;
-                       };Elm.Touch = Elm.Touch || {};
+                };Elm.Touch = Elm.Touch || {};
 Elm.Touch.make = function (elm)
                  {
                    elm.Touch = elm.Touch || {};
@@ -4650,8 +4170,6 @@ Elm.String.make = function (elm)
                     var Maybe = Elm.Maybe.make(elm);
                     var _op = {};
                     var words = Native.String.words;
-                    var unwords = Native.String.unwords;
-                    var unlines = Native.String.unlines;
                     var uncons = Native.String.uncons;
                     var trimRight = Native.String.trimRight;
                     var trimLeft = Native.String.trimLeft;
@@ -4687,7 +4205,7 @@ Elm.String.make = function (elm)
                     var cons = Native.String.cons;
                     var any = Native.String.any;
                     var all = Native.String.all;
-                    elm.String.values = {_op: _op, isEmpty: isEmpty, cons: cons, uncons: uncons, length: length, map: map, filter: filter, reverse: reverse, foldl: foldl, foldr: foldr, split: split, join: join, repeat: repeat, sub: sub, left: left, right: right, dropLeft: dropLeft, dropRight: dropRight, pad: pad, padLeft: padLeft, padRight: padRight, trim: trim, trimLeft: trimLeft, trimRight: trimRight, words: words, unwords: unwords, lines: lines, unlines: unlines, toUpper: toUpper, toLower: toLower, any: any, all: all, contains: contains, startsWith: startsWith, endsWith: endsWith, indices: indices, indexes: indexes, toInt: toInt, toFloat: toFloat};
+                    elm.String.values = {_op: _op, isEmpty: isEmpty, cons: cons, uncons: uncons, length: length, map: map, filter: filter, reverse: reverse, foldl: foldl, foldr: foldr, split: split, join: join, repeat: repeat, sub: sub, left: left, right: right, dropLeft: dropLeft, dropRight: dropRight, pad: pad, padLeft: padLeft, padRight: padRight, trim: trim, trimLeft: trimLeft, trimRight: trimRight, words: words, lines: lines, toUpper: toUpper, toLower: toLower, any: any, all: all, contains: contains, startsWith: startsWith, endsWith: endsWith, indexes: indexes, indices: indices, toInt: toInt, toFloat: toFloat};
                     return elm.String.values;
                   };Elm.Char = Elm.Char || {};
 Elm.Char.make = function (elm)
@@ -4940,7 +4458,7 @@ Elm.Random.make = function (elm)
                     var _op = {};
                     var range = Native.Random.range;
                     var floatList = Native.Random.floatList;
-                    var $float = Native.Random.flt;
+                    var $float = Native.Random.float_;
                     elm.Random.values = {_op: _op, range: range, $float: $float, floatList: floatList};
                     return elm.Random.values;
                   };Elm.Keyboard = Elm.Keyboard || {};
@@ -5033,7 +4551,7 @@ Elm.Automaton.make = function (elm)
                                                     "_Tuple2" :
                                                       return {ctor: "_Tuple2", _0: {ctor: "::", _0: x, _1: arg0._0}, _1: arg0._1};}
                                                    _E.Case($moduleName,
-                                                           "on line 93, column 22 to 31");
+                                                           "on line 95, column 22 to 31");
                                                  }();
                                         });
                        var empty = {ctor: "_Tuple2", _0: _J.toList([]), _1: _J.toList([])};
@@ -5060,7 +4578,7 @@ Elm.Automaton.make = function (elm)
                                                     "[]" :
                                                       return dequeue({ctor: "_Tuple2", _0: _J.toList([]), _1: List.reverse(q._0)});}
                                                    break;}
-                                                _E.Case($moduleName,"between lines 94 and 99");
+                                                _E.Case($moduleName,"between lines 96 and 101");
                                               }();
                                      };
                        var Step = function (a)
@@ -5114,10 +4632,10 @@ Elm.Automaton.make = function (elm)
                                                                                           "Nothing" :
                                                                                             return {ctor: "_Tuple2", _0: {ctor: "_Tuple3", _0: arg0._0, _1: arg0._1, _2: arg0._2}, _1: 0};}
                                                                                          _E.Case($moduleName,
-                                                                                                 "between lines 106 and 110");
+                                                                                                 "between lines 108 and 112");
                                                                                        }();}
                                                                              _E.Case($moduleName,
-                                                                                     "between lines 106 and 110");
+                                                                                     "between lines 108 and 112");
                                                                            }();
                                                                   });
                                                 var step = F2(function (n,arg0)
@@ -5134,7 +4652,7 @@ Elm.Automaton.make = function (elm)
                                                                                                                                                                                                             n,
                                                                                                                                                                                                             arg0._0), _1: arg0._1 + 1, _2: arg0._2 + n}, _1: (arg0._2 + n) / (Basics.toFloat(arg0._1) + 1)};}
                                                                          _E.Case($moduleName,
-                                                                                 "between lines 103 and 104");
+                                                                                 "between lines 105 and 106");
                                                                        }();
                                                               });
                                                 return A2(hiddenState,
@@ -5166,7 +4684,7 @@ Elm.Automaton.make = function (elm)
                                                                               return arg0._0._0(a);}
                                                                            break;}
                                                                         _E.Case($moduleName,
-                                                                                "on line 33, column 28 to 31");
+                                                                                "on line 35, column 28 to 31");
                                                                       }();
                                                              });
                                                return A2(Signal.lift,
@@ -5179,7 +4697,7 @@ Elm.Automaton.make = function (elm)
                                                                      "_Tuple2" :
                                                                        return arg0._1;}
                                                                     _E.Case($moduleName,
-                                                                            "on line 34, column 23 to 24");
+                                                                            "on line 36, column 23 to 24");
                                                                   }();
                                                          },
                                                          A3(Signal.foldp,
@@ -5218,7 +4736,7 @@ Elm.Automaton.make = function (elm)
                                                 {case
                                                  "Step" :
                                                    return arg0._0(a);}
-                                                _E.Case($moduleName,"on line 38, column 19 to 22");
+                                                _E.Case($moduleName,"on line 40, column 19 to 22");
                                               }();
                                      });
                        var combine = function (autos)
@@ -5258,7 +4776,7 @@ Elm.Automaton.make = function (elm)
                                        {
                                          return A2(_op[">>>"],f,g);
                                        });
-                       elm.Automaton.values = {_op: _op, run: run, step: step, combine: combine, pure: pure, state: state, hiddenState: hiddenState, count: count, empty: empty, enqueue: enqueue, dequeue: dequeue, average: average, Step: Step};
+                       elm.Automaton.values = {_op: _op, pure: pure, state: state, hiddenState: hiddenState, run: run, step: step, combine: combine, count: count, average: average};
                        return elm.Automaton.values;
                      };Elm.Prelude = Elm.Prelude || {};
 Elm.Prelude.make = function (elm)
@@ -5464,7 +4982,7 @@ Elm.List.make = function (elm)
                                                    case
                                                    "[]" :
                                                      return _J.toList([]);}
-                                                  _E.Case($moduleName,"between lines 208 and 213");
+                                                  _E.Case($moduleName,"between lines 209 and 214");
                                                 }();
                                        });
                   var partition = F2(function (pred,lst)
@@ -5484,7 +5002,7 @@ Elm.List.make = function (elm)
                                                  case
                                                  "[]" :
                                                    return {ctor: "_Tuple2", _0: _J.toList([]), _1: _J.toList([])};}
-                                                _E.Case($moduleName,"between lines 165 and 175");
+                                                _E.Case($moduleName,"between lines 166 and 176");
                                               }();
                                      });
                   var unzip = function (pairs)
@@ -5506,7 +5024,7 @@ Elm.List.make = function (elm)
                                           case
                                           "[]" :
                                             return {ctor: "_Tuple2", _0: _J.toList([]), _1: _J.toList([])};}
-                                         _E.Case($moduleName,"between lines 190 and 198");
+                                         _E.Case($moduleName,"between lines 191 and 199");
                                        }();
                               };
                   _op["++"] = Native.List.append;
@@ -5605,9 +5123,9 @@ Elm.Either.make = function (elm)
                                                                 "Right" :
                                                                   return {ctor: "_Tuple2", _0: arg0._0, _1: {ctor: "::", _0: e._0, _1: arg0._1}};}
                                                                _E.Case($moduleName,
-                                                                       "between lines 78 and 80");
+                                                                       "between lines 66 and 68");
                                                              }();}
-                                                   _E.Case($moduleName,"between lines 78 and 80");
+                                                   _E.Case($moduleName,"between lines 66 and 68");
                                                  }();
                                         });
                     var partition = function (es)
@@ -5628,7 +5146,7 @@ Elm.Either.make = function (elm)
                                                   case
                                                   "Right" :
                                                     return vs;}
-                                                 _E.Case($moduleName,"between lines 60 and 66");
+                                                 _E.Case($moduleName,"between lines 56 and 58");
                                                }();
                                       });
                     var lefts = function (es)
@@ -5646,7 +5164,7 @@ Elm.Either.make = function (elm)
                                                    case
                                                    "Right" :
                                                      return {ctor: "::", _0: e._0, _1: vs};}
-                                                  _E.Case($moduleName,"between lines 69 and 75");
+                                                  _E.Case($moduleName,"between lines 61 and 63");
                                                 }();
                                        });
                     var rights = function (es)
@@ -6577,9 +6095,6 @@ function init(display, container, module, moduleToReplace) {
       }
       return changed;
   }
-
-  container.offsetX = 0;
-  container.offsetY = 0;
 
   var listeners = [];
   function addListener(relevantInputs, domNode, eventName, func) {
