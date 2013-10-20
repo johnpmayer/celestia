@@ -1,5 +1,5 @@
 
-all: build/index.html build/Cat.js
+all: build/index.html
 
 fresh: clean all
 
