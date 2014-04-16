@@ -25,12 +25,12 @@ import Mouse as M
 
 import Dict as D
 
-import open Draw
-import open Physics
-import open Data.TagTree
-import open Types
-import open Utils
-import open Data.Vec2
+import Draw (..)
+import Physics (..)
+import Data.TagTree (..)
+import Types (..)
+import Utils (..)
+import Data.Vec2 (..)
 
 buildPoints : LabelStructure -> [BuildPoint]
 buildPoints = 

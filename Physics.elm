@@ -20,10 +20,10 @@
 
 module Physics where
 
-import open Data.Vec2
-import open Data.TagTree
-import open Types
-import open Utils
+import Data.Vec2 (..)
+import Data.TagTree (..)
+import Types (..)
+import Utils (..)
 
 {- Mass -}
 

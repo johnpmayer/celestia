@@ -23,19 +23,19 @@ module Step where
 
 import Char as C
 import Dict as D
-import open Either
+import Either (..)
 
 import Control.State as ST
 import Control.State (State)
 
 import Data.Vec2 as V
 
-import open Data.TagTree
+import Data.TagTree (..)
 
-import open Types
-import open Utils
-import open Physics
-import open ShipWright
+import Types (..)
+import Utils (..)
+import Physics (..)
+import ShipWright (..)
 
 gamePaused : State GameState Bool
 gamePaused =

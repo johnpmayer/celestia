@@ -1,0 +1,6 @@
+{ "dependencies":
+      { "johnpmayer/state": "0.2.1"
+      , "johnpmayer/tagtree": "0.2.1"
+      , "johnpmayer/vec2": "0.2.2"
+      }
+}

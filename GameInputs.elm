@@ -21,7 +21,7 @@
 
 module GameInputs where
 
-import open Either
+import Either (..)
 
 import Char as C
 import Dict as D
@@ -32,8 +32,8 @@ import Mouse as M
 import Time as T
 import Window as W
 
-import open Types 
-import open Utils
+import Types  (..)
+import Utils (..)
 
 gameInputs : Signal GameInput
 -- TODO gameInputs = GameInput

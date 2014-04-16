@@ -21,20 +21,20 @@
 
 module Demo where
 
-import open Either
+import Either (..)
 
 import Dict (Dict)
 import Dict as D
 
-import open Physics
+import Physics (..)
 
 import Draw (drawEntity)
 import Control.State (execState)
 import Step (step)
 import GameInputs (gameInputs)
-import open Types
-import open Utils
-import open Data.Vec2
+import Types (..)
+import Utils (..)
+import Data.Vec2 (..)
 
 import Main (simpleShip)
 import ShipWright (addPhantom)

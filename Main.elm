@@ -25,11 +25,11 @@ import Char (toCode)
 import Keyboard as K
 import Mouse as M
 
-import open Draw 
-import open Physics 
-import open Types 
-import open Utils
-import open Data.Vec2
+import Draw  (..)
+import Physics  (..)
+import Types  (..)
+import Utils (..)
+import Data.Vec2 (..)
 
 attitude : EngineConfig -> Structure
 attitude ec = beam { r=10 } <|

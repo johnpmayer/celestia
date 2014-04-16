@@ -21,10 +21,10 @@
 
 module Utils where
 
-import open Dict
-import open Data.Vec2
+import Dict (..)
+import Data.Vec2 (..)
 
-import open Types
+import Types (..)
 
 cnst : a -> b -> a
 cnst x = \a -> x

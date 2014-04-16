@@ -20,16 +20,16 @@
 
 module Draw where
 
-import open Either
+import Either (..)
 import Graphics.Collage
 import Transform2D (Transform2D)
 import Transform2D as T
 
-import open Data.TagTree
-import open Data.Vec2
+import Data.TagTree (..)
+import Data.Vec2 (..)
 
-import open Physics
-import open Types 
+import Physics (..)
+import Types  (..)
 
 translation : Float -> Float -> Transform2D
 translation = T.matrix 1 0 0 1
