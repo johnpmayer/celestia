@@ -5,18 +5,14 @@ fresh: clean all
 
 SOURCES=*.elm
 
-RUNTIME="build/elm-runtime.js"
 ELM_VER=$(shell ghc-pkg latest Elm)
 
-${RUNTIME}: build
-	cp ${HOME}/.cabal/share/${ELM_VER}/elm-runtime.js build/
-
-ELM=elm --runtime elm-runtime.js ${CABINFLAGS}
+ELM=elm --bundle-runtime ${CABINFLAGS}
 
 build/index.html: build/Demo.html
 	cp build/Demo.html build/index.html
 
-build/Demo.html: ${RUNTIME} ${SOURCES}
+build/Demo.html: ${SOURCES}
 	${ELM} --make Demo.elm 
 
 build/Cat.js: ${RUNTIME} ${SOURCES}
