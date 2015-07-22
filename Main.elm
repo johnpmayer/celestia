@@ -20,16 +20,17 @@
 
 module Main where
 
-import Char (toCode)
+import Char exposing (toCode)
 
 import Keyboard as K
 import Mouse as M
+import Signal exposing (..)
 
-import Draw  (..)
-import Physics  (..)
-import Types  (..)
-import Utils (..)
-import Data.Vec2 (..)
+import Draw exposing (..)
+import Physics exposing (..)
+import Types exposing (..)
+import Utils exposing (..)
+import Data.Vec2 exposing (..)
 
 attitude : EngineConfig -> Structure
 attitude ec = beam { r=10 } <|
@@ -46,7 +47,7 @@ reverseR = beam { r=10 } <|
   [ ( { offset=10, theta=(pi/2) }, 
       part <| Engine {r=4, config=Reverse} ) ]
 
-mods : [(Attach, Structure)]
+mods : List (Attach, Structure)
 mods = 
   [ ({ offset=6, theta=(3*pi/2) }, reverseL)
   , ({ offset=6, theta=(pi/2) }, reverseR)
@@ -63,14 +64,14 @@ simpleShip = beam { r=50 } mods
 startPos : MotionState
 startPos = { pos = { x = 0, y = 0, theta = 0 }, v = { x = 0, y = 0 }, omega = 0 }
 
-control : { x:Int, y:Int } -> [ EngineConfig ]
+control : { x:Int, y:Int } -> List EngineConfig 
 control input = 
   (if input.y < 0 then [ Reverse ] else []) ++
   (if input.y > 0 then [ Forward ] else []) ++
   (if input.x > 0 then [ TurnRight ] else []) ++
   (if input.x < 0 then [ TurnLeft ] else [])
 
-engines : Signal [ EngineConfig ]
+engines : Signal (List EngineConfig) 
 engines = control <~ K.wasd
 
 brakes : Signal Bool

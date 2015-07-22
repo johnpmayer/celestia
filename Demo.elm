@@ -21,23 +21,26 @@
 
 module Demo where
 
-import Either (..)
-
-import Dict (Dict)
+import Color exposing (..)
+import Dict exposing (Dict)
 import Dict as D
+import Graphics.Collage exposing (..)
+import Graphics.Element exposing (..)
+import Signal exposing (..)
+import Time exposing (..)
 
-import Physics (..)
+import Physics exposing (..)
 
-import Draw (drawEntity)
-import Control.State (execState)
-import Step (step)
-import GameInputs (gameInputs)
-import Types (..)
-import Utils (..)
-import Data.Vec2 (..)
+import Draw exposing (drawEntity)
+import Control.State exposing (execState)
+import Step exposing (step)
+import GameInputs exposing (gameInputs)
+import Types exposing (..)
+import Utils exposing (..)
+import Data.Vec2 exposing (..)
 
-import Main (simpleShip)
-import ShipWright (addPhantom)
+import Main exposing (simpleShip)
+import ShipWright exposing (addPhantom)
 
 {- Setup initial game state and initialize the loop -}
 
@@ -45,19 +48,19 @@ spine : Structure
 spine = beam {r = 200} [ ( { offset=150, theta=(pi/2) }, beam { r=40 } [] ) ] 
 
 station : Entity
-station = { controls = Right [], motion = { pos = { x = 0, y = 200, theta = 0 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genEntityCache spine }
+station = { controls = Active [], motion = { pos = { x = 0, y = 200, theta = 0 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genEntityCache spine }
 
-initialShips : [Entity]
+initialShips : List Entity
 initialShips = 
-  [ { controls = Right [], motion = { pos = { x =   0, y =   0, theta = 0 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genEntityCache simpleShip }
-  , { controls = Right [], motion = { pos = { x =  60, y =  50, theta = 1 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genEntityCache simpleShip }
-  , { controls = Right [], motion = { pos = { x = -80, y =  40, theta = 4 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genEntityCache simpleShip }
-  , { controls = Right [], motion = { pos = { x = 120, y = -20, theta = 3 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genEntityCache simpleShip }
+  [ { controls = Active [], motion = { pos = { x =   0, y =   0, theta = 0 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genEntityCache simpleShip }
+  , { controls = Active [], motion = { pos = { x =  60, y =  50, theta = 1 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genEntityCache simpleShip }
+  , { controls = Active [], motion = { pos = { x = -80, y =  40, theta = 4 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genEntityCache simpleShip }
+  , { controls = Active [], motion = { pos = { x = 120, y = -20, theta = 3 }, v = { x = 0, y = 0 }, omega = 0 }, cache = genEntityCache simpleShip }
   ]
 
 initialEntities : Dict Int Entity
 initialEntities = 
-  D.fromList <| (4, station) :: (zip [0,1,2,3] initialShips)
+  D.fromList <| (4, station) :: (List.map2 [0,1,2,3] initialShips)
 
 initialState : GameState
 initialState = { entities = initialEntities, mode = initialMode, focus = 0, cache = genGameStateCache 0 initialEntities }
@@ -69,14 +72,14 @@ initialBuildMode : BuildMode
 initialBuildMode = { entity = 4, stage = Place, absRotate = Nothing, placement = Nothing, part = Nothing }
 
 current : Signal GameState
-current = foldp (execState . step) initialState gameInputs
+current = Signal.foldp (execState << step) initialState gameInputs
 
 withPhantom : Signal GameState
 withPhantom = addPhantom <~ current
 
 {- Render the display -}
 
-draw : Float -> GameState -> [Form]
+draw : Float -> GameState -> Form
 draw n gs = 
   let entities = D.values <| gs.entities
       camera = gs.cache.camera
@@ -87,12 +90,12 @@ draw n gs =
 main = combineSElems outward <|
   [ spaceBlack <~ (.window <~ gameInputs) ~ (draw <~ (fst <~ timestamp gameInputs) ~ withPhantom)
   , combineSElems down
-    [ (color white . asText) <~ constant "Celestia"
-    , (color white . asText) <~ constant "Use WASD to control your current ship, and X to brake"
-    , (color white . asText) <~ constant "Use 1-4 and the mouse to build parts on the skeleton structure"
-    , (color white . asText) <~ constant "Use C to cycle between ships, including the skeleton ship"
-    --, (color white . asText . prepend "Focus " . show . .focus) <~ current
-    , (color white . asText . prepend "Build Part " . show . .part . .build . .mode) <~ current
-    --, (color white . asText . prepend "Ship4 " . show . D.lookup 4 . .entities) <~ current
+    [ (color white << asText) <~ constant "Celestia"
+    , (color white << asText) <~ constant "Use WASD to control your current ship, and X to brake"
+    , (color white << asText) <~ constant "Use 1-4 and the mouse to build parts on the skeleton structure"
+    , (color white << asText) <~ constant "Use C to cycle between ships, including the skeleton ship"
+    --, (color white << asText << prepend "Focus " << show << .focus) <~ current
+    , (color white << asText << prepend "Build Part " << show << .part << .build << .mode) <~ current
+    --, (color white << asText << prepend "Ship4 " << show << D.lookup 4 << .entities) <~ current
     ]
   ]

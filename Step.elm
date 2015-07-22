@@ -23,19 +23,18 @@ module Step where
 
 import Char as C
 import Dict as D
-import Either (..)
 
 import Control.State as ST
-import Control.State (State)
+import Control.State exposing (State)
 
 import Data.Vec2 as V
 
-import Data.TagTree (..)
+import Data.TagTree exposing (..)
 
-import Types (..)
-import Utils (..)
-import Physics (..)
-import ShipWright (..)
+import Types exposing (..)
+import Utils exposing (..)
+import Physics exposing (..)
+import ShipWright exposing (..)
 
 gamePaused : State GameState Bool
 gamePaused =
@@ -138,7 +137,7 @@ rotateFocus =
   in
     ST.get >>= (\state ->
     let focus = state.focus
-        newFocus = (focus + 1) `mod` 5
+        newFocus = (focus + 1) % 5
         newState = { state | focus <- newFocus }
     in ST.put newState)
 
@@ -180,8 +179,8 @@ updatePhantom pointer =
       Nothing -> noStep
       Just _ ->
         let relPointerV = V.fromIntPair pointer
-            myShip = D.lookup state.focus state.entities
-            buildShip = D.lookup state.mode.build.entity state.entities
+            myShip = D.get state.focus state.entities
+            buildShip = D.get state.mode.build.entity state.entities
         in case (myShip, buildShip) of
           (Just myShip, Just buildShip) ->
             let absPointerV = V.addVec state.cache.camera relPointerV
@@ -214,7 +213,7 @@ focusControls input =
     ST.get >>= (\state ->
     let focus = state.focus
         entities = state.entities
-        myShip = D.lookup focus entities
+        myShip = D.get focus entities
     in case myShip of
       Nothing -> noStep
       Just e ->
@@ -226,8 +225,8 @@ focusControls input =
 entityPureStep : Entity -> Entity
 entityPureStep e =
   let newMotion = case e.controls of
-        Left _ -> updateBrakes e.cache e.motion
-        Right engines -> 
+        Brakes -> updateBrakes e.cache e.motion
+        Active engines -> 
           let delta = netDelta engines e.cache
           in updateMotion e.cache delta e.motion
   in { e | motion <- newMotion }
@@ -238,7 +237,7 @@ physicsStep =
       pure = ST.returnS
   in
     ST.get >>= (\state ->
-    let newEntities = D.map entityPureStep state.entities
+    let newEntities = D.map (\_ -> entityPureStep) state.entities
         focus = state.focus
         newCache = genGameStateCache focus newEntities
         newState = { state | entities <- newEntities, cache <- newCache }

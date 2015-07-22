@@ -20,32 +20,32 @@
 
 module Types where
 
-import Dict (Dict)
-import Either (Either)
+import Dict exposing (Dict)
+import Time exposing (Time)
 
-import Control.State (..)
-import Data.TagTree (..)
-import Data.Vec2 (..)
+import Control.State exposing (..)
+import Data.TagTree exposing (..)
+import Data.Vec2 exposing (..)
 
 {- Structures -}
 
-type Attach = { offset : Float, theta : Float }
+type alias Attach = { offset : Float, theta : Float }
 
 translateAttach : Attach -> Vec2Ext a -> Vec2Ext a
-translateAttach {offset,theta} = addVec {x=offset,y=0} . rotVec theta
+translateAttach {offset,theta} = addVec {x=offset,y=0} << rotVec theta
 
-type Beam = { r : Float }
+type alias Beam = { r : Float }
 
-type StructureExt a = TagTree Part a Attach
-type Structure = StructureExt Beam
+type alias StructureExt a = TagTree Part a Attach
+type alias Structure = StructureExt Beam
 
-beam : Beam -> [(Attach, Structure)] -> Structure
+beam : Beam -> List (Attach, Structure) -> Structure
 beam = Node
 
 part : Part -> Structure
 part = Leaf
 
-data EngineConfig = Disabled
+type EngineConfig = Disabled
                   | Forward 
                   | Reverse
                   | TurnLeft 
@@ -59,16 +59,16 @@ nextConfig e = case e of
   TurnLeft  -> TurnRight
   TurnRight -> Disabled
 
-data Part = Brain { r : Float }
+type Part = Brain { r : Float }
           | FuelTank { l : Float, w : Float }
           | Engine { r : Float, config : EngineConfig }
 
 {- Labeling -}
 
-type LabelBeamExt a = { a | id : Int }
-type LabelBeam = LabelBeamExt Beam
+type alias LabelBeamExt a = { a | id : Int }
+type alias LabelBeam = LabelBeamExt Beam
 
-type LabelStructure = TagTree Part LabelBeam Attach
+type alias LabelStructure = TagTree Part LabelBeam Attach
 
 fresh : State Int Int
 fresh =
@@ -84,58 +84,58 @@ labelBeams s =
 
 {- Physics -}
 
-type PointMass = Vec2Ext { m : Float }
+type alias PointMass = Vec2Ext { m : Float }
 
-data Moment = Point PointMass 
+type Moment = Point PointMass 
             | ParallelAxis (Vec2Ext { m : Float, localMoment : Float })
 
-type Thrust = { disp : Vec2, force : Vec2 }
+type alias Thrust = { disp : Vec2, force : Vec2 }
 
-type Position = Vec2Ext { theta : Float }
+type alias Position = Vec2Ext { theta : Float }
 
-type MotionState = { pos : Position, v : Vec2, omega : Float }
+type alias MotionState = { pos : Position, v : Vec2, omega : Float }
 
-type MotionDelta = { a : Vec2, alpha : Float }
+type alias MotionDelta = { a : Vec2, alpha : Float }
 
-type Entity = { controls : Either Brakes [EngineConfig], motion : MotionState, cache : EntityCache }
+type alias Entity = { controls : Controls, motion : MotionState, cache : EntityCache }
 
-type EntityCache = { structure : Structure, comOffset : Vec2, totalMass : Float, rotInertia : Float }
+type alias EntityCache = { structure : Structure, comOffset : Vec2, totalMass : Float, rotInertia : Float }
 
 {- GameInputs -}
 
-type GameInput = { engines : Either Brakes [EngineConfig], window : (Int,Int), trigger : Trigger }
+type alias GameInput = { engines : Controls, window : (Int,Int), trigger : Trigger }
 
-data Brakes = Brakes
+type Controls = Brakes | Active (List EngineConfig)
 
-data Trigger 
+type Trigger 
   = Click
   | Modal Modal
   | FPS Time
   | Pointer (Int,Int)
 
-data Modal
+type Modal
   = Pause
   | Cycle
   | Exit
   | Number Int
 
-type GameState = { entities : Dict Int Entity, mode : Mode, focus : Int, cache : GameStateCache }
+type alias GameState = { entities : Dict Int Entity, mode : Mode, focus : Int, cache : GameStateCache }
 
-type GameStateCache = { camera : Vec2 }
+type alias GameStateCache = { camera : Vec2 }
 
-type Mode = { pause : Bool, build : BuildMode }
+type alias Mode = { pause : Bool, build : BuildMode }
 
-type LabelDist = { id:Int, r:Float, offset:Float }
+type alias LabelDist = { id:Int, r:Float, offset:Float }
 
-type BuildPoint = {id : Int, start : Vec2, end : Vec2}
+type alias BuildPoint = {id : Int, start : Vec2, end : Vec2}
 
-type BuildCache = { localDisp : Vec2, relOrientation : Float }
+type alias BuildCache = { localDisp : Vec2, relOrientation : Float }
 
-data BuildStage
+type BuildStage
   = Place
   | Rotate BuildCache
 
-type BuildMode = { entity : Int, stage : BuildStage, absRotate : Maybe Float, placement : Maybe LabelDist, part : Maybe Structure }
+type alias BuildMode = { entity : Int, stage : BuildStage, absRotate : Maybe Float, placement : Maybe LabelDist, part : Maybe Structure }
 
-type GameStep = State GameState ()
+type alias GameStep = State GameState ()
 

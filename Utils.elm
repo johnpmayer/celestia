@@ -21,26 +21,31 @@
 
 module Utils where
 
-import Dict (..)
-import Data.Vec2 (..)
+import Color exposing (..)
+import Data.Vec2 exposing (..)
+import Dict exposing (..)
+import Graphics.Collage exposing (..)
+import Graphics.Element exposing (..)
+import Signal exposing (..)
+import Signal.Extra exposing (combine)
 
-import Types (..)
+import Types exposing (..)
 
 cnst : a -> b -> a
 cnst x = \a -> x
 
 convertPos : (Int,Int) -> (Int,Int) -> (Int,Int)
-convertPos (w,h) (x,y) = (x - div w 2, div h 2 - y)
+convertPos (w,h) (x,y) = (x - w // 2, h // 2 - y)
 
-combineSElems : Direction -> [Signal Element] -> Signal Element
+combineSElems : Direction -> List (Signal Element) -> Signal Element
 combineSElems dir ses = flow dir <~ combine ses
 
-spaceBlack : (Int,Int) -> [Form] -> Element
+spaceBlack : (Int,Int) -> List Form -> Element
 spaceBlack (w,h) stuff = collage w h <|
   (filled black <| rect (toFloat w) (toFloat h)) ::
   stuff
 
-controlEngines : { x:Int, y:Int } -> [ EngineConfig ]
+controlEngines : { x:Int, y:Int } -> List EngineConfig
 controlEngines input = 
   (if input.y < 0 then [ Reverse ] else []) ++
   (if input.y > 0 then [ Forward ] else []) ++
@@ -49,13 +54,13 @@ controlEngines input =
 
 updateDict : comparable -> (v -> v) -> Dict comparable v -> Dict comparable v
 updateDict k f d =
-  case lookup k d of
+  case get k d of
     Nothing -> d
     Just v -> insert k (f v) d
 
 genGameStateCache : Int -> Dict Int Entity -> GameStateCache
 genGameStateCache focus entities = 
-  let camera = case lookup focus entities of
+  let camera = case get focus entities of
     Nothing -> origin
     Just e ->
       let pos = e.motion.pos
@@ -69,3 +74,8 @@ prepend p s = p ++ s
 
 rndModulo : Float -> Float -> Float
 rndModulo f n = f * (toFloat (round (n / f)))
+
+justs : List (Maybe a) -> List a
+justs = List.foldl (\mx xs -> case mx of
+  Nothing -> xs
+  Just x -> x :: xs) []

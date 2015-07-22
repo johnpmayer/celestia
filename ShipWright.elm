@@ -21,25 +21,25 @@
 
 module ShipWright where
 
+import List exposing (concat, foldl, map)
 import Mouse as M
-
 import Dict as D
 
-import Draw (..)
-import Physics (..)
-import Data.TagTree (..)
-import Types (..)
-import Utils (..)
-import Data.Vec2 (..)
+import Draw exposing (..)
+import Physics exposing (..)
+import Data.TagTree exposing (..)
+import Types exposing (..)
+import Utils exposing (..)
+import Data.Vec2 exposing (..)
 
-buildPoints : LabelStructure -> [BuildPoint]
+buildPoints : LabelStructure -> List BuildPoint
 buildPoints = 
   let partPoints = cnst []
       beamPoint beam = 
         { id = beam.id, start = origin, end = {x=beam.r,y=0}}
       beamPoints beam subs = beamPoint beam :: concat subs
       attachPoint {offset,theta} bp = 
-        let place = addVec {x=offset,y=0} . rotVec theta
+        let place = addVec {x=offset,y=0} << rotVec theta
         in { bp | start <- place bp.start, end <- place bp.end }
       attachPoints attach = map (attachPoint attach)
   in foldTagTree partPoints beamPoints attachPoints
@@ -52,7 +52,7 @@ pointDist pointerV bp =
 compareDists : LabelDist -> LabelDist -> LabelDist
 compareDists p1 p2 = if p1.r < p2.r then p1 else p2
 
-minPointDist : Vec2 -> [BuildPoint] -> LabelDist
+minPointDist : Vec2 -> List BuildPoint -> LabelDist
 minPointDist pointerV bps = 
   let minDist = 50
       fakePoint = { id=-1, r=minDist, offset=0 }
@@ -61,7 +61,7 @@ minPointDist pointerV bps =
 
 bestPlacement : Vec2 -> Entity -> LabelDist
 bestPlacement localPointerV entity =
-  minPointDist localPointerV . buildPoints . labelBeams <| entity.cache.structure
+  minPointDist localPointerV << buildPoints << labelBeams <| entity.cache.structure
 
 walkLocalDisp : LabelDist -> Entity -> Maybe BuildCache
 walkLocalDisp placement e = 
@@ -106,7 +106,7 @@ placePhantomPart p theta best e =
 fixPhantom : GameState -> Maybe BuildCache
 fixPhantom state = 
   let buildMode = state.mode.build
-      e = D.lookup buildMode.entity state.entities
+      e = D.get buildMode.entity state.entities
       placement = buildMode.placement
   in case (e, placement) of
     (Just e, Just best) -> walkLocalDisp best e

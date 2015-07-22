@@ -20,23 +20,25 @@
 
 module Draw where
 
-import Either (..)
-import Graphics.Collage
-import Transform2D (Transform2D)
+import Color exposing (..)
+import Graphics.Collage exposing (..)
+import List exposing (any)
+import Time exposing (Time)
+import Transform2D exposing (Transform2D)
 import Transform2D as T
 
-import Data.TagTree (..)
-import Data.Vec2 (..)
+import Data.TagTree exposing (..)
+import Data.Vec2 exposing (..)
 
-import Physics (..)
-import Types  (..)
+import Physics exposing (..)
+import Types exposing (..)
 
 translation : Float -> Float -> Transform2D
 translation = T.matrix 1 0 0 1
 
-drawPart : Time -> [EngineConfig] -> Part -> Form
+drawPart : Time -> List EngineConfig -> Part -> Form
 drawPart noise ecs part =
-  let hashedNoise = mod (truncate noise) 150
+  let hashedNoise = (truncate noise) % 150
       gasColor = rgb 255 (255 - hashedNoise) 0
   in case part of
     (Brain size) -> 
@@ -45,9 +47,9 @@ drawPart noise ecs part =
       filled green <| rect size.l size.w 
     (Engine engine) -> 
       group <|
-        (rotate pi . filled red <| ngon 3 engine.r) ::
+        (rotate pi << filled red <| ngon 3 engine.r) ::
         (if any (\ec -> ec == engine.config) ecs
-        then [ move ((0.4 * engine.r), 0) . rotate pi . filled gasColor <| ngon 3 (engine.r * 0.8) ]
+        then [ move ((0.4 * engine.r), 0) << rotate pi << filled gasColor <| ngon 3 (engine.r * 0.8) ]
         else [])
 
 drawAttach : Attach -> Form -> Form
@@ -55,14 +57,14 @@ drawAttach {offset,theta} subForm =
   let modelM = T.multiply (translation offset 0) (T.rotation theta)
   in groupTransform modelM [subForm]
 
-drawBeam : Beam -> [Form] -> Form
+drawBeam : Beam -> List Form -> Form
 drawBeam beam subForms =
   let l = beam.r
       w = 2
-      beamForm = move (l * 0.5, 0) . filled white <| rect l w
+      beamForm = move (l * 0.5, 0) << filled white <| rect l w
   in group (beamForm :: subForms)
 
-drawStructure : Time -> [EngineConfig] -> Structure -> Form
+drawStructure : Time -> List EngineConfig -> Structure -> Form
 drawStructure noise ec structure =
   foldTagTree (drawPart noise ec) drawBeam drawAttach structure
 
@@ -72,8 +74,8 @@ drawEntity noise { controls, motion, cache } =
       moveM = translation motion.pos.x motion.pos.y
       modelM = T.multiply moveM rotM
       engines = case controls of
-        Left _ -> []
-        Right ecs -> ecs
+        Brakes -> []
+        Active ecs -> ecs
   in groupTransform modelM <| [ drawStructure noise engines cache.structure ]
 
 drawBuildArea : BuildMode -> Form

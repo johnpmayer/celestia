@@ -20,20 +20,21 @@
 
 module Physics where
 
-import Data.Vec2 (..)
-import Data.TagTree (..)
-import Types (..)
-import Utils (..)
+import Data.Vec2 exposing (..)
+import Data.TagTree exposing (..)
+import List exposing (any, concat, map, sum)
+import Types exposing (..)
+import Utils exposing (..)
 
 {- Mass -}
 
-sumMasses : [PointMass] -> Float
-sumMasses = sum . map (\pm -> pm.m)
+sumMasses : List PointMass -> Float
+sumMasses = sum << map (\pm -> pm.m)
 
 massContrib : PointMass -> Vec2
 massContrib pm = scaleVec pm.m <| extractVec pm
 
-partMasses : Part -> [PointMass]
+partMasses : Part -> List PointMass
 partMasses part = 
   let m = case part of
     (Brain size)    -> 3 * size.r * size.r
@@ -41,30 +42,30 @@ partMasses part =
     (Engine size)   -> 2 * size.r * size.r
   in [{ x=0, y=0, m=m }]
 
-beamMasses : Beam -> [[PointMass]] -> [PointMass]
+beamMasses : Beam -> List (List PointMass) -> List PointMass
 beamMasses beam subs = {x = beam.r / 2, y = 0, m = 0.1 * beam.r} :: concat subs 
 
-attachMasses : Attach -> [PointMass] -> [PointMass]
+attachMasses : Attach -> List PointMass -> List PointMass
 attachMasses attach = map (translateAttach attach)
 
-structureMasses : Structure -> [PointMass]
+structureMasses : Structure -> List PointMass
 structureMasses = foldTagTree partMasses beamMasses attachMasses
 
 totalMass : Structure -> Float
-totalMass = sumMasses . structureMasses
+totalMass = sumMasses << structureMasses
 
 centerOfMass : Structure -> Vec2
 centerOfMass structure = 
-  scaleVec (1 / totalMass structure) .
-  sumVec .
-  map massContrib .
+  scaleVec (1 / totalMass structure) <<
+  sumVec <<
+  map massContrib <<
   structureMasses <|
   structure
 
-partMoment : Part -> [Moment]
-partMoment = map Point . partMasses
+partMoment : Part -> List Moment
+partMoment = map Point << partMasses
 
-beamMoment : Beam -> [[Moment]] -> [Moment]
+beamMoment : Beam -> List (List Moment) -> List Moment
 beamMoment beam subs = 
   let m = 0.1 * beam.r
       parallel = { x = beam.r / 2, y = 0, m = m, localMoment = (1/12) * m * beam.r * beam.r }
@@ -86,10 +87,10 @@ translateMoment a m = case m of
   Point pm -> Point <| translateAttach a pm
   ParallelAxis pa -> ParallelAxis <| translateAttach a pa
 
-attachMoment : Attach -> [Moment] -> [Moment]
+attachMoment : Attach -> List Moment -> List Moment
 attachMoment attach = map (translateMoment attach)
 
-structureMoments : Structure -> [Moment]
+structureMoments : Structure -> List Moment
 structureMoments = foldTagTree partMoment beamMoment attachMoment
 
 momentContrib : Moment -> Float
@@ -108,9 +109,9 @@ rotInertiaContrib pm =
 
 rotInertia : Structure -> Float
 rotInertia structure = 
-  sum .
-  map momentContrib .
-  map (momentMapVec (subVec <| centerOfMass structure)) .
+  sum <<
+  map momentContrib <<
+  map (momentMapVec (subVec <| centerOfMass structure)) <<
   structureMoments <|
   structure
 
@@ -123,7 +124,7 @@ genEntityCache s = EntityCache
 
 {- Thrust -}
 
-partThrusts : [EngineConfig] -> Part -> [Thrust]
+partThrusts : List EngineConfig -> Part -> List Thrust
 partThrusts ecs part = 
   case part of
     (Engine engine) -> 
@@ -133,45 +134,45 @@ partThrusts ecs part =
       else [] 
     _ -> []
 
-beamThrusts : Beam -> [[Thrust]] -> [Thrust]
+beamThrusts : Beam -> List (List Thrust) -> List Thrust
 beamThrusts = cnst concat
 
-attachThrusts : Attach -> [Thrust] -> [Thrust]
+attachThrusts : Attach -> List Thrust -> List Thrust
 attachThrusts attach ts = 
   let offsetDisp t = { t | disp <- addVec { x = attach.offset, y = 0 } t.disp }
       rotateDisp t = { t | disp <- rotVec attach.theta t.disp }
       rotateForce t = { t | force <- rotVec attach.theta t.force }
-  in map (offsetDisp . rotateDisp . rotateForce) <| ts
+  in map (offsetDisp << rotateDisp << rotateForce) <| ts
 
-structureThrusts : [EngineConfig] -> Structure -> [Thrust]
+structureThrusts : List EngineConfig -> Structure -> List Thrust
 structureThrusts ec = foldTagTree (partThrusts ec) beamThrusts attachThrusts
 
 {- Entity Physics -}
 
-netForce : [EngineConfig] -> EntityCache -> Vec2
+netForce : List EngineConfig -> EntityCache -> Vec2
 netForce controls cache = 
-  sumVec . map .force <| structureThrusts controls cache.structure
+  sumVec << map .force <| structureThrusts controls cache.structure
 
-netAcceleration : [EngineConfig] -> EntityCache -> Vec2
+netAcceleration : List EngineConfig -> EntityCache -> Vec2
 netAcceleration controls cache = 
   scaleVec (1 / cache.totalMass) <| netForce controls cache
 
 torqueMag : Thrust -> Float
 torqueMag t = crossVecMag t.disp t.force
 
-netTorque : [EngineConfig] -> EntityCache -> Float
+netTorque : List EngineConfig -> EntityCache -> Float
 netTorque controls cache =
   let com = cache.comOffset
       thrusts = structureThrusts controls cache.structure
       center thrust = { thrust | disp <- subVec com thrust.disp }
       torqueForces = map center thrusts
-  in sum . map torqueMag <| torqueForces 
+  in sum << map torqueMag <| torqueForces 
 
-netRotAcceleration : [EngineConfig] -> EntityCache -> Float
+netRotAcceleration : List EngineConfig -> EntityCache -> Float
 netRotAcceleration controls cache = 
   netTorque controls cache / cache.rotInertia
 
-netDelta : [EngineConfig] -> EntityCache -> MotionDelta
+netDelta : List EngineConfig -> EntityCache -> MotionDelta
 netDelta controls cache = MotionDelta
   (netAcceleration controls cache)
   (netRotAcceleration controls cache)

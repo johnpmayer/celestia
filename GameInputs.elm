@@ -21,19 +21,18 @@
 
 module GameInputs where
 
-import Either (..)
-
 import Char as C
 import Dict as D
-import Dict (Dict)
+import Dict exposing (Dict)
 import Keyboard as K
-import Keyboard (KeyCode)
+import Keyboard exposing (KeyCode)
 import Mouse as M
+import Signal exposing (..)
 import Time as T
 import Window as W
 
-import Types  (..)
-import Utils (..)
+import Types  exposing (..)
+import Utils exposing (..)
 
 gameInputs : Signal GameInput
 -- TODO gameInputs = GameInput
@@ -45,15 +44,15 @@ gameInputs = sampleOn triggers <| (\engines window trigger -> { engines=engines,
 dimensions : Signal (Int, Int)
 dimensions = W.dimensions
 
-engines : Signal (Either Brakes [EngineConfig])
+engines : Signal Controls
 engines =
-  let brakes = K.isDown . C.toCode <| 'x'
+  let brakes = K.isDown << C.toCode <| 'x'
       controls = controlEngines <~ K.wasd
-      override b ecs = if b then Left Brakes else Right ecs
+      override b ecs = if b then Brakes else Active ecs
   in override <~ brakes ~ controls
 
 triggers : Signal Trigger
-triggers = merges [ clicks, modes, ticks, pointer ]
+triggers = mergeMany [ clicks, modes, ticks, pointer ]
 
 clicks : Signal Trigger
 clicks = (cnst Click) <~ M.clicks
@@ -73,8 +72,9 @@ watchKeymap = D.fromList
 modeKeysDown : Signal Modal
 modeKeysDown =
   let watchKeys = D.toList watchKeymap
-      keysDown = map (\(kc,modal) -> lift (cnst modal) . keepIf id True <| K.isDown kc) watchKeys
-  in merges keysDown
+      keysDown : List (Signal Modal) 
+      keysDown = List.map (\(kc,modal) -> Signal.map (cnst modal) << filter identity True <| K.isDown kc) watchKeys
+  in mergeMany keysDown
 
 modes : Signal Trigger
 modes = Modal <~ modeKeysDown
