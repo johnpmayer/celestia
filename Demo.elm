@@ -27,6 +27,7 @@ import Dict as D
 import Graphics.Collage exposing (..)
 import Graphics.Element exposing (..)
 import Signal exposing (..)
+import Text exposing (fromString)
 import Time exposing (..)
 
 import Physics exposing (..)
@@ -60,7 +61,7 @@ initialShips =
 
 initialEntities : Dict Int Entity
 initialEntities = 
-  D.fromList <| (4, station) :: (List.map2 [0,1,2,3] initialShips)
+  D.fromList <| (4, station) :: (List.map2 (,) [0,1,2,3] initialShips)
 
 initialState : GameState
 initialState = { entities = initialEntities, mode = initialMode, focus = 0, cache = genGameStateCache 0 initialEntities }
@@ -79,14 +80,17 @@ withPhantom = addPhantom <~ current
 
 {- Render the display -}
 
-draw : Float -> GameState -> Form
+draw : Float -> GameState -> List Form
 draw n gs = 
   let entities = D.values <| gs.entities
       camera = gs.cache.camera
       cameraTransform = vecTranslate <| negVec camera
-      entityForms = map (drawEntity <| n) entities
+      entityForms = List.map (drawEntity <| n) entities
   in [groupTransform cameraTransform <| entityForms]
 
+asText = leftAligned << fromString
+
+main : Signal Element
 main = combineSElems outward <|
   [ spaceBlack <~ (.window <~ gameInputs) ~ (draw <~ (fst <~ timestamp gameInputs) ~ withPhantom)
   , combineSElems down
@@ -95,7 +99,7 @@ main = combineSElems outward <|
     , (color white << asText) <~ constant "Use 1-4 and the mouse to build parts on the skeleton structure"
     , (color white << asText) <~ constant "Use C to cycle between ships, including the skeleton ship"
     --, (color white << asText << prepend "Focus " << show << .focus) <~ current
-    , (color white << asText << prepend "Build Part " << show << .part << .build << .mode) <~ current
+    --, (color white << asText << prepend "Build Part " << show << .part << .build << .mode) <~ current
     --, (color white << asText << prepend "Ship4 " << show << D.lookup 4 << .entities) <~ current
     ]
   ]
