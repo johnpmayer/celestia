@@ -98,8 +98,9 @@ main = combineSElems outward <|
     , (color white << asText) <~ constant "Use WASD to control your current ship, and X to brake"
     , (color white << asText) <~ constant "Use 1-4 and the mouse to build parts on the skeleton structure"
     , (color white << asText) <~ constant "Use C to cycle between ships, including the skeleton ship"
-    --, (color white << asText << prepend "Focus " << show << .focus) <~ current
-    --, (color white << asText << prepend "Build Part " << show << .part << .build << .mode) <~ current
-    --, (color white << asText << prepend "Ship4 " << show << D.lookup 4 << .entities) <~ current
+    --, (color white << asText << prepend "Focus " << toString << .focus) <~ current
+    --, (color white << asText << prepend "ModeKey " << toString) <~ current
+    , (color white << asText << prepend "Build Part " << toString << .part << .build << .mode) <~ current
+    --, (color white << asText << prepend "Ship4 " << toString << D.get 4 << .entities) <~ current
     ]
   ]

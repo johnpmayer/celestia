@@ -46,7 +46,7 @@ dimensions = W.dimensions
 
 engines : Signal Controls
 engines =
-  let brakes = K.isDown << C.toCode <| 'x'
+  let brakes = K.isDown << C.toCode <| 'X'
       controls = controlEngines <~ K.wasd
       override b ecs = if b then Brakes else Active ecs
   in override <~ brakes ~ controls
@@ -64,8 +64,8 @@ watchKeymap = D.fromList
   , (C.toCode '3', Number 3)
   , (C.toCode '4', Number 4)
   , (C.toCode '5', Number 5)
-  , (C.toCode 'p', Pause)
-  , (C.toCode 'c', Cycle)
+  , (C.toCode 'P', Pause)
+  , (C.toCode 'C', Cycle)
   , (27, Exit)
   ]
 
